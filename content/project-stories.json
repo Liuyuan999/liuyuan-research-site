@@ -37,27 +37,35 @@
     "notation": [
       [
         "w",
-        "Scalar weight; the bi-objective weight vector is [w, 1 − w]."
+        "Scalarization weight in [0, 1]; the two objective weights are w and 1 − w."
       ],
       [
         "f_PF(w)",
-        "Objective vector on the scalarization-induced Pareto-front path."
+        "Objective vector at a scalarized optimum, defining the front path in Equation 4."
       ],
       [
         "v(w)",
-        "Traversal speed: the norm of the weight derivative of f_PF(w)."
+        "Speed of that path in objective space."
       ],
       [
         "s(w)",
-        "Arc length traversed from weight 0 to weight w."
+        "Cumulative arc length from weight 0 to w. In the integral, p is a dummy weight variable."
       ],
       [
         "Φ(w)",
-        "Normalized arc length s(w)/s(1), exactly as in Equation 5."
+        "Normalized arc length s(w)/s(1), the CDF in Equation 5."
       ],
       [
-        "N",
-        "Number of front segments; n runs from 0 to N, giving N + 1 solutions."
+        "N, n",
+        "N front segments give N + 1 solution slots indexed by n = 0, …, N."
+      ],
+      [
+        "Φₜ, Φ̃ₜ",
+        "Current CDF estimate and the reconstructed CDF at outer iteration t."
+      ],
+      [
+        "α",
+        "Damping parameter for the CDF update in Algorithm 1."
       ]
     ],
     "anchor": "Section 3 · Algorithm 1 and Theorem 1",
@@ -121,12 +129,12 @@
     ],
     "notation": [
       [
-        "(i, d)",
-        "Stock i and trading date d, the experimental stock-day unit."
+        "i, d",
+        "Stock and trading-date indices. Together they identify one stock-day."
       ],
       [
-        "t",
-        "Sequential decision interval; t runs from 1 to T."
+        "t, T",
+        "Decision-interval index and total number of intervals in that stock-day."
       ],
       [
         "p_idt",
@@ -134,15 +142,19 @@
       ],
       [
         "r_idt",
-        "Research-return label for that interval, revealed after the action."
+        "Following interval’s research-return label, revealed after the action."
       ],
       [
         "p̄_id",
-        "Mean long exposure on stock-day (i, d)."
+        "Mean long exposure over the stock-day."
       ],
       [
         "A_id(p, r)",
-        "Exposure-matched timing on that stock-day, Equation 1."
+        "Exposure-matched timing score in Equation 1. The tables average stock-day scores."
+      ],
+      [
+        "w",
+        "Memory window: number of earlier memories supplied in addition to the current memory."
       ]
     ],
     "anchor": "Equation 1 · Timing decomposition",
@@ -211,36 +223,44 @@
     ],
     "notation": [
       [
-        "x / x̃",
+        "x, x̃",
         "Unmasked normalized speech sequence and its masked view."
       ],
       [
         "θ",
-        "Parameters of the K-layer acoustic encoder."
+        "Parameters of the shared acoustic encoder."
+      ],
+      [
+        "k, K",
+        "Target-generating intermediate layer and total encoder depth."
       ],
       [
         "z^(k)(θ; x)",
-        "Normalized intermediate representation at layer k."
+        "Normalized representation at layer k."
       ],
       [
         "y(x)",
-        "Raw-input anchoring label, Equation 2."
+        "Raw-input anchoring label in Equation 2."
       ],
       [
         "y^(k)(θ; x)",
-        "Differentiable enhanced label, Equation 4."
+        "Differentiable enhanced label in Equation 4."
       ],
       [
-        "F(θ) / G(θ)",
-        "Enhanced-label and anchoring-label masked-frame cross-entropy."
+        "F(θ), G(θ)",
+        "Enhanced-label and anchor-label masked-frame cross-entropy losses."
       ],
       [
-        "S_δ(θ)",
-        "Anchor-loss feasible set, Equation 8."
+        "S_δ(θ), δ",
+        "Anchor-loss feasible set and its allowed gap above the optimum. θ′ is the variable in the anchor-loss minimum."
       ],
       [
         "w₁, w₂",
-        "Loss weights; w₂/w₁ is the penalty constant in Equation 9."
+        "Enhanced and anchoring loss weights. Their ratio is the penalty constant in Equation 9."
+      ],
+      [
+        "η",
+        "Learning rate in Algorithm 1."
       ]
     ],
     "anchor": "Section 3 · Equation 8 and Algorithm 1",
@@ -304,28 +324,44 @@
     ],
     "notation": [
       [
+        "x, y",
+        "Upper-level and lower-level variables."
+      ],
+      [
+        "f(x, y), g(x, y)",
+        "Upper-level and lower-level objectives, respectively."
+      ],
+      [
+        "γ",
+        "Penalty constant on the lower-level optimality gap."
+      ],
+      [
+        "Y, Ỹ, Y(x)",
+        "Base lower-level domain, fixed feasible set, and feasible set depending on x."
+      ],
+      [
+        "c(x, y)",
+        "Vector of lower-level inequality constraints."
+      ],
+      [
+        "v(x), vγ(x)",
+        "Original and perturbed lower-level minimum values, defined below. y_g and y_γ are the respective minimization variables."
+      ],
+      [
         "F̃γ(x, y)",
         "Joint penalty objective in Equation 3."
       ],
       [
         "Fγ(x)",
-        "Reduced objective γ(vγ(x) − v(x)), Equation 5."
-      ],
-      [
-        "v(x) / vγ(x)",
-        "Original and perturbed lower-level value functions."
-      ],
-      [
-        "Ỹ / Y(x)",
-        "Fixed feasible set and coupled feasible set, respectively."
+        "Reduced penalty objective after minimizing over the feasible lower variable."
       ],
       [
         "λ_g^*(x)",
-        "Original lower-level constraint multiplier used in the coupled analysis."
+        "Constraint multiplier at an original lower-level optimum."
       ],
       [
-        "γ",
-        "Penalty parameter, distinct from the outer iteration count."
+        "α, δ",
+        "Exponent and residual in the upper-level flatness condition used for PBGD-Free."
       ]
     ],
     "anchor": "Theorems 3.1, 4.1, 5.1, and 5.2 · current arXiv version",
@@ -372,27 +408,43 @@
     ],
     "notation": [
       [
-        "y_g^*(x)",
-        "A lower-level optimum in S_g^*(x)."
+        "x, y",
+        "Upper-level and lower-level variables."
       ],
       [
-        "y_γ^*(x)",
-        "A minimizer of the perturbed penalty objective; distinct from y_g^*(x)."
-      ],
-      [
-        "y_t^γ",
-        "The perturbed lower-level iterate after K tracking steps at outer iteration t."
-      ],
-      [
-        "c, α, δ",
-        "Modulus, exponent, and residual in Definition 1."
+        "f(x, y), g(x, y)",
+        "Upper-level and lower-level objectives, respectively."
       ],
       [
         "γ",
-        "Penalty constant, independent of the iteration counters."
+        "Penalty constant in Equation 2."
       ],
       [
-        "η / η^γ",
+        "F̃γ(x, y), Fγ(x)",
+        "Joint and reduced penalty objectives in Equation 2. z is the lower-variable dummy in the inner minimum."
+      ],
+      [
+        "S_g^*(x), y_g^*(x)",
+        "Set of lower-level minimizers of g and a solution in that set."
+      ],
+      [
+        "S_γ^*(x), y_γ^*(x)",
+        "Set of minimizers of the joint penalty objective and a solution in that set."
+      ],
+      [
+        "c, α, δ",
+        "Flatness modulus, distance exponent, and residual in Definition 1."
+      ],
+      [
+        "t, T, k, K",
+        "Outer-iteration index and budget, followed by lower-tracking-step index and budget."
+      ],
+      [
+        "y_{t,k}^γ, y_t^γ",
+        "Perturbed lower iterate during tracking and the iterate after K tracking steps."
+      ],
+      [
+        "η, η^γ",
         "Outer and lower tracking step sizes in Algorithm 1."
       ]
     ],
@@ -472,28 +524,52 @@
     ],
     "notation": [
       [
-        "Hγ(x, y)",
-        "Joint penalty objective, Equation 2."
+        "x, y",
+        "Upper-level and lower-level variables."
       ],
       [
-        "Fγ(x)",
-        "Reduced penalty objective, Equation 3."
+        "f(x, y), g(x, y)",
+        "Upper-level and lower-level objectives, respectively."
       ],
       [
-        "v(x) / vγ(x)",
-        "Original and perturbed lower-level value functions, Equation 3."
+        "γ",
+        "Penalty constant in the joint objective."
       ],
       [
-        "y_g^*(x) / y_γ^*(x)",
-        "Original and perturbed lower-level optimal responses."
+        "X, Y, Y(x)",
+        "Upper domain, base lower domain, and lower feasible set depending on x."
+      ],
+      [
+        "c(x, y)",
+        "Vector of lower-level inequality constraints."
+      ],
+      [
+        "v(x), vγ(x)",
+        "Original and perturbed lower-level minimum values. y_g and y_γ are the corresponding minimization variables."
+      ],
+      [
+        "Hγ(x, y), Fγ(x)",
+        "Joint penalty objective and its reduced objective after lower minimization."
+      ],
+      [
+        "y_g^*(x), y_γ^*(x)",
+        "Original and perturbed optimal lower responses."
       ],
       [
         "λ_g^*(x)",
-        "Original lower-level multiplier in Equation 7."
+        "Original lower-level constraint multiplier in Equation 7."
+      ],
+      [
+        "d, D²_dd",
+        "Unit direction and second-order directional derivative along d."
+      ],
+      [
+        "η, Gη(x)",
+        "Outer step size and projected-gradient mapping, defined below."
       ],
       [
         "ε",
-        "Tolerance in the squared generalized-gradient criterion."
+        "Tolerance for the squared generalized-gradient norm. Proj denotes Euclidean projection onto the indicated domain."
       ]
     ],
     "anchor": "Sections III–IV · Reduced smoothness and convergence",
@@ -540,28 +616,40 @@
     ],
     "notation": [
       [
-        "x",
-        "Upper-level variable in the domain 𝒳."
+        "x, y",
+        "Upper-level and lower-level variables."
       ],
       [
-        "y_g^*(x)",
-        "Unique constrained lower-level optimum, Equation 1b."
+        "f(x, y), g(x, y)",
+        "Upper-level and lower-level objectives, respectively."
+      ],
+      [
+        "X, Y, Y(x)",
+        "Upper domain, base lower domain, and coupled lower feasible set."
       ],
       [
         "g^c(x, y)",
-        "Coupled lower-level inequality constraints, Equation 1b."
+        "Vector of coupled inequality constraints in Equation 1b."
       ],
       [
-        "μ_g^*(x)",
-        "Lower-level Lagrange multiplier in Equation 7."
+        "y_g^*(x), μ_g^*(x)",
+        "Original lower-level optimal response and its constraint multiplier."
       ],
       [
         "y_F^*(x), μ_F^*(x)",
-        "Primal-dual solution of the penalty subproblem, Equation 5."
+        "Primal-dual solution of the penalty subproblem in Equation 5."
       ],
       [
-        "Fγ(x) / v(x)",
-        "Penalty reformulation and original lower-level value, Equation 2."
+        "v(x)",
+        "Original lower-level minimum value in Equation 2b."
+      ],
+      [
+        "Fγ(x), γ",
+        "Primal-dual penalty reformulation in Equation 2 and its penalty constant."
+      ],
+      [
+        "ε",
+        "Tolerance for the squared generalized-gradient stationarity criterion."
       ]
     ],
     "anchor": "Section 3 · Value-function derivative and convergence",

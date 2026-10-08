@@ -1,6 +1,6 @@
 {
   "name": "Liuyuan Jiang",
-  "role": "PhD student \u00b7 Electrical & Computer Engineering",
+  "role": "PhD student · Electrical & Computer Engineering",
   "institution": "University of Rochester",
   "links": [
     {
@@ -30,5 +30,6 @@
     "width": 1122,
     "height": 1402,
     "source": "User-supplied jiang.PNG, preserved unchanged"
-  }
+  },
+  "email": "ljiang24@ur.rochester.edu"
 }

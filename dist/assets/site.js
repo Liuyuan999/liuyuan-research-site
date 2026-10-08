@@ -46,10 +46,22 @@ for(const d of document.querySelectorAll('[data-demo]')){
   d.querySelectorAll('[data-action]').forEach((b,i)=>b.addEventListener('click',()=>{ps[i]=1-ps[i];update();}));d.querySelector('[data-invert]').addEventListener('click',()=>{ps=ps.map(x=>1-x);update();});d.querySelector('[data-reset]').addEventListener('click',()=>{ps=[1,0,1,0,1,0];update();});update();
  }
  if(type==='curvature'){
+  // Keep the coordinate system fixed so only the joint slice changes with gamma.
+  const ceiling=12,xPixel=x=>70+510*(x+1)/2,yPixel=value=>250-220*value/ceiling;
   const update=()=>{const gamma=+range.value;d.querySelector('[data-count]').textContent=gamma;
-   const points=f=>Array.from({length:101},(_,i)=>{const x=-1+2*i/100;return[65+510*i/100,245-215*f(x)/(gamma+.5)];});
-   draw(d,[{points:points(x=>x*x/2+gamma*x*x),color:'#354ac6'},{points:points(x=>x*x/2),color:'#008274'}],[],[],'x (−1 to 1)',`Value (0 to ${(gamma+.5).toFixed(1)})`);
-   d.querySelector('[data-metric]').textContent=`Fixed-slice curvature: ${1+2*gamma} · reduced curvature: 1`;};range.addEventListener('input',update);update();
+   const g=d.querySelector('[data-plot]');g.replaceChildren();
+   for(const value of [0,2,4,6,8,10,12]){const y=yPixel(value);g.append(node('path',{d:`M70 ${y} H580`,stroke:'#e2e7f0',fill:'none'}));g.append(node('text',{x:58,y:y+5,'text-anchor':'end','font-size':14,fill:'#546176','data-curvature-tick':value},String(value)));}
+   g.append(node('path',{d:'M70 30 V250 H580',stroke:'#9aabc7',fill:'none'}));
+   for(const x of [-1,0,1])g.append(node('text',{x:xPixel(x),y:271,'text-anchor':'middle','font-size':14,fill:'#546176'},String(x)));
+   for(const [key,coefficient,color] of [['joint',gamma+.5,'#354ac6'],['reduced',.5,'#008274']]){
+    const points=Array.from({length:121},(_,i)=>{const x=-1+2*i/120;return[xPixel(x),yPixel(coefficient*x*x)];});
+    g.append(node('polyline',{points:points.map(p=>p.join(',')).join(' '),fill:'none',stroke:color,'stroke-width':3.5,'data-curvature-curve':key}));
+    g.append(node('circle',{cx:xPixel(1),cy:yPixel(coefficient),r:5,fill:color,stroke:'white','stroke-width':1.5}));
+   }
+   g.append(node('text',{x:325,y:296,'text-anchor':'middle','font-size':15,fill:'#546176'},'Upper variable x'));
+   g.append(node('text',{x:22,y:140,'text-anchor':'middle',transform:'rotate(-90 22 140)','font-size':15,fill:'#546176'},'Objective value'));
+   d.querySelector('[data-metric]').textContent=`Fixed-slice curvature: ${1+2*gamma} · reduced curvature: 1`;
+  };range.addEventListener('input',update);update();
  }
  if(type==='speech'){
   const update=source=>{const enhanced=source==='enhanced';d.querySelectorAll('[data-source]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.source===source));b.classList.toggle('primary',b.dataset.source===source);});d.querySelectorAll('[data-node]').forEach(n=>n.classList.toggle('active',['input','quant',enhanced?'repr':'anchor'].includes(n.dataset.node)));d.querySelector('[data-explanation]').textContent=enhanced?'Enhanced targets use intermediate model representations, followed by random-projection quantization. The learner’s evolving features help construct the labels used for learning.':'Anchor targets use raw-input quantization. This input-based branch complements the enhanced targets produced from the evolving model.';};
@@ -216,4 +228,19 @@ for (const lab of document.querySelectorAll('[data-evidence-lab]')) {
   });
  });
  select(0);
+}
+
+// Keep full equations readable and keyboard-scrollable when a panel is narrow.
+for (const equation of document.querySelectorAll('.math-block .katex-display')) {
+ const block=equation.closest('.math-block'),hint=block.querySelector('.math-scroll-hint');
+ const update=()=>{
+  const scrolls=equation.clientWidth>0&&equation.scrollWidth>equation.clientWidth+1;
+  hint.hidden=!scrolls;
+  if(scrolls){equation.tabIndex=0;equation.setAttribute('role','region');equation.setAttribute('aria-label',block.dataset.equationLabel||'Equation');}
+  else{equation.removeAttribute('tabindex');equation.removeAttribute('role');equation.removeAttribute('aria-label');}
+ };
+ if('ResizeObserver' in window)new ResizeObserver(update).observe(equation);
+ window.addEventListener('resize',update);
+ document.fonts?.ready.then(update);
+ update();
 }

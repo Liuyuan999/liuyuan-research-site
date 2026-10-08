@@ -14,6 +14,9 @@ def evidence_panels(p,g):
   table='<div class="table-scroll" role="region" tabindex="0" aria-label="'+e(x['title'])+' results"><table class="research-table"><caption>'+e(x['caption'])+'</caption><thead><tr>'+''.join('<th scope="col">'+e(col)+'</th>' for col in x['columns'])+'</tr></thead><tbody>'+rows+'</tbody></table></div><p class="table-hint" hidden>Scroll horizontally to see all columns.</p>'
   panels+=f'<div id="evidence-panel-{i}" class="evidence-panel" data-evidence-panel="{i}"><h3>{e(x["title"])}</h3>{table}<div class="result-reading"><span>What to notice</span><p>{e(x["reading"])}</p></div><details class="protocol"><summary>Experiment setup and comparison details</summary><p>{e(x["protocol"])}</p></details><a class="source-anchor" href="{e(guide_source(g,x["source"]))}">Read the original {"analysis" if p["slug"]=="smoothness" or x["label"]=="Algorithm map" else "result"} <span aria-hidden="true">↗</span></a></div>'
  return '<div class="evidence-lab" data-evidence-lab><div class="evidence-tabs" role="tablist" aria-label="Select a reported comparison" hidden>'+buttons+'</div>'+panels+'</div>'
+def notation_symbol(slug,symbol):
+ tex=MATH_CONFIG.get('notation_inline',{}).get(slug,{}).get(symbol)
+ return MATH_HTML['inline:'+tex] if tex else e(symbol)
 def research_cards(g):
  return '<div class="research-cards">'+''.join('<div class="research-card"><span class="eyebrow">'+e(label)+'</span><h3>'+e(title)+'</h3><p>'+e(body)+'</p><a href="'+e(guide_source(g,source))+'">Read the statement <span aria-hidden="true">↗</span></a></div>' for label,title,body,source in g['cards'])+'</div>'
 def project_page(p,a,t):
@@ -27,6 +30,9 @@ def project_page(p,a,t):
  hero=f'<header class="project-hero refined-hero"><a class="route-back" href="../../index.html#papers"><span aria-hidden="true">←</span> Publications &amp; projects</a><div class="paper-identity"><p class="meta"><span class="venue">{e(venue)}</span><span>{e(p["topic"])}</span></p><h1>{e(p["title"])}</h1><p class="authors">{authorshtml(p)}</p><div class="actions">{actions}</div></div></header>'
  findings='<div class="finding-links">'+''.join('<a href="#'+anchor+'"><span>'+e(label)+'</span><strong>'+e(value)+'</strong><p>'+e(text)+'</p><span class="finding-arrow" aria-hidden="true">↘</span></a>' for label,value,text,anchor in g['findings'])+'</div>'
  takeaway='<section id="takeaway" class="project-takeaway"><div class="eyebrow">'+e(p['short'])+' / The takeaway</div><h2>'+e(t['headline'])+'</h2><p class="lede">'+e(a['takeaway'])+'</p>'+findings+'</section>'
+ if s=='efficient-penalty':
+  related=BY['pbgd-free']
+  takeaway+='<aside class="companion-paper"><p class="eyebrow">Related paper · NeurIPS 2025</p><h3><a href="'+e(related['paper'])+'">'+e(related['title'])+'</a></h3><p>PBGD-Free develops value-function removal under flatness. This preprint expands the smoothness analysis and develops fixed-set and coupled-constraint updates.</p><div class="actions"><a class="button" href="'+e(related['paper'])+'">Read the PBGD-Free paper</a><a href="../pbgd-free/">PBGD-Free project page</a></div></aside>'
  story=''.join('<div class="story-block"><h3>'+e(title)+'</h3><p>'+e(body)+'</p></div>' for title,body in g['story'])
  method='<ol class="method-path">'+''.join(f'<li class="method-step"><div class="step-number">{i:02}</div><h3>{e(title)}</h3><p>{e(body)}</p></li>' for i,(title,body) in enumerate(t['steps'],1))+'</ol>'
  fig='' if s=='smoothness' else original_paper_figure(p,g['figure'])+figure_reading(g)
@@ -36,10 +42,11 @@ def project_page(p,a,t):
  evidence_figure=original_paper_figure(p,0)+figure_reading(g) if s=='smoothness' else ''
  evidence=f'<section id="evidence">{kicker(3,"Evidence")}<h2>{e(t["result_title"])}</h2><p class="evidence-intro">Choose a comparison to inspect the reported values, then open its setup for the evaluation details.</p>{evidence_figure}{evidence_panels(p,g)}<div class="scope-box"><h3>{e(g["result_note_title"])}</h3><p>{e(a["boundary"])}</p></div></section>'
  extra={'surf':('surf-refine','Damped empirical CDF refinement'),'retailagent':('retail-decompose','Equation 2 · Return decomposition'),'birq':('birq-update','Algorithm 1 · Weighted-gradient update'),'smoothness':('smoothness-cancel','The cancellation analyzed by directional derivatives'),'blocc':('blocc-value-gradient','Lemma 2 · Value gradient with boundary movement'),'pbgd-free':('pbgd-floor','Theorem 3 · Penalty-stationarity bound')}.get(s)
- core=paper_math(s)+'<p class="formula-reading">'+e(a['formula_note'])+'</p>'
+ notation='<div class="notation-key"><h3>Symbols used below</h3><dl class="notation">'+''.join('<dt>'+notation_symbol(s,symbol)+'</dt><dd>'+e(desc)+'</dd>' for symbol,desc in t['notation'])+'</dl></div>'
+ core=notation+paper_math(s)+'<p class="formula-reading">'+e(a['formula_note'])+'</p>'
  if extra:core+=extra_math(extra[0],extra[1])
- notation='<dl class="notation">'+''.join('<dt>'+e(symbol)+'</dt><dd>'+e(desc)+'</dd>' for symbol,desc in t['notation'])+'</dl>'
- deeper='<details class="technical-detail"><summary>Notation and the reasoning behind the formulation</summary>'+notation+''.join('<div class="story-block"><h3>'+e(title)+'</h3><p>'+e(body)+'</p></div>' for title,body in t['reasoning'])+'</details>'
+ if s=='smoothness':core+=extra_math('smoothness-gradient','Proposition 2 · Projected-gradient mapping')
+ deeper='<details class="technical-detail"><summary>Reasoning behind the formulation</summary>'+''.join('<div class="story-block"><h3>'+e(title)+'</h3><p>'+e(body)+'</p></div>' for title,body in t['reasoning'])+'</details>'
  if t.get('update_equations'):deeper+='<details class="technical-detail"><summary>Inspect the single-loop update</summary><div class="equation-set update-set">'+extra_math('update-lower','Equation 8 · Lower tracking update')+extra_math('update-upper','Equation 8 · Outer update')+'</div><p>'+e(t['update_caption'])+'</p></details>'
  deeper+='<details class="technical-detail"><summary>Assumptions behind the analysis</summary><p>'+e(a['formal'])+'</p><a href="'+e(p['paper'])+'">'+e(t['anchor'])+' in the paper</a></details>'
  faq='<div class="reader-questions"><h3>Questions worth asking</h3>'+''.join('<details><summary>'+e(question)+'</summary><p>'+e(answer)+'</p></details>' for question,answer in g['faq'])+'</div>'

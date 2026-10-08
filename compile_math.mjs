@@ -7,4 +7,5 @@ for(const equations of Object.values(config.papers))for(const equation of equati
 for(const tex of Object.values(config.extra))add(tex,true);
 for(const tex of Object.values(config.inline))add(tex,false);
 for(const mapping of Object.values(config.paper_inline||{}))for(const tex of Object.values(mapping))add(tex,false);
+for(const mapping of Object.values(config.notation_inline||{}))for(const tex of Object.values(mapping))add(tex,false);
 process.stdout.write(JSON.stringify(compiled));

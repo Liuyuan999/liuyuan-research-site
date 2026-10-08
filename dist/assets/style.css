@@ -122,3 +122,7 @@ ol.method-path{list-style:none;padding:0;margin:18px 0;gap:12px}
 .refined-project .notation{grid-template-columns:minmax(0,180px) minmax(0,1fr);gap:14px 22px}
 .refined-project .notation dt,.refined-project .notation dd{min-width:0}
 @media(max-width:700px){.refined-project .notation{grid-template-columns:minmax(0,1fr);gap:6px}.refined-project .notation dt{font-size:1.15rem}.refined-project .notation dd{margin-bottom:16px}}
+
+.notation-key{margin:24px 0;background:#f8fafc;border:1px solid var(--line);padding:24px;border-radius:6px}.notation-key h3{margin-bottom:18px}.notation-key .notation{margin:0}.companion-paper{margin:28px 0 0;padding:24px;border-left:3px solid var(--teal);background:#f3f8f6;border-radius:0 6px 6px 0}.companion-paper h3{font-size:1.15rem;line-height:1.4}.companion-paper .eyebrow{margin-top:0}.companion-paper p{font-size:.95rem}.companion-paper .actions{align-items:center}.math-block .katex-display{scrollbar-width:thin;padding-bottom:10px}@media(max-width:700px){.notation-key,.companion-paper{padding:18px}.notation-key .notation dt{overflow-wrap:normal}}
+
+.math-scroll-hint{font-size:.8rem!important;color:var(--muted);margin:8px 0 0;line-height:1.5!important}.math-block .katex-display:focus-visible{outline:2px solid var(--blue);outline-offset:2px}

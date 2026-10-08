@@ -6,7 +6,7 @@ MATH_HTML=json.loads(subprocess.check_output([node_path,str(ROOT/'compile_math.m
 MATH_PATTERN=re.compile('|'.join(re.escape(k) for k in sorted(MATH_CONFIG['inline'],key=len,reverse=True)))
 def display_math(tex,label='',attributes=''):
  label_html='<div class="math-label">'+e(label)+'</div>' if label else ''
- return '<div class="math-block" '+attributes+'>'+label_html+MATH_HTML['display:'+tex]+'</div>'
+ return '<div class="math-block" data-equation-label="'+e(label or 'Equation')+'" '+attributes+'>'+label_html+MATH_HTML['display:'+tex]+'<p class="math-scroll-hint" hidden>Scroll horizontally to read the full equation.</p></div>'
 def extra_math(key,label='',attributes=''):
  return display_math(MATH_CONFIG['extra'][key],label,attributes)
 def paper_math(slug):
