@@ -1,5 +1,5 @@
 from pathlib import Path
-import json,html,math,re
+import json,html,math,re,os
 ROOT=Path(__file__).resolve().parent
 D=ROOT/'dist'
 PAPERS=json.loads((ROOT/'content/papers.json').read_text())
@@ -22,7 +22,7 @@ def concept_prose(text,seen=None):
         seen.add(c['term']);end=stop
     return ''.join(parts)+e(text[end:])
 SITE=json.loads((ROOT/'content/site.json').read_text()) if (ROOT/'content/site.json').exists() else {}
-ORIGIN=SITE.get('origin','')
+ORIGIN=os.environ.get('SITE_ORIGIN',SITE.get('origin','')).rstrip('/')
 PUBLISH_VIDEOS=SITE.get('publish_videos',False)
 exec((ROOT/'math_typesetting.py').read_text())
 def head(title,desc,depth=0,path=''):

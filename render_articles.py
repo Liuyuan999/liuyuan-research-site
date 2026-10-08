@@ -78,4 +78,4 @@ if PUBLISH_VIDEOS:paths+=['videos/'+p['slug']+'/' for p in PAPERS]
 if ORIGIN:
  save('sitemap.xml','<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join('<url><loc>'+e(ORIGIN+'/'+path)+'</loc><lastmod>2026-10-08</lastmod></url>' for path in paths)+'</urlset>')
  save('robots.txt','User-agent: *\nAllow: /\nSitemap: '+ORIGIN+'/sitemap.xml\n')
-save('404.html',head('Page not found | Liuyuan Jiang','Return to the research collection.')+'<main id="main" class="wrap" style="padding:70px 0"><h1>Page not found</h1><p><a href="/">Return to the research collection</a></p></main>'+footer())
+save('404.html',head('Page not found | Liuyuan Jiang','Return to the research collection.')+'<main id="main" class="wrap" style="padding:70px 0"><h1>Page not found</h1><p><a href="'+e((ORIGIN or '.')+'/')+'">Return to the research collection</a></p></main>'+footer())

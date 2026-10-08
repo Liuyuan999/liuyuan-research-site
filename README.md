@@ -41,9 +41,15 @@ All toy demonstrations identify their status. The BiRQ WER chart uses measured v
 
 ## Files and hosting
 
-Everything created for this project stays in this folder. `work/` holds downloaded public PDFs, extraction files, temporary publishing files, and QA artifacts. It is excluded from the source repository and deployment archive. The deployed static files are in `dist/`. The hosting identity is in `.openai/hosting.json`.
+Source repository: https://github.com/Liuyuan999/liuyuan-research-site
 
-The initial hosted version is private for review. Public visibility requires changing its audience. To move to another static host later, upload `dist/`, change the origin in `content/site.json`, and regenerate pages so canonical links and the sitemap match the new address.
+Website: https://liuyuan999.github.io/liuyuan-research-site/
+
+The workflow in `.github/workflows/pages.yml` builds the site and its equations on GitHub, then deploys `dist/` to GitHub Pages. Pushing to `main` triggers a deployment; the Actions tab also supports a manual run. The workflow uses GitHub Pages metadata for the site origin so canonical links and the sitemap follow the configured address.
+
+To connect a custom domain, open this repository’s **Settings → Pages**, enter the domain, and follow [GitHub’s DNS instructions](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site). No domain has been configured in this repository.
+
+`work/` holds downloaded public PDFs, extraction files, temporary publishing files, and QA artifacts. It is excluded from Git and deployment. Video drafts stay outside the hosted output. `.openai/hosting.json` records the earlier Sites preview; GitHub Pages does not use it.
 
 ## Recording the videos
 
