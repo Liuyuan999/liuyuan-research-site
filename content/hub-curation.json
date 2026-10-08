@@ -1,0 +1,34 @@
+{
+  "ordering": "Publication year descending, then first public release within each year.",
+  "release_months": {
+    "retailagent": "2026-08",
+    "surf": "2026-05",
+    "birq": "2025-09",
+    "efficient-penalty": "2025-11",
+    "smoothness": "2025-09",
+    "pbgd-free": "2025-07",
+    "blocc": "2024-06"
+  },
+  "date_sources": {
+    "arxiv": "The YYMM prefix of the primary arXiv identifier records the submission month.",
+    "smoothness": "https://eurasip.org/Proceedings/Eusipco/Eusipco2025/HTML/index.html"
+  },
+  "paper_labels": {
+    "efficient-penalty": "Penalty methods",
+    "pbgd-free": "PBGD-Free",
+    "smoothness": "Reduced smoothness",
+    "blocc": "BLOCC",
+    "surf": "SURF",
+    "retailagent": "RetailAgent",
+    "birq": "BiRQ"
+  },
+  "visual_evidence": {
+    "surf": "Section 2 and Figures 1\u20132: nonuniform traversal speed and inverse arc-length CDF; Theorem 1 requires regularity and has a finite-sampling floor.",
+    "retailagent": "Sections 2.1 and 3.2.1, Table 1: exposure-matched timing; intact \u221245.7 bps, global shuffle \u22123.5, same-day \u22128.7. The bar preview uses signed values and the reported date-bootstrap confidence intervals.",
+    "birq": "Section 3, Figure 1, Algorithm 1: reuse intermediate encoder features, preserve raw-input anchors, use differentiable enhanced labels; original architecture chosen over a generic WER thumbnail.",
+    "efficient-penalty": "Theorems 1 and 4, Figure 3: reduced O(1) smoothness with regime-specific assumptions; fully single-loop PBGD-Free is restricted to uncoupled constraints.",
+    "pbgd-free": "Definition 1, Algorithm 1, Theorem 3, Figure 1: single-step lower update, no value-function loop; flatness controls omitted-gradient bias.",
+    "smoothness": "Section III and IV, Table I: directional-derivative cancellation. Home preview is the exact toy H=x\u00b2/2+\u03b3(y\u2212x)\u00b2 at \u03b3=5 and F=min_y H=x\u00b2/2, not experimental data.",
+    "blocc": "Section 2.1, Equation 8, Figure 1: the value-function gradient includes the multiplier contribution from moving constraints."
+  }
+}

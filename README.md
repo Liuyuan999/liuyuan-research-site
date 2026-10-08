@@ -58,3 +58,9 @@ The project pages contain explanations, interactive examples, results, technical
 The hub starts with three topic clusters: Bilevel Optimization (four papers), Multi-Objective Optimization (SURF), and Applications (RetailAgent and BiRQ). `research_hub.py` controls the topic map and publication rows. The rows show each paper’s full title, authors, venue, figure preview, and available resource links. Preview plots are labeled as illustrative or linked to their primary-paper table.
 
 `content/equations.json` contains the display and inline TeX. `compile_math.mjs` renders it with the pinned, locally vendored KaTeX 0.19.0 package; `math_typesetting.py` adds accessible MathML and bundles the local stylesheet and fonts. `python3 build.py` requires Node.js (uses the installed Codex runtime as a fallback on this computer). Equations are pre-rendered and do not depend on a CDN or browser JavaScript. Malformed TeX fails the build. Main formulations, interactive constraint-regime formulas, and update steps use the same renderer.
+
+### Research atlas and original paper figures
+
+The home page lists papers by publication year, newest first; first public release month breaks ties within a year. `content/hub-curation.json` records this ordering and the paper-to-visual evidence notes. Topic-card links jump to stable `#paper-<slug>` publication anchors.
+
+`content/paper-figures.json` records each original figure or table, its source URL, local image dimensions, explanatory caption, and any PDF crop. Original artwork lives in `dist/assets/paper-figures/`. arXiv PNG/SVG assets are preserved; RetailAgent Figure 2 and EUSIPCO Table I are extracted from the original PDFs. The project page displays a source link and full-size image link for every figure. Preview charts for RetailAgent and smoothness are explicitly distinguished as reported results and an explanatory toy.

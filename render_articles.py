@@ -68,14 +68,14 @@ for p in PAPERS:
  actions+=f'<a class="button" href="../../videos/{s}/">Video storyboard</a>'
  method='<div class="method-path">'+''.join(f'<div class="method-step"><div class="step-number">{i:02}</div><h3>{e(title)}</h3><p>{e(body)}</p></div>' for i,(title,body) in enumerate(t['steps'],1))+'</div>'
  blocks=['<div class="story-block"><h3>'+e(title)+'</h3><p>'+e(text)+'</p></div>' for title,text in a['explanation']]
- explanation=''.join(blocks[:2])+method+''.join(blocks[2:])
+ explanation=blocks[0]+original_paper_figure(p)+''.join(blocks[1:2])+method+''.join(blocks[2:])
  why='<div class="reading-note"><strong>'+e(t['why_title'])+'</strong><p>'+e(t['why'])+'</p></div>'
  scope='<div class="scope-box"><h3>How to read this result</h3><p>'+e(a['boundary'])+'</p></div>'
  evidence='<p class="lede">'+e(t['result_context'])+'</p>'+resultchart(t)
  if s=='smoothness':evidence+='<div class="result-grid"><div class="result-stat"><strong>O(ε⁻¹·⁵)</strong><p>Compared outer-iteration bound</p></div><div class="result-stat"><strong>O(ε⁻¹)</strong><p>Sharper bound under the stated assumptions</p></div></div>'
  if s=='efficient-penalty':evidence+='<div class="evidence"><strong>Reduced smoothness / uncoupled constraints</strong><p>Theorem 1 gives an O(1) smoothness bound for Fγ under its stated assumptions, without scaling with γ.</p></div><div class="evidence"><strong>Reduced smoothness / coupled constraints</strong><p>Theorem 4 extends the bound under Assumptions 1–5 and sufficiently large γ. The different feasible-set regularity is part of this result.</p></div>'
  evidence+='<p>'+e(t['second_result'])+'</p><p><a href="'+e(p['paper'])+'">'+e(t['result_reference'])+' in the paper</a></p>'+scope
- technical=paper_math(s)+'<p>'+e(a['formula_note'])+'</p><dl class="notation">'+''.join('<dt>'+e(symbol)+'</dt><dd>'+e(desc)+'</dd>' for symbol,desc in t['notation'])+'</dl><h3>The technical idea</h3>'+''.join('<div class="story-block"><h3>'+e(title)+'</h3><p>'+e(text)+'</p></div>' for title,text in t['reasoning'])
+ technical=original_paper_figure(p,1)+paper_math(s)+'<p>'+e(a['formula_note'])+'</p><dl class="notation">'+''.join('<dt>'+e(symbol)+'</dt><dd>'+e(desc)+'</dd>' for symbol,desc in t['notation'])+'</dl><h3>The technical idea</h3>'+''.join('<div class="story-block"><h3>'+e(title)+'</h3><p>'+e(text)+'</p></div>' for title,text in t['reasoning'])
  if t.get('update_equations'):technical+='<h3>The single-loop update</h3><div class="equation-set update-set">'+extra_math('update-direction','Lower update direction')+extra_math('update-lower','One lower-level step')+extra_math('update-upper','One upper-level step')+'</div><p>'+e(t['update_caption'])+'</p>'
  technical+='<details><summary>Assumptions and guarantee</summary><p>'+e(a['formal'])+'</p><a href="'+e(p['paper'])+'">'+e(t['anchor'])+' in the paper</a></details><div class="connection"><h3>How this connects to the other papers</h3><p>'+e(t['connection'])+'</p>'+relatedhtml(p,a)+'</div>'
  venue_note=f'<p class="note">{e(p["venue_note"])}</p>' if p.get('venue_note') else ''
