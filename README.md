@@ -45,7 +45,7 @@ Source repository: https://github.com/Liuyuan999/liuyuan-research-site
 
 Website: https://liuyuan999.github.io/liuyuan-research-site/
 
-The workflow in `.github/workflows/pages.yml` builds the site and its equations on GitHub, then deploys `dist/` to GitHub Pages. Pushing to `main` triggers a deployment; the Actions tab also supports a manual run. The workflow uses GitHub Pages metadata for the site origin so canonical links and the sitemap follow the configured address.
+The workflow in `.github/workflows/pages.yml` builds the research site and its equations on GitHub, then deploys `dist/` to GitHub Pages. Pushing to `main` triggers a deployment; the Actions tab also supports a manual run. The workflow uses GitHub Pages metadata for the site origin so canonical links and the sitemap follow the configured address.
 
 To connect a custom domain, open this repository’s **Settings → Pages**, enter the domain, and follow [GitHub’s DNS instructions](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site). No domain has been configured in this repository.
 
