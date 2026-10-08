@@ -8,7 +8,7 @@ At each interval, a frozen LLM sees an anonymized price history and chooses long
 
 ## The bottleneck
 
-A positive return alone does not establish good timing. A policy can benefit from a rising stock while being flat during its strongest intervals. Average exposure and alignment with the next return need separate measurements.
+A policy can benefit from a rising stock while being flat during its strongest intervals. Measuring average exposure and alignment with the next return separately reveals when the policy allocated its exposure.
 
 ## The idea
 

@@ -1,10 +1,10 @@
 {
   "surf": {
-    "scene": "Choose a menu of models, not just one compromise.",
+    "scene": "Choose a well-spaced menu of model trade-offs.",
     "story": [
       [
         "The decision",
-        "A summarization system can reward both a useful summary and a faithful one. A single weighted loss selects one compromise; a collection of models lets a user choose among compromises. The collection is useful only if it represents the front well."
+        "A summarization system can reward both a useful summary and a faithful one. A weighted loss selects one compromise. A well-spaced collection of models gives users a range of quality–faithfulness balances to choose from."
       ],
       [
         "The bottleneck",
@@ -29,7 +29,7 @@
         "evidence"
       ],
       [
-        "Conditional theory",
+        "Convergence analysis",
         "O(N⁻²) floor",
         "Finite reconstruction resolution remains.",
         "technical"
@@ -47,7 +47,7 @@
       ],
       [
         "What changes in training",
-        "Weights are reassigned; models warm-start from their previous slot. The method does not replace the inner optimizer."
+        "Weights are reassigned and models warm-start from their previous slot. Each slot continues training with its chosen inner optimizer."
       ]
     ],
     "panels": [
@@ -140,7 +140,7 @@
       [
         "Geometric rule",
         "Match a distribution on the front",
-        "Traversal speed gives the density correction. Equal quantiles of normalized arc length specify the scalarization weights. This requires a well-defined, monotone path; linear scalarization does not recover every nonconvex front in arbitrary problems.",
+        "Traversal speed determines the density correction along a well-defined, monotone scalarization-induced path. Inverting its normalized arc-length map assigns weights to evenly spaced points on that path.",
         "S2"
       ],
       [
@@ -152,15 +152,16 @@
     ],
     "faq": [
       [
-        "Does uniform coverage mean equal utility?",
-        "It means equal arc-length spacing in the selected objective-space metric. It is a way to represent available compromises, rather than a claim that all users value them equally."
+        "What determines uniform spacing?",
+        "Uniform spacing means equal arc-length gaps in the selected objective-space metric. The objective units and normalization determine that metric."
       ],
       [
         "What does the interactive example demonstrate?",
-        "It evaluates the quadratic gear toy in Appendix F.1 using its exact scalarized solution and fixed evaluation front. The arc-length points use numerical integration and inversion of the exact map; they do not run the paper’s iterative PCHIP reconstruction or reproduce a noisy training experiment."
+        "The quadratic gear toy in Appendix F.1 keeps the evaluation front fixed while changing traversal speed. The demo evaluates the exact scalarized solution and obtains arc-length targets by numerical integration and direct inversion."
       ]
     ],
-    "source": "https://arxiv.org/html/2605.20619v1"
+    "source": "https://arxiv.org/html/2605.20619v1",
+    "result_note_title": "The metric shapes the coverage"
   },
   "retailagent": {
     "scene": "A rising stock can hide a poorly timed policy.",
@@ -171,7 +172,7 @@
       ],
       [
         "The bottleneck",
-        "A positive return alone does not establish good timing. A policy can benefit from a rising stock while being flat during its strongest intervals. Average exposure and alignment with the next return need separate measurements."
+        "A policy can benefit from a rising stock while being flat during its strongest intervals. Measuring average exposure and alignment with the next return separately reveals when the policy allocated its exposure."
       ],
       [
         "The idea",
@@ -210,7 +211,7 @@
       ],
       [
         "Separate the optional learned channel",
-        "The soft-token encoder includes a training stage. Standard and narrative conditions use inference only; they should not be conflated with the learned adapter experiments."
+        "The soft-token encoder has a training stage. The standard and narrative conditions use a frozen LLM for inference, with observations and carried state specified by each condition."
       ]
     ],
     "panels": [
@@ -284,14 +285,14 @@
             "[−75.0, −59.6]"
           ]
         ],
-        "reading": "The one-earlier-memory condition is the most negative of these four. Its later-period record also has fewer position changes: 1.7 per stock-day versus 2.5 for current memory only. Longer memory windows do not produce a monotone timing trend.",
-        "protocol": "Each main-period arm attempts 1,500 stock-days across 150 dates. Scored N excludes failed intervals and constant-action trajectories, so these timing estimates are conditional on both actions appearing. The position-change figures belong to the later-period panel, not the main-period rows.",
+        "reading": "The one-earlier-memory condition has the most negative timing of these four. In the later-period panel, it also makes fewer position changes: 1.7 per stock-day versus 2.5 for current memory only. Timing varies non-monotonically with memory-window length.",
+        "protocol": "Each main-period arm attempts 1,500 stock-days across 150 dates. Scored N excludes failed intervals and constant-action trajectories, so the timing estimates condition on both actions appearing. Position-change counts come from the separate later-period panel.",
         "source": "S3.T3"
       }
     ],
     "application": [
       "An audit for sequential agents",
-      "Exposure-matched timing diagnoses a choice policy even when aggregate returns look favorable. The same study keeps cross-sectional stock selection separate through IC. This is evidence about controlled historical action traces; executable returns and matched human behavior remain additional empirical questions."
+      "Exposure-matched timing diagnoses the agent’s interval choices on historical price paths. The study measures cross-sectional stock selection separately through IC and uses saved-action shuffles to examine sequential alignment."
     ],
     "cards": [
       [
@@ -301,26 +302,27 @@
         "S2.SS1"
       ],
       [
-        "Experimental boundary",
+        "Recorded comparisons",
         "Compare within the recorded panel",
-        "Modalities, model families, and state conditions have different sampling frames. Their repeated negative signs are descriptive checks; equal-looking magnitudes do not imply matched causal comparisons.",
+        "Modalities, model families, and state conditions are evaluated in their recorded sampling frames. The panel definitions and stock-day counts specify which action traces contribute to each timing estimate.",
         "S3.SS3"
       ]
     ],
     "faq": [
       [
-        "Why not just invert the agent and trade?",
-        "The sign flips algebraically on fixed research-return paths. Transaction costs, latency, market impact, capacity, price feedback, and a deployable execution protocol are additional requirements."
+        "What does inverting a schedule reveal?",
+        "On a fixed research-return path, complementing every long-or-flat action negates centered timing while preserving the same sequence of returns. This gives a sign diagnostic for the saved action trace."
       ],
       [
-        "Is w = 0 a memory-free baseline?",
-        "No. The two-pass protocol still creates a current-step memory. w counts earlier memories, so w = 0 exposes the current memory and no earlier ones."
+        "How is the memory window counted?",
+        "The two-pass protocol creates a current-step memory. The window w counts earlier memories, so w = 0 provides the current memory and w = 1 adds one earlier memory."
       ]
     ],
-    "source": "https://arxiv.org/html/2608.28399v1"
+    "source": "https://arxiv.org/html/2608.28399v1",
+    "result_note_title": "Timing on the same historical path"
   },
   "birq": {
-    "scene": "Improve the labels without adding a separate teacher.",
+    "scene": "Let a speech model improve its own training targets.",
     "story": [
       [
         "The decision",
@@ -328,7 +330,7 @@
       ],
       [
         "The bottleneck",
-        "Input-based labels are stable but do not use the representations the encoder is learning. Labels from intermediate features can be richer, yet their target distribution changes with the same encoder being optimized."
+        "Raw-input labels stay fixed as the encoder learns. Intermediate-feature labels evolve with the same encoder that predicts them. Training must coordinate the changing targets with a stable reference task."
       ],
       [
         "The idea",
@@ -367,7 +369,7 @@
       ],
       [
         "Follow the trainable feedback",
-        "Gumbel-softmax makes the enhanced target selection differentiable. The target and prediction share encoder parameters, so the update must include the target-generation path."
+        "Gumbel-softmax makes enhanced target selection differentiable. The target and prediction share encoder parameters, so the update includes gradients through both paths."
       ]
     ],
     "panels": [
@@ -398,7 +400,7 @@
           ]
         ],
         "reading": "BiRQ lowers both clean and difficult-test WER in this setting. The 7.0 percentage-point test-other reduction is a 35.7% relative reduction, calculated from the reported 19.6% and 12.6% values.",
-        "protocol": "10-layer 155M Conformer with full attention; 100 SSL epochs on 960h LibriSpeech; downstream fine-tuning on 100h labeled LibriSpeech. The paper uses CTC and a 4-gram language model for decoding. Table 2 reports point values without uncertainty.",
+        "protocol": "10-layer 155M Conformer with full attention. Pretraining uses 100 SSL epochs on 960h LibriSpeech, followed by fine-tuning on 100h labeled LibriSpeech. Decoding uses CTC and a 4-gram language model. Table 2 reports point estimates.",
         "source": "S4.T2"
       },
       {
@@ -427,14 +429,14 @@
             "34.0"
           ]
         ],
-        "reading": "The benefit persists on meeting speech in the reported larger setting. This is a separate evaluation, rather than another point on the same LibriSpeech scaling curve.",
-        "protocol": "10-layer 275M Conformer; 100 SSL epochs on 5k hours of YODAS; fine-tuning on 150h labeled AMI. IHM uses individual headset microphones; SDM uses a single distant microphone. Table 3 reports point values without uncertainty.",
+        "reading": "BiRQ also lowers WER on meeting speech after pretraining on YODAS. This evaluation uses a 275M model and the AMI microphone conditions listed in Table 3.",
+        "protocol": "10-layer 275M Conformer. Pretraining uses 100 SSL epochs on 5k hours of YODAS, followed by fine-tuning on 150h labeled AMI. IHM uses individual headset microphones and SDM uses a single distant microphone. Table 3 reports point estimates.",
         "source": "S4.T3"
       }
     ],
     "application": [
       "An application of bilevel thinking",
-      "The enhanced-label objective seeks informative targets while the anchor objective constrains the learner’s reference task. The implementation reduces the penalty to a weighted sum because the anchor optimum is constant with respect to the model parameters; a separate lower-level optimizer is not needed in Algorithm 1."
+      "The enhanced-label objective learns from intermediate features while the anchor objective preserves the reference task. Because the anchor optimum is constant with respect to the model parameters, Algorithm 1 updates a weighted sum of the two loss gradients in one training loop."
     ],
     "cards": [
       [
@@ -446,21 +448,22 @@
       [
         "Algorithm 1",
         "One update includes both gradients",
-        "The training direction combines the enhanced and anchoring loss gradients. Experiments use weights 0.1 and 2.4, and Gumbel-softmax temperature 0.5. The penalty interpretation in Lemma 1 requires its error-bound assumptions; it does not prove a neural encoder is globally strongly convex.",
+        "Algorithm 1 combines enhanced-label and anchoring-loss gradients. The experiments use weights 0.1 and 2.4 with Gumbel-softmax temperature 0.5. Lemma 1 gives the penalty interpretation under its stated error-bound condition.",
         "S3.SS3"
       ]
     ],
     "faq": [
       [
         "Why keep the raw-input labels?",
-        "They provide a fixed source of targets while the enhanced labels evolve. Without that distinction, improved representations and changing targets can reinforce each other without a stable anchoring task."
+        "Raw-input labels provide a fixed reference task while the enhanced labels evolve with the encoder. Both target sources contribute to the shared training update."
       ],
       [
-        "Which intermediate layer should supply targets?",
-        "The paper proposes a pilot-based rule near 70% of encoder depth and studies layer choices. Its layer and codebook ablations are empirical settings, not a universal optimal-layer guarantee. Comparisons with longer training must also retain their epoch budgets."
+        "How is the target-generating layer selected?",
+        "A pilot study motivates selecting a layer near 70% of encoder depth. The paper then evaluates layer and codebook choices through ablations, with training budgets specified for each comparison."
       ]
     ],
-    "source": "https://arxiv.org/html/2509.15430v1"
+    "source": "https://arxiv.org/html/2509.15430v1",
+    "result_note_title": "Recognition error in each evaluation setup"
   },
   "efficient-penalty": {
     "scene": "Separate the sources of cost in a penalty method.",
@@ -475,7 +478,7 @@
       ],
       [
         "The idea",
-        "Analyze the reduced objective to recover curvature cancellation; alternate responses and outer updates; then use upper-level flatness to justify removing a value-function correction. Extend the analysis to coupled constraints with their own multiplier and regularity assumptions."
+        "Analyze the reduced objective to capture curvature cancellation, then alternate lower responses and outer updates. Upper-level flatness controls the bias from removing a value-function correction. The coupled extension incorporates constraint multipliers and boundary regularity."
       ]
     ],
     "findings": [
@@ -510,7 +513,7 @@
       ],
       [
         "Use the illustration for the mechanism",
-        "The figure motivates the reduced-smoothness theorem. It does not establish constant curvature for every bilevel problem or report a universal runtime gain."
+        "The example shows how following the optimized lower response changes the gradient’s dependence on the penalty. The reduced-smoothness theorems formalize that mechanism for their constraint regimes."
       ]
     ],
     "panels": [
@@ -585,14 +588,14 @@
             "0.17 ± 0.09"
           ]
         ],
-        "reading": "PBGD-BLOCC has the highest reported mean accuracy; PBGD-Free has the lowest reported mean runtime and a nearby accuracy. The uncertainty is large enough that the accuracy means alone do not establish a significant difference.",
-        "protocol": "20 random train–validation–test splits. Runtime ends at a validation-loss change below 10⁻⁵ or 50 epochs. PBGD-Free uses penalty 20. This coupled SVM benchmark does not make the coupled algorithm fully single-loop.",
+        "reading": "PBGD-BLOCC has the highest mean accuracy and PBGD-Free the lowest mean runtime in this experiment. Their accuracy means are close relative to the standard deviations across splits.",
+        "protocol": "20 random train–validation–test splits. Runtime ends at a validation-loss change below 10⁻⁵ or 50 epochs. PBGD-Free uses penalty 20 and the coupled method’s retained inner solve.",
         "source": "S6.SS3"
       }
     ],
     "application": [
       "A guide to the broader framework",
-      "For LLM adaptation, flatness motivates learning a preference backbone with a supervised head. For constrained SVMs, outer violation bounds reshape the inner feasible set. These applications activate different parts of the framework; selecting an update requires matching its regime and assumptions."
+      "In LLM adaptation, flatness supports preference learning in a backbone with a supervised head. In constrained SVMs, outer violation bounds reshape the inner feasible set. The fixed-set and coupled algorithms address these different response structures."
     ],
     "cards": [
       [
@@ -604,7 +607,7 @@
       [
         "Theorems 4.1 and 5.2",
         "Flatness controls a residual",
-        "Both results quantify a stationarity neighborhood controlled by the flatness residual. The coupled theorem uses a multiplier-dependent surrogate and a retained inner solve; its metric should not be silently identified with the unconstrained objective.",
+        "The flatness residual controls the stationarity neighborhood in both results. The fixed-set theorem uses the reduced objective. The coupled theorem measures stationarity of its multiplier-dependent surrogate and retains an inner solve.",
         "S5"
       ]
     ],
@@ -614,11 +617,12 @@
         "It is a broader preprint developing the smoothness analysis and flatness-based updates together. The EUSIPCO page focuses on reduced curvature; the NeurIPS 2025 page focuses on value-function removal under flatness."
       ],
       [
-        "Can every penalty correction be discarded?",
-        "No. The paper gives a counterexample where the simplified outer partial gradient converges to the wrong point. The positive results depend on flatness and the remaining regularity conditions."
+        "What role does flatness play in removing the correction?",
+        "Flatness controls upper-objective sensitivity near a lower-level optimum and bounds the bias from omission. The paper’s counterexample motivates this condition by showing a persistent error with the simplified outer partial gradient."
       ]
     ],
-    "source": "https://arxiv.org/html/2511.16796v1"
+    "source": "https://arxiv.org/html/2511.16796v1",
+    "result_note_title": "Count the retained inner solve"
   },
   "pbgd-free": {
     "scene": "Learn a preference backbone while a head adapts.",
@@ -633,7 +637,7 @@
       ],
       [
         "The idea",
-        "Make the reason for omission explicit: upper-level flatness bounds how the DPO objective varies around an SFT-optimal head. Under that condition and the other regularity assumptions, one lower update and one outer update yield controlled stationarity error."
+        "Upper-level flatness bounds how the DPO objective varies around an SFT-optimal head. Together with the lower-level regularity conditions, it controls the stationarity error of one lower update followed by one outer update."
       ]
     ],
     "findings": [
@@ -668,7 +672,7 @@
       ],
       [
         "Ask what justifies that change",
-        "The schematic explains computation. The flatness inequality and Theorem 3 quantify the approximation bias and its residual; fewer boxes alone are not a correctness argument."
+        "The flatness inequality bounds upper-loss variation around the original lower-level response. Theorem 3 uses that condition to quantify the bias and residual introduced by the simplified update."
       ]
     ],
     "panels": [
@@ -704,7 +708,7 @@
           ]
         ],
         "reading": "PBGD-Free has the lowest reported loss in both columns for this fixed-time comparison. ALRIGHT is a bi-objective baseline, so its formulation differs from the bilevel methods.",
-        "protocol": "LoRA adaptation of the model labeled Llama-3-3b in the paper. DPO uses Dahoas/rm-hh-rlhf; SFT uses OpenOrca. Training time is fixed across methods. These table entries have no reported uncertainty and do not count an equal number of updates.",
+        "protocol": "LoRA adaptation of the model labeled Llama-3-3b in the paper. DPO uses Dahoas/rm-hh-rlhf and SFT uses OpenOrca. Methods share a fixed training-time budget. Table 2 reports point estimates, with each method completing its own number of updates.",
         "source": "S4.T2"
       },
       {
@@ -739,7 +743,7 @@
           ]
         ],
         "reading": "The PBGD-Free backbone also gives the lowest reported losses after head adaptation in this experiment. The SFT column here is a training loss, whereas the first panel reports an evaluated SFT loss.",
-        "protocol": "Phase S2 holds the learned backbone fixed and adapts the head on another SFT dataset under the specified fixed-time budget. The paper separately evaluates generated output with BLEU; the loss table alone is not a benchmark of general conversational quality.",
+        "protocol": "Phase S2 holds the learned backbone fixed and adapts the head on another SFT dataset under a fixed-time budget. Table 2 reports the resulting DPO and SFT losses. The paper evaluates generated output separately with BLEU.",
         "source": "S4.T2"
       }
     ],
@@ -751,7 +755,7 @@
       [
         "Proposition 2",
         "Omission can leave a persistent bias",
-        "Under generic Lipschitz assumptions, a counterexample has a non-vanishing stationarity residual. Increasing the penalty alone does not make the simplified gradient correct.",
+        "Under generic Lipschitz conditions, Proposition 2 identifies a non-vanishing stationarity residual after omitting the correction. This motivates the flatness condition used to control the bias.",
         "S2.SS2"
       ],
       [
@@ -763,18 +767,19 @@
     ],
     "faq": [
       [
-        "Does flatness mean a small derivative everywhere?",
-        "The bound compares upper-loss values around a lower-level optimum and permits a residual. It can accommodate local variation that a small uniform Lipschitz bound would exclude. A small residual still needs validation for the problem being solved."
+        "What does flatness measure?",
+        "Definition 1 measures upper-loss variation around a lower-level optimum using a distance exponent and a residual. The residual allows local variation, and the theorem carries its contribution into the stationarity bound."
       ],
       [
-        "Does a single loop solve every bilevel problem?",
-        "The theorem concerns the analyzed unconstrained setting and its assumptions. The broader efficient-penalty preprint develops constrained extensions, with an inner solve retained in the coupled case."
+        "How does the method extend to constraints?",
+        "This paper analyzes the unconstrained setting. The broader efficient-penalty preprint develops fixed-set and coupled-constraint extensions. The coupled method retains an inner solve for its constrained response."
       ]
     ],
-    "source": "https://arxiv.org/html/2507.20400v1"
+    "source": "https://arxiv.org/html/2507.20400v1",
+    "result_note_title": "Flatness controls the remaining bias"
   },
   "smoothness": {
-    "scene": "A stronger penalty need not force a smaller outer step.",
+    "scene": "Reduced curvature supports larger outer steps.",
     "story": [
       [
         "The decision",
@@ -813,7 +818,7 @@
     "figure_read": [
       [
         "Locate the constraint regime",
-        "The table treats fixed domains, general coupled constraints, and affine constraints separately. A rate from one row should not be transferred to another."
+        "Read the constraint regime first: fixed domains, general coupled constraints, and affine constraints use different inner solvers and have different total costs."
       ],
       [
         "Separate smoothness and complexity",
@@ -821,14 +826,14 @@
       ],
       [
         "Read the convergence metric",
-        "The comparison uses a squared generalized-gradient norm. The exponents must be interpreted using that tolerance definition."
+        "The tolerance ε applies to the squared generalized-gradient norm. The complexity exponents describe the work needed to meet that stationarity criterion."
       ]
     ],
     "panels": [
       {
         "label": "Fixed constraints",
         "title": "A sharper analysis of alternating updates",
-        "caption": "Section III-B · conditional complexity",
+        "caption": "Section III-B · outer and total complexity",
         "columns": [
           "Update",
           "Smoothness order",
@@ -902,15 +907,16 @@
     ],
     "faq": [
       [
-        "Is the joint objective now O(1)-smooth?",
-        "The claim is about the reduced objective. The joint penalty objective can remain stiff in directions that move away from a lower-level response."
+        "Which objective gets the sharper smoothness bound?",
+        "The O(1) bound describes the reduced objective along the optimized lower response. The joint penalty objective includes additional directions that move away from that response."
       ],
       [
-        "Are second-order derivatives computed by the algorithm?",
-        "They are used in the smoothness analysis. The penalty-gradient implementation uses first-order evaluations together with approximate lower responses and, when needed, multipliers."
+        "Where do second-order derivatives enter?",
+        "Second-order directional derivatives establish the smoothness bound. The algorithm evaluates first-order gradients using approximate lower responses and, for coupled constraints, their multipliers."
       ]
     ],
-    "source": "https://eurasip.org/Proceedings/Eusipco/Eusipco2025/pdfs/0001183.pdf"
+    "source": "https://eurasip.org/Proceedings/Eusipco/Eusipco2025/pdfs/0001183.pdf",
+    "result_note_title": "Outer steps and total work"
   },
   "blocc": {
     "scene": "Design a network while passengers choose their routes.",
@@ -1020,14 +1026,14 @@
             "13.481 ± 0.970"
           ]
         ],
-        "reading": "BLOCC reaches the specified stopping condition sooner on average in these runs. A smaller upper-objective update is the recorded stopping rule; it is not itself a certificate of identical bilevel solution accuracy.",
+        "reading": "BLOCC reaches the stopping condition sooner on average in these runs. Runtime is measured until the upper-objective change falls below 10⁻⁵. The accuracy panel reports the resulting classifiers’ test performance separately.",
         "protocol": "The runtime entries stop when the upper-objective update is smaller than 10⁻⁵. Table 3 separately reports seconds and utility for the transportation experiments.",
         "source": "S4.T2"
       }
     ],
     "application": [
       "A larger test of coupled decisions",
-      "The transportation experiments include 3- and 9-node synthetic networks and a 26-node Seville network with 49,216 variables and 13,336 constraints. Table 3 reports runtime and operator utility separately. A missing baseline entry means it did not converge within the 24-hour budget; it is not a numeric zero or evidence that the baseline cannot solve any such network."
+      "Transportation experiments use 3- and 9-node synthetic networks and a 26-node Seville network with 49,216 variables and 13,336 constraints. Table 3 lists runtime and operator utility. A missing baseline entry marks the 24-hour time limit."
     ],
     "cards": [
       [
@@ -1045,14 +1051,15 @@
     ],
     "faq": [
       [
-        "Is BLOCC projection-free in every variable?",
-        "Its primal-dual reformulation avoids the full joint projection onto the coupled constraints. Simple domain projections can remain in the updates; the claim should be understood in that context."
+        "Which projections does BLOCC use?",
+        "The primal-dual formulation handles the coupled inequalities through multipliers. Updates retain simple projections onto the separate variable domains and avoid a joint projection onto the coupled feasible set."
       ],
       [
-        "Does strong inner convexity make the whole problem convex?",
-        "No. It gives a well-controlled inner response, but the reduced outer objective can remain nonconvex. The paper’s convergence criterion is stationarity rather than global optimality."
+        "What convergence criterion does the analysis use?",
+        "The analysis uses a squared generalized-gradient stationarity criterion for the penalty reformulation. Strong inner convexity controls the lower-level response while the reduced outer objective can remain nonconvex."
       ]
     ],
-    "source": "https://arxiv.org/html/2406.10148v2"
+    "source": "https://arxiv.org/html/2406.10148v2",
+    "result_note_title": "Moving constraints enter the analysis"
   }
 }

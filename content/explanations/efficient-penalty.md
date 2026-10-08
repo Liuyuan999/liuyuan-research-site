@@ -1,6 +1,6 @@
 # Separate the sources of cost in penalty-based bilevel learning
 
-A large penalty can make a joint objective stiff. A better analysis and a different update rule can change which costs the algorithm must pay.
+Reduced-curvature analysis permits larger outer steps. Flatness-based updates remove one response computation, with separate methods for fixed and coupled constraints.
 
 ## The decision
 
@@ -12,7 +12,7 @@ There are three distinct costs: a penalty-scaled step-size restriction, two lowe
 
 ## The idea
 
-Analyze the reduced objective to recover curvature cancellation; alternate responses and outer updates; then use upper-level flatness to justify removing a value-function correction. Extend the analysis to coupled constraints with their own multiplier and regularity assumptions.
+Analyze the reduced objective to capture curvature cancellation, then alternate lower responses and outer updates. Upper-level flatness controls the bias from removing a value-function correction. The coupled extension incorporates constraint multipliers and boundary regularity.
 
 ## Source
 

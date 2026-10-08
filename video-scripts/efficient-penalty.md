@@ -26,7 +26,7 @@ Paper: https://arxiv.org/abs/2511.16796
 
 **On screen:** Show two schedules: one lower update; several constrained inner updates.
 
-**Narration:** PBGD-Free is fully single-loop in the analyzed uncoupled case. With coupled constraints, an inner loop remains, but the paper reduces its complexity. We need to count those inner updates.
+**Narration:** PBGD-Free is fully single-loop with uncoupled constraints. The coupled extension retains an inner solve and reduces its complexity. Its total computation includes both the inner and outer updates.
 
 ## 1:35–2:00
 
@@ -39,4 +39,4 @@ Paper: https://arxiv.org/abs/2511.16796
 - Keep toy diagrams visibly labeled as illustrative.
 - Show paper figure/table identifiers when discussing measured results.
 - End with the project URL and a link to the primary paper.
-- Record narration, then add figures and captions; no recorded video is included in this draft.
+- Record narration, then add figures and captions.

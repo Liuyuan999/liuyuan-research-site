@@ -4,7 +4,7 @@ A weight chooses a compromise. SURF asks how far that choice moves us along the 
 
 ## The decision
 
-A summarization system can reward both a useful summary and a faithful one. A single weighted loss selects one compromise; a collection of models lets a user choose among compromises. The collection is useful only if it represents the front well.
+A summarization system can reward both a useful summary and a faithful one. A weighted loss selects one compromise. A well-spaced collection of models gives users a range of quality–faithfulness balances to choose from.
 
 ## The bottleneck
 

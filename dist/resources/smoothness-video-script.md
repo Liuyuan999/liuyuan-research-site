@@ -32,11 +32,11 @@ Paper: https://eurasip.org/Proceedings/Eusipco/Eusipco2025/pdfs/0001183.pdf
 
 **On screen:** Add the cost of the inner solves to an outer-loop diagram.
 
-**Narration:** The full computation still includes lower-level work. The lesson is to analyze the geometry seen by the update, then count every part of the algorithm when comparing its cost.
+**Narration:** The fixed, general coupled, and affine constraint regimes use different lower-level solvers. Combining their inner work with the improved outer rate gives the full complexity of each method.
 
 ## Recording notes
 
 - Keep toy diagrams visibly labeled as illustrative.
 - Show paper figure/table identifiers when discussing measured results.
 - End with the project URL and a link to the primary paper.
-- Record narration, then add figures and captions; no recorded video is included in this draft.
+- Record narration, then add figures and captions.

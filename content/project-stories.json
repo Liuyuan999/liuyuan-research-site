@@ -31,7 +31,7 @@
       ],
       [
         "Reconstruction creates an error floor",
-        "For general problems, the map is estimated from finitely many solved points and refined iteratively. Theorem 1 bounds that reconstruction process under its assumptions; increasing the number of outer refinements alone does not remove the finite-sampling floor."
+        "For general problems, SURF reconstructs the map from finitely many solved points and refines it iteratively. Theorem 1 gives geometric contraction toward an O(N⁻²) discretization floor. Increasing N improves that resolution."
       ]
     ],
     "notation": [
@@ -66,7 +66,7 @@
     "result_reference": "Table 2 · LLM alignment experiment",
     "chart": {
       "title": "Spacing coefficient of variation",
-      "caption": "Lower is more even. This chart shows reported measurements, not the toy example.",
+      "caption": "Lower CV means more even spacing in these reported measurements.",
       "rows": [
         [
           "Uniform-w",
@@ -116,7 +116,7 @@
       ],
       [
         "Read controls within their sampling frame",
-        "Same-day shuffling preserves each day’s action count while breaking interval alignment. Global shuffling is a different control. The paper’s modalities and memory panels do not all use identical stock-day frames, so their magnitudes need the stated conditioning and sample counts."
+        "Same-day shuffling preserves each day’s action count while breaking interval alignment. Global shuffling draws from the saved archive. Each modality and memory panel specifies its stock-day frame, conditioning, and sample count."
       ]
     ],
     "notation": [
@@ -171,7 +171,7 @@
       ],
       "max": 50
     },
-    "second_result": "The matched memory analyses also examine persistence and timing conditional on switching. They help describe the behavior of the tested agents; they do not turn this audit into a live-market profitability result.",
+    "second_result": "The matched memory analyses examine action persistence and timing conditional on switching, linking the timing pattern to the evaluated agents’ sequential behavior.",
     "connection": "RetailAgent focuses on the timing of sequential choices. SURF offers another view of decision quality: how well a set of choices represents different objective trade-offs."
   },
   "birq": {
@@ -198,11 +198,11 @@
     "reasoning": [
       [
         "The target generator shares the learner’s representations",
-        "BiRQ uses a random-projection quantizer on intermediate features. That reuses a representation already being trained instead of requiring a separate external label encoder."
+        "BiRQ applies random-projection quantization to intermediate features from the encoder being trained. Those features supply the enhanced target labels."
       ],
       [
         "An anchor and an enhanced target have distinct roles",
-        "Raw-input labels provide an input-based reference. Enhanced labels use the evolving learned features. The method combines the two sources; selecting a branch in this page’s diagram only explains its role."
+        "Raw-input labels provide a fixed reference task. Enhanced labels draw on the evolving learned features. Both sources contribute to the masked-frame prediction objective."
       ],
       [
         "Selection connects the discrete and trainable components",
@@ -269,13 +269,13 @@
   },
   "efficient-penalty": {
     "headline": "Rethink the cost of a bilevel update.",
-    "deck": "A large penalty can make a joint objective stiff. A better analysis and a different update rule can change which costs the algorithm must pay.",
+    "deck": "Reduced-curvature analysis permits larger outer steps. Flatness-based updates remove one response computation, with separate methods for fixed and coupled constraints.",
     "figure_title": "Two constraint regimes, two loop structures",
     "figure_caption": "PBGD-Free is fully single-loop in the analyzed uncoupled case. With general coupled constraints, the proposed method retains an inner solve. Sections 4–5.",
     "steps": [
       [
         "Analyze the reduced objective",
-        "Study curvature after the lower-level response, rather than inheriting the joint objective’s penalty-scaled bound."
+        "Analyze curvature along the optimized lower-level response to obtain a penalty-independent smoothness order."
       ],
       [
         "Use upper-level flatness",
@@ -287,7 +287,7 @@
       ]
     ],
     "why_title": "Efficiency has more than one bottleneck",
-    "why": "A method may be slowed by a conservative outer step, repeated value-function solves, or moving constraints and their multipliers. This paper addresses these mechanisms separately, so the guarantee must be read with the specific algorithm and constraint regime.",
+    "why": "Outer step size, value-function response tracking, and coupled-constraint solves contribute separately to the computation. The paper gives a smoothness analysis and update rules for each constraint regime.",
     "reasoning": [
       [
         "Cancellation changes the smoothness analysis",
@@ -295,11 +295,11 @@
       ],
       [
         "Flatness changes which correction is necessary",
-        "A generic bilevel problem cannot safely drop the value-function contribution. The paper analyzes PBGD-Free under a condition that controls the upper objective’s sensitivity to lower-level deviations."
+        "Upper-level flatness controls the objective’s sensitivity to lower-level deviations. That structure bounds the bias from omitting the value-function contribution in PBGD-Free."
       ],
       [
         "Coupled constraints change the remaining work",
-        "When c(x, y) depends on x, constraint multipliers enter the value-function derivative. The coupled PBGD-Free construction still uses an inner loop; a single-loop description of the uncoupled method does not describe this extension."
+        "When c(x, y) depends on x, multipliers enter the value-function derivative. The coupled PBGD-Free method retains an inner loop to estimate the constrained response."
       ]
     ],
     "notation": [
@@ -329,7 +329,7 @@
       ]
     ],
     "anchor": "Theorems 3.1, 4.1, 5.1, and 5.2 · current arXiv version",
-    "result_title": "A framework with theorem-specific guarantees",
+    "result_title": "Match the update to the constraint regime",
     "result_context": "Read each result with its algorithm, constraint regime, stationarity metric, and inner-solve work.",
     "result_reference": "Theorems 3.1, 4.1, 5.1, and 5.2 · Table 7",
     "second_result": "The SVM benchmark compares accuracy and training time under a recorded stopping rule; the coupled PBGD-Free method retains an inner solve.",
@@ -337,9 +337,9 @@
   },
   "pbgd-free": {
     "headline": "When can we let go of the inner solve?",
-    "deck": "PBGD-Free removes the value-function loop from a penalty method. The reason this can work is upper-level flatness—not simply using fewer updates.",
+    "deck": "PBGD-Free uses upper-level flatness to bound the bias from removing the value-function loop, yielding a single-loop penalty method.",
     "figure_title": "The condition behind the update",
-    "figure_caption": "Definition 1 bounds upper-objective variation around a lower-level optimum. The residual δ and exponent α are part of the condition, not interchangeable tuning guarantees.",
+    "figure_caption": "Definition 1 bounds upper-objective variation around a lower-level optimum using exponent α and residual δ.",
     "steps": [
       [
         "Identify a flat upper objective",
@@ -347,27 +347,27 @@
       ],
       [
         "Drop the value-function loop",
-        "Use the simplified PBGD-Free update rather than estimating the full correction."
+        "Use the upper partial gradient in the simplified PBGD-Free update."
       ],
       [
         "Control the remaining bias",
         "Analyze convergence with the flatness parameters and the paper’s other assumptions."
       ]
     ],
-    "why_title": "Removing a term creates a bias that must be explained",
-    "why": "The full penalty gradient includes a correction involving the lower-level value function. Dropping it is attractive computationally, but it can leave a non-vanishing bias in a generic problem. Flatness supplies the additional structure used to bound the effect.",
+    "why_title": "Flatness controls the bias from omission",
+    "why": "Removing the value-function correction saves a response computation. The omitted term creates a bias, which the analysis bounds using upper-level flatness.",
     "reasoning": [
       [
-        "The value-function correction is not automatically small",
-        "Two nearby lower-level responses do not by themselves imply a small penalty-gradient difference: that difference is multiplied by γ. This is why a large penalty alone cannot justify removing the correction."
+        "The penalty magnifies response error",
+        "The difference between original and perturbed lower-level responses enters the penalty gradient with a factor γ. Controlling the resulting bias requires the upper-loss sensitivity captured by flatness."
       ],
       [
         "Flatness measures upper-loss sensitivity",
         "Definition 1 states |f(x, y_g^*(x)) − f(x, y)| ≤ c‖y_g^*(x) − y‖^α + δ. The residual δ permits local variation, while α controls how the distance contribution shrinks near a lower-level optimum. The paper generally studies δ > 0 and α > 1."
       ],
       [
-        "The simplified update still has a scope",
-        "The single-loop method alternates the lower-level update with an upper update based on ∇xf. Its analysis controls the omitted correction under flatness and the other assumptions. A flatness envelope by itself is not a convergence theorem."
+        "Flatness enters the convergence bound",
+        "The single-loop method tracks the perturbed lower response and updates x using ∇xf. Theorem 3 combines flatness with lower-level regularity to quantify the stationarity error and its residual."
       ]
     ],
     "notation": [
@@ -398,7 +398,7 @@
     ],
     "anchor": "Definition 1 · Section 3",
     "result_title": "From a structural condition to LLM fine-tuning",
-    "result_context": "Table 2 compares parameter-efficient fine-tuning of Llama-3-3B with a fixed training-time budget. The values below are the evaluated DPO loss at the trained outcome (xT, yT), not recognition errors or post-SFT results. The table reports no uncertainty for these values.",
+    "result_context": "Table 2 compares parameter-efficient fine-tuning of Llama-3-3b with a fixed training-time budget. Its first column evaluates DPO loss at the trained outcome. The post-SFT outcomes are separate columns.",
     "result_reference": "Table 2 · First column, evaluated DPO loss",
     "chart": {
       "title": "Evaluated DPO loss",
@@ -439,7 +439,7 @@
     "headline": "The curvature bound was hiding a cancellation.",
     "deck": "Penalty methods can look increasingly stiff as the penalty grows. Follow the optimized lower-level response, and the reduced objective can have a different curvature scale.",
     "figure_title": "Analyze the objective the outer loop follows",
-    "figure_caption": "Conditional theory: the joint penalty bound scales with γ, while the reduced formulation admits an O(1) smoothness bound. The exact assumptions and directional-derivative argument are in Sections III–IV.",
+    "figure_caption": "The joint penalty bound scales with γ. Analyzing the reduced formulation yields O(1) smoothness through directional-curvature cancellation in Sections III–IV.",
     "steps": [
       [
         "Separate joint from reduced",
@@ -467,7 +467,7 @@
       ],
       [
         "The rate uses a specific stationarity criterion",
-        "The comparison improves the outer count from O(ε⁻¹·⁵) to O(ε⁻¹) for the paper’s squared generalized-gradient criterion. Inner solves add work; the exponent is not an unconditional runtime prediction."
+        "The outer iteration order improves from O(ε⁻¹·⁵) to O(ε⁻¹) for the squared generalized-gradient criterion. Total complexity also includes the response-solve work for the chosen constraint regime."
       ]
     ],
     "notation": [
@@ -497,21 +497,21 @@
       ]
     ],
     "anchor": "Sections III–IV · Reduced smoothness and convergence",
-    "result_title": "A sharper conditional outer-iteration bound",
+    "result_title": "A sharper outer-iteration bound",
     "result_context": "The paper revisits ALT-PBGD and BLOCC under uncoupled and coupled constraints. The comparison uses the squared generalized-gradient stationarity criterion for the penalty formulation. Inner-solve costs introduce additional factors.",
     "result_reference": "Sections III–IV · Complexity analysis",
-    "second_result": "The improvement comes from the analysis of the reduced formulation. It does not require the joint penalty landscape itself to become less stiff, and it does not remove the regularity assumptions used to establish the bound.",
+    "second_result": "The improvement follows from cancellation between nearby value functions in the reduced formulation, allowing a penalty-independent outer step-size order.",
     "connection": "BLOCC supplies the earlier primal-dual penalty approach for coupled constraints. The efficient-penalty preprint places the smoothness analysis alongside new updates and flatness in a broader framework."
   },
   "blocc": {
     "headline": "The leader changes the follower’s choices.",
     "deck": "In a coupled bilevel problem, the outer decision changes the inner feasible set. BLOCC uses primal-dual information to keep that moving boundary in the optimization.",
     "figure_title": "A moving boundary / exact toy problem",
-    "figure_caption": "For g(x, y) = (y − 2x)² and 0 ≤ y ≤ x, the unconstrained minimizer is 2x but the feasible response is y_g^*(x) = x. This illustration is not a BLOCC run.",
+    "figure_caption": "In Figure 1, the constraint g^c(x, y) = 3x − y gives y_g^*(x) = 3x. The multiplier-weighted boundary term restores the value gradient.",
     "steps": [
       [
         "Model the changing feasible set",
-        "Represent the follower’s constraints as g^c(x, y) ≤ 0 rather than using a fixed inner domain."
+        "Represent the follower’s moving feasible set using g^c(x, y) ≤ 0."
       ],
       [
         "Track primal and dual information",
@@ -534,8 +534,8 @@
         "In Figure 1, y_g^*(x) = 3x and μ_g^*(x) = 2x for x > 0. The partial objective derivative is −4x, while the constraint term contributes 6x. Together they give the true value gradient 2x."
       ],
       [
-        "The algorithm requires more than a toy KKT identity",
-        "BLOCC combines primal-dual information with a penalty approach. Its approximation and convergence analysis uses strong convexity in y, convex lower-level constraints, feasible domains, smoothness, and LICQ; the schematic only explains why constraint information matters."
+        "Primal-dual responses support the penalty update",
+        "BLOCC uses primal-dual responses in its first-order penalty updates. Strong convexity in y, convex lower-level constraints, domain feasibility, smoothness, and LICQ support the approximation and convergence analysis."
       ]
     ],
     "notation": [
@@ -570,7 +570,7 @@
     "result_reference": "Table 2 · Diabetes SVM test accuracy",
     "chart": {
       "title": "Test accuracy / diabetes",
-      "caption": "Higher is better. BLOCC and LV-HBA have similar reported mean accuracy; the error bars in the paper must be considered.",
+      "caption": "BLOCC and LV-HBA have similar mean accuracy and reported standard deviation.",
       "rows": [
         [
           "BLOCC",

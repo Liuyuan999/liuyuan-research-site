@@ -14,7 +14,7 @@ Paper: https://arxiv.org/abs/2509.15430
 
 **On screen:** Compare raw-input quantization with intermediate-representation quantization.
 
-**Narration:** Random quantization is simple. BiRQ adds labels made from representations inside the model itself. We reuse features already being learned instead of adding a separate external label encoder.
+**Narration:** BiRQ creates enhanced labels from intermediate representations inside the speech model. Random-projection quantization turns those evolving features into training targets.
 
 ## 0:45–1:10
 
@@ -32,11 +32,11 @@ Paper: https://arxiv.org/abs/2509.15430
 
 **On screen:** Show the LibriSpeech WER bars, labeled Table 2, and the AMI table reference.
 
-**Narration:** In the reported 155-million-parameter LibriSpeech setting, test-other word error rate is 12.6 percent for BiRQ and 19.6 percent for BEST-RQ. Read these results with the architecture, data, and decoding setup. The idea is to improve targets while reusing the learner.
+**Narration:** With a 155-million-parameter Conformer pretrained on 960 hours of LibriSpeech and fine-tuned on 100 labeled hours, test-other word error rate is 12.6 percent for BiRQ and 19.6 percent for BEST-RQ. The result shows how learned representations can improve the model’s own targets.
 
 ## Recording notes
 
 - Keep toy diagrams visibly labeled as illustrative.
 - Show paper figure/table identifiers when discussing measured results.
 - End with the project URL and a link to the primary paper.
-- Record narration, then add figures and captions; no recorded video is included in this draft.
+- Record narration, then add figures and captions.

@@ -32,11 +32,11 @@ Paper: https://arxiv.org/abs/2507.20400
 
 **On screen:** Show backbone and head roles, then link to the paper.
 
-**Narration:** The experiments include parameter-efficient LLM post-training. The takeaway is conditional: a simpler optimization loop becomes justified when problem structure makes its omitted correction small. Read the flatness assumptions alongside the results.
+**Narration:** The LLM post-training experiments learn a preference backbone with an SFT head, then evaluate the backbone again after adapting the head. Flatness connects this learning structure to the simplified optimization loop.
 
 ## Recording notes
 
 - Keep toy diagrams visibly labeled as illustrative.
 - Show paper figure/table identifiers when discussing measured results.
 - End with the project URL and a link to the primary paper.
-- Record narration, then add figures and captions; no recorded video is included in this draft.
+- Record narration, then add figures and captions.

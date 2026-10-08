@@ -32,11 +32,11 @@ Paper: https://arxiv.org/abs/2608.28399
 
 **On screen:** Show controlled audit, then transaction costs and market feedback as open study directions.
 
-**Narration:** The results reveal sequential structure in the evaluated policies. They do not establish live-market profitability. The takeaway is to inspect when an agent acts, alongside how often it takes exposure.
+**Narration:** The action traces reveal sequential structure in the evaluated policies. Measuring timing alongside exposure shows how self-authored memory changes the agent’s decisions.
 
 ## Recording notes
 
 - Keep toy diagrams visibly labeled as illustrative.
 - Show paper figure/table identifiers when discussing measured results.
 - End with the project URL and a link to the primary paper.
-- Record narration, then add figures and captions; no recorded video is included in this draft.
+- Record narration, then add figures and captions.

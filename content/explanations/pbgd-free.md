@@ -1,6 +1,6 @@
 # When bilevel learning can skip a nested solve
 
-PBGD-Free removes the value-function loop from a penalty method. The reason this can work is upper-level flatness—not simply using fewer updates.
+PBGD-Free uses upper-level flatness to bound the bias from removing the value-function loop, yielding a single-loop penalty method.
 
 ## The decision
 
@@ -12,7 +12,7 @@ A full penalty gradient estimates both the original SFT-optimal head and a pertu
 
 ## The idea
 
-Make the reason for omission explicit: upper-level flatness bounds how the DPO objective varies around an SFT-optimal head. Under that condition and the other regularity assumptions, one lower update and one outer update yield controlled stationarity error.
+Upper-level flatness bounds how the DPO objective varies around an SFT-optimal head. Together with the lower-level regularity conditions, it controls the stationarity error of one lower update followed by one outer update.
 
 ## Source
 

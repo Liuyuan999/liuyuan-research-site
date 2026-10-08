@@ -11,7 +11,7 @@
       "For structured bi-objective problems, the paper derives analytical rules. For general problems, SURF alternates scalarized solves with reconstruction of the arc-length map. This makes the choice of the next weights depend on the geometry seen so far."
     ],
     "formula": "Φ(w) = s(w)/s(1); wₙ = Φ⁻¹(n/N), n = 0, …, N.",
-    "formula_note": "Equations 4–5 define f_PF(w), v(w), s(w), and Φ(w). Rule 1 uses the targets n/N directly, for n = 0, …, N. The damping parameter α in Algorithm 1 controls the update of Φₜ; it is not a scalarization weight.",
+    "formula_note": "Equations 4–5 define f_PF(w), v(w), s(w), and Φ(w). Rule 1 uses the targets n/N for n = 0, …, N. Algorithm 1 uses damping α to update Φₜ.",
     "formal": "Under Assumptions 1–3 and the stated inner-solver budget, SURF’s combined CDF estimation and optimization error contracts geometrically toward an O(N⁻²) discretization floor. N counts segments, so there are N + 1 sampled solutions. The theorem assumes hidden-space strong convexity, path regularity, and a sufficiently accurate monotone reconstruction.",
     "evidence": [
       [
@@ -23,7 +23,7 @@
         "In the reported Reddit summarization experiment, SURF improves hypervolume and spacing metrics compared with uniform weights under the same per-slot PPO budget. See Table 2 for the metrics, variability, and reward definitions."
       ]
     ],
-    "boundary": "Uniform coverage is defined using the objective-space metric. Rescaling an objective changes arc length, so objective units and normalization are part of the coverage choice. The convergence result also depends on the paper’s regularity and reconstruction assumptions.",
+    "boundary": "Uniform coverage is measured by arc length in objective space. Rescaling an objective changes that geometry, so units and normalization determine which trade-offs receive equal spacing.",
     "scenes": [
       [
         "0:00–0:20",
@@ -57,7 +57,7 @@
     "explanation": [
       [
         "The decision",
-        "A summarization system can reward both a useful summary and a faithful one. A single weighted loss selects one compromise; a collection of models lets a user choose among compromises. The collection is useful only if it represents the front well."
+        "A summarization system can reward both a useful summary and a faithful one. A weighted loss selects one compromise. A well-spaced collection of models gives users a range of quality–faithfulness balances to choose from."
       ],
       [
         "The bottleneck",
@@ -71,7 +71,7 @@
     "explanation_title": "Why uniform weights do not give uniform trade-offs"
   },
   "pbgd-free": {
-    "lead": "PBGD-Free removes the value-function loop from a penalty method. The reason this can work is upper-level flatness—not simply using fewer updates.",
+    "lead": "PBGD-Free uses upper-level flatness to bound the bias from removing the value-function loop, yielding a single-loop penalty method.",
     "takeaway": "PBGD-Free uses first-order updates without tracking the lower-level value function. Flatness conditions control the bias introduced by removing that correction.",
     "problem": [
       "In a bilevel problem, the upper-level objective is evaluated at a lower-level solution. Computing that response and its effect on the outer decision can require nested optimization or second-order operations.",
@@ -94,7 +94,7 @@
         "The experiments include bilevel parameter-efficient fine-tuning with preference optimization at the upper level and supervised fine-tuning at the lower level, together with an additional post-SFT transfer evaluation. See Section 4."
       ]
     ],
-    "boundary": "The simplified update is not a general recipe for every bilevel objective. Outside the analyzed flatness regime, the omitted correction can remain large and convergence can stop in a neighborhood of a stationary point.",
+    "boundary": "Flatness controls the bias left by the omitted correction. The convergence bound combines a decaying iteration term with a residual determined by the flatness parameters.",
     "scenes": [
       [
         "0:00–0:20",
@@ -119,7 +119,7 @@
       [
         "1:35–2:00",
         "Show backbone and head roles, then link to the paper.",
-        "The experiments include parameter-efficient LLM post-training. The takeaway is conditional: a simpler optimization loop becomes justified when problem structure makes its omitted correction small. Read the flatness assumptions alongside the results."
+        "The LLM post-training experiments learn a preference backbone with an SFT head, then evaluate the backbone again after adapting the head. Flatness connects this learning structure to the simplified optimization loop."
       ]
     ],
     "related": [
@@ -138,13 +138,13 @@
       ],
       [
         "The idea",
-        "Make the reason for omission explicit: upper-level flatness bounds how the DPO objective varies around an SFT-optimal head. Under that condition and the other regularity assumptions, one lower update and one outer update yield controlled stationarity error."
+        "Upper-level flatness bounds how the DPO objective varies around an SFT-optimal head. Together with the lower-level regularity conditions, it controls the stationarity error of one lower update followed by one outer update."
       ]
     ],
     "explanation_title": "When bilevel learning can skip a nested solve"
   },
   "efficient-penalty": {
-    "lead": "A large penalty can make a joint objective stiff. A better analysis and a different update rule can change which costs the algorithm must pay.",
+    "lead": "Reduced-curvature analysis permits larger outer steps. Flatness-based updates remove one response computation, with separate methods for fixed and coupled constraints.",
     "takeaway": "The paper sharpens smoothness analysis for alternating penalty updates and extends PBGD-Free. Uncoupled constraints admit fully single-loop updates; coupled constraints retain an inner loop with reduced complexity.",
     "problem": [
       "Penalty-based bilevel methods face two costs: step sizes can shrink as a penalty grows, and inner solves can consume many updates. Coupled constraints add another dependence because the outer variable changes the inner feasible set.",
@@ -156,7 +156,7 @@
     ],
     "formula": "Fγ(x) = γ [vγ(x) − v(x)]; Y(x) = {y ∈ Y : c(x, y) ≤ 0}.",
     "formula_note": "The joint objective F̃γ(x, y) in Equation 3 and the reduced objective Fγ(x) in Equation 5 are distinct. Reduced smoothness controls the outer step; dependence of Y(x) on x determines whether moving constraints and multipliers enter the method.",
-    "formal": "Read the theorem for the chosen regime. Theorems 3.1 and 5.1 establish reduced smoothness. Theorems 4.1 and 5.2 analyze PBGD-Free under flatness, with a fully single-loop fixed-set update and a retained inner solve for coupled constraints. The coupled results additionally use bounded multipliers, strict complementarity, and boundary regularity.",
+    "formal": "Theorems 3.1 and 5.1 establish reduced smoothness. Theorems 4.1 and 5.2 analyze PBGD-Free under flatness, with a fully single-loop fixed-set update and a retained inner solve for coupled constraints. The coupled results use bounded multipliers, strict complementarity, and boundary regularity.",
     "evidence": [
       [
         "Optimization analysis",
@@ -167,7 +167,7 @@
         "The experiments examine SVM hyperparameter optimization and LLM fine-tuning. They evaluate the proposed update rules in settings with different constraint structures. See the experimental section."
       ]
     ],
-    "boundary": "A fully single-loop claim applies to the uncoupled-constraint case analyzed in the paper. The coupled-constraint version still uses an inner loop, whose work must be counted when comparing total computation.",
+    "boundary": "The fixed-set PBGD-Free method is fully single-loop. With coupled constraints, it retains a constrained inner solve, which contributes to the total complexity alongside the outer iterations.",
     "scenes": [
       [
         "0:00–0:20",
@@ -187,7 +187,7 @@
       [
         "1:10–1:35",
         "Show two schedules: one lower update; several constrained inner updates.",
-        "PBGD-Free is fully single-loop in the analyzed uncoupled case. With coupled constraints, an inner loop remains, but the paper reduces its complexity. We need to count those inner updates."
+        "PBGD-Free is fully single-loop with uncoupled constraints. The coupled extension retains an inner solve and reduces its complexity. Its total computation includes both the inner and outer updates."
       ],
       [
         "1:35–2:00",
@@ -211,7 +211,7 @@
       ],
       [
         "The idea",
-        "Analyze the reduced objective to recover curvature cancellation; alternate responses and outer updates; then use upper-level flatness to justify removing a value-function correction. Extend the analysis to coupled constraints with their own multiplier and regularity assumptions."
+        "Analyze the reduced objective to capture curvature cancellation, then alternate lower responses and outer updates. Upper-level flatness controls the bias from removing a value-function correction. The coupled extension incorporates constraint multipliers and boundary regularity."
       ]
     ],
     "explanation_title": "Separate the sources of cost in penalty-based bilevel learning"
@@ -240,7 +240,7 @@
         "The analysis revisits ALT-PBGD and BLOCC. See Section III for uncoupled constraints and Section IV for coupled constraints. The convergence metric and inner-loop accounting are part of the comparison."
       ]
     ],
-    "boundary": "These are conditional complexity results. The O(ε⁻¹) outer iteration count should not be read as an unconditional wall-clock speedup or a count that omits the cost of inner solves.",
+    "boundary": "The sharper smoothness bound controls the outer iteration count. Total work combines those iterations with the lower-level solver cost, as shown separately for each constraint regime.",
     "scenes": [
       [
         "0:00–0:20",
@@ -265,7 +265,7 @@
       [
         "1:35–2:00",
         "Add the cost of the inner solves to an outer-loop diagram.",
-        "The full computation still includes lower-level work. The lesson is to analyze the geometry seen by the update, then count every part of the algorithm when comparing its cost."
+        "The fixed, general coupled, and affine constraint regimes use different lower-level solvers. Combining their inner work with the improved outer rate gives the full complexity of each method."
       ]
     ],
     "related": [
@@ -313,7 +313,7 @@
         "The infrastructure-planning experiments include synthetic networks and a 26-node network based on Seville. The upper-level design is evaluated through lower-level passenger responses. See Section 4.3."
       ]
     ],
-    "boundary": "The analyzed lower-level objective is strongly convex in y, and the lower-level constraints are convex in y with the stated constraint qualification. Those conditions are part of the convergence guarantee.",
+    "boundary": "Multipliers account for the moving constraints, and the penalty controls lower-level suboptimality. The analysis gives stationarity and total-complexity bounds for general and affine-in-y constraints.",
     "scenes": [
       [
         "0:00–0:20",
@@ -374,7 +374,7 @@
     ],
     "formula": "Audio → intermediate representation → random-projection quantizer → enhanced pseudo-labels.",
     "formula_note": "Equation 8 minimizes the enhanced-label loss F(θ) while requiring the anchoring-label loss G(θ) to stay within δ of its optimum. Both losses average masked-frame cross-entropy over the training data. Section 3 defines the label generators, losses, and training updates.",
-    "formal": "Equation 8 formulates enhanced-target learning subject to near-optimal anchor loss. Lemma 1 relates the penalty to that formulation under its error-bound assumptions; Algorithm 1 implements a weighted-gradient update with differentiable target generation. The empirical neural-network training results do not certify global strong convexity.",
+    "formal": "Equation 8 formulates enhanced-target learning subject to near-optimal anchor loss. Lemma 1 relates the penalty to that formulation under its error-bound condition. Algorithm 1 implements the weighted-gradient update with differentiable target generation.",
     "evidence": [
       [
         "155M Conformer · LibriSpeech",
@@ -385,7 +385,7 @@
         "Table 3 reports WER of 18.4% versus 16.3% on ami-ihm and 37.2% versus 34.0% on ami-sdm for BEST-RQ and BiRQ. The setting uses 5k-hour YODAS pretraining and 150h AMI fine-tuning."
       ]
     ],
-    "boundary": "The reported WER comparisons belong to their stated architecture, pretraining data, fine-tuning data, and decoding setup. The target-source diagram explains the design and does not measure the effect of changing its controls.",
+    "boundary": "The LibriSpeech and AMI tables report word error rate after pretraining, labeled fine-tuning, and decoding. Each setup specifies the architecture, data, and training budget used for its comparison.",
     "scenes": [
       [
         "0:00–0:20",
@@ -395,7 +395,7 @@
       [
         "0:20–0:45",
         "Compare raw-input quantization with intermediate-representation quantization.",
-        "Random quantization is simple. BiRQ adds labels made from representations inside the model itself. We reuse features already being learned instead of adding a separate external label encoder."
+        "BiRQ creates enhanced labels from intermediate representations inside the speech model. Random-projection quantization turns those evolving features into training targets."
       ],
       [
         "0:45–1:10",
@@ -410,7 +410,7 @@
       [
         "1:35–2:00",
         "Show the LibriSpeech WER bars, labeled Table 2, and the AMI table reference.",
-        "In the reported 155-million-parameter LibriSpeech setting, test-other word error rate is 12.6 percent for BiRQ and 19.6 percent for BEST-RQ. Read these results with the architecture, data, and decoding setup. The idea is to improve targets while reusing the learner."
+        "With a 155-million-parameter Conformer pretrained on 960 hours of LibriSpeech and fine-tuned on 100 labeled hours, test-other word error rate is 12.6 percent for BiRQ and 19.6 percent for BEST-RQ. The result shows how learned representations can improve the model’s own targets."
       ]
     ],
     "related": [
@@ -423,7 +423,7 @@
       ],
       [
         "The bottleneck",
-        "Input-based labels are stable but do not use the representations the encoder is learning. Labels from intermediate features can be richer, yet their target distribution changes with the same encoder being optimized."
+        "Raw-input labels stay fixed as the encoder learns. Intermediate-feature labels evolve with the same encoder that predicts them. Training must coordinate the changing targets with a stable reference task."
       ],
       [
         "The idea",
@@ -445,7 +445,7 @@
     ],
     "formula": "A_id(p, r) = Σₜ (p_idt − p̄_id) r_idt, where p̄_id = (1/T) Σₜ p_idt.",
     "formula_note": "p_idt is 1 for long and 0 for flat, and r_idt is the following interval return. The score compares a binary schedule with constant exposure p̄_id on the same realized path. Basis points are used for the interactive toy returns.",
-    "formal": "This is an empirical audit of directional and sequential policy structure under a controlled information boundary. Its timing measure is defined in Equation 1. It does not establish a theorem about all LLM trading policies.",
+    "formal": "RetailAgent audits directional and sequential policy structure on historical equity paths with controlled decision-time information. Equation 1 defines exposure-matched timing, and the experimental panels specify the observed policies, state conditions, and sampling frames.",
     "evidence": [
       [
         "Timing and shuffle controls",
@@ -456,7 +456,7 @@
         "The matched-panel analyses examine how self-authored memory affects action persistence and conditional timing. See Section 3 and the appendix for conditioning, sampling frames, and reporting details."
       ]
     ],
-    "boundary": "These scores are research timing measures on the evaluated historical paths. The paper leaves transaction costs, market impact, strategic feedback, and whether the pattern remains actionable to further study. Magnitudes from different sampling frames are descriptive comparisons.",
+    "boundary": "The timing score compares a saved long-or-flat schedule with constant exposure on the same historical stock-day. Date-resampled confidence intervals describe variability across the evaluated paths.",
     "scenes": [
       [
         "0:00–0:20",
@@ -481,7 +481,7 @@
       [
         "1:35–2:00",
         "Show controlled audit, then transaction costs and market feedback as open study directions.",
-        "The results reveal sequential structure in the evaluated policies. They do not establish live-market profitability. The takeaway is to inspect when an agent acts, alongside how often it takes exposure."
+        "The action traces reveal sequential structure in the evaluated policies. Measuring timing alongside exposure shows how self-authored memory changes the agent’s decisions."
       ]
     ],
     "related": [
@@ -494,7 +494,7 @@
       ],
       [
         "The bottleneck",
-        "A positive return alone does not establish good timing. A policy can benefit from a rising stock while being flat during its strongest intervals. Average exposure and alignment with the next return need separate measurements."
+        "A policy can benefit from a rising stock while being flat during its strongest intervals. Measuring average exposure and alignment with the next return separately reveals when the policy allocated its exposure."
       ],
       [
         "The idea",

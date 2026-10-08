@@ -8,7 +8,7 @@ A self-supervised speech model learns by predicting pseudo-labels at masked fram
 
 ## The bottleneck
 
-Input-based labels are stable but do not use the representations the encoder is learning. Labels from intermediate features can be richer, yet their target distribution changes with the same encoder being optimized.
+Raw-input labels stay fixed as the encoder learns. Intermediate-feature labels evolve with the same encoder that predicts them. Training must coordinate the changing targets with a stable reference task.
 
 ## The idea
 
