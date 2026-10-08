@@ -161,6 +161,46 @@ for (const lab of document.querySelectorAll('[data-opening]')) {
  }
  if(lab.dataset.opening==='bakery') {
   const range=lab.querySelector('#bakery-price'),g=lab.querySelector('[data-bakery-plot]');
+  const profitBase=lab.querySelector('[data-bakery-profit-base]'),profitOverlay=lab.querySelector('[data-bakery-profit-overlay]');
+  const plotTabs=[...lab.querySelectorAll('[data-bakery-view]')],plotPanels=[...lab.querySelectorAll('[data-bakery-panel]')];
+  const selectPlot=index=>{
+   plotTabs.forEach((tab,i)=>{tab.setAttribute('aria-selected',String(i===index));tab.tabIndex=i===index?0:-1;plotPanels[i].hidden=i!==index;});
+  };
+  lab.querySelector('.bakery-plot-tabs').hidden=false;
+  plotTabs.forEach((tab,i)=>{
+   tab.addEventListener('click',()=>selectPlot(i));
+   tab.addEventListener('keydown',event=>{
+    let index;
+    if(event.key==='ArrowRight'||event.key==='ArrowLeft')index=1-i;
+    if(event.key==='Home')index=0;
+    if(event.key==='End')index=1;
+    if(index!==undefined){event.preventDefault();selectPlot(index);plotTabs[index].focus();}
+   });
+  });
+  selectPlot(0);
+  const xx=p=>55+340*(p-1)/7,yy=q=>205-175*q/7;
+  const profitColor=value=>{
+   const stops=[[251,252,255],[219,230,243],[130,183,199],[36,125,135],[7,85,83]];
+   const scaled=Math.min(4,Math.max(0,value/49*4)),index=Math.min(3,Math.floor(scaled)),fraction=scaled-index;
+   return 'rgb('+stops[index].map((start,c)=>Math.round(start+(stops[index+1][c]-start)*fraction)).join(',')+')';
+  };
+  for(let i=0;i<56;i++)for(let j=0;j<35;j++) {
+   const price=1+7*(i+.5)/56,amount=7*(j+.5)/35;
+   profitBase.append(node('rect',{x:55+340*i/56,y:30+175*(34-j)/35,width:340/56+.2,height:175/35+.2,fill:profitColor((price-1)*amount)}));
+  }
+  for(const value of [5,10,20,35]) {
+   const start=1+value/7;
+   const points=Array.from({length:101},(_,i)=>{const price=start+(8-start)*i/100;return `${xx(price)},${yy(value/(price-1))}`;}).join(' ');
+   profitBase.append(node('polyline',{points,fill:'none',stroke:value>=20?'#fff':'#627c8e','stroke-opacity':.55,'stroke-width':1}));
+   profitBase.append(node('text',{x:390,y:yy(value/7)-4,'text-anchor':'end',class:'profit-contour-label',style:'fill:'+(value>=20?'#fff':'#324758')},'$'+value));
+  }
+  const axisGroup=node('g');
+  for(const q of [0,3,7])axisGroup.append(node('text',{x:44,y:yy(q)+6,'text-anchor':'end'},String(q)));
+  axisGroup.append(node('path',{d:'M55 24 V205 H400',fill:'none',stroke:'#9aabc7'}));
+  for(const p of [1,4,8])axisGroup.append(node('text',{x:xx(p),y:228,'text-anchor':'middle'},'$'+p));
+  axisGroup.append(node('text',{x:228,y:252,'text-anchor':'middle'},'Price per kg, x'));
+  axisGroup.append(node('text',{x:18,y:115,'text-anchor':'middle',transform:'rotate(-90 18 115)'},'Bread bought, y (kg)'));
+  profitBase.append(axisGroup);
   const toggles=[...lab.querySelectorAll('[data-bakery-constraint]')];
   const money=x=>'$'+x.toFixed(2),quantity=x=>x.toFixed(2).replace(/\.?0+$/,'');
   const update=()=>{
@@ -176,7 +216,7 @@ for (const lab of document.querySelectorAll('[data-opening]')) {
    if(budget&&Math.abs(bought-12/price)<1e-8&&preferred(price)>bought+1e-8)reason.push('the $12 budget');
    if(stock&&Math.abs(bought-3)<1e-8&&preferred(price)>bought+1e-8)reason.push('the 3 kg stock limit');
    lab.querySelector('[data-bakery-result]').textContent=`At ${money(price)} per kg, the customer buys ${quantity(bought)} kg. The bakery earns ${money(profit)}.`+(reason.length?` The purchase is limited by ${reason.join(' and ')}.`:' The customer can buy their preferred amount.');
-   const xx=p=>55+340*(p-1)/7,yy=q=>205-175*q/7;
+
    g.replaceChildren();
    for(const q of [0,3,7]) {
     g.append(node('path',{d:`M55 ${yy(q)} H395`,stroke:'#e0e5ef','stroke-width':1}));
@@ -191,6 +231,19 @@ for (const lab of document.querySelectorAll('[data-opening]')) {
    for(const p of [1,4,8])g.append(node('text',{x:xx(p),y:228,'text-anchor':'middle'},'$'+p));
    g.append(node('text',{x:228,y:252,'text-anchor':'middle'},'Price per kg, x'));
    g.append(node('text',{x:18,y:115,'text-anchor':'middle',transform:'rotate(-90 18 115)'},'Bread bought, y (kg)'));
+   profitOverlay.replaceChildren();
+   if(budget) {
+    const boundary=Array.from({length:141},(_,i)=>{const p=1+7*i/140;return `${xx(p)},${yy(Math.min(7,12/p))}`;}).join(' ');
+    profitOverlay.append(node('polygon',{points:`55,30 395,30 ${boundary.split(' ').reverse().join(' ')}`,fill:'url(#bakery-infeasible)'}));
+   }
+   if(stock)profitOverlay.append(node('rect',{x:55,y:30,width:340,height:yy(3)-30,fill:'url(#bakery-infeasible)'}));
+   const responsePoints=curve(purchase);
+   profitOverlay.append(node('polyline',{points:responsePoints,fill:'none',stroke:'#fff','stroke-width':7,'stroke-linejoin':'round'}));
+   profitOverlay.append(node('polyline',{points:responsePoints,fill:'none',stroke:'#007c70','stroke-width':3.5,'stroke-linejoin':'round','data-profit-response':''}));
+   profitOverlay.append(node('path',{d:`M${xx(price)} 30 V205`,stroke:'#354ac6','stroke-width':1.5,'stroke-dasharray':'3 5'}));
+   profitOverlay.append(node('circle',{cx:xx(price),cy:yy(bought),r:6,fill:'#354ac6',stroke:'#fff','stroke-width':2,'data-profit-selected':''}));
+   lab.querySelector('[data-bakery-infeasible-key]').hidden=!budget&&!stock;
+   lab.querySelector('.bakery-profit-plot').setAttribute('aria-label',`Profit equals (price minus one dollar per kg) times bread bought. Color scale stays between zero and 49 dollars. At ${money(price)} per kg, the customer chooses ${quantity(bought)} kg and the bakery earns ${money(profit)}. The curve shows the customer’s response at every price.`);
   };
   range.addEventListener('input',update);
   for(const button of toggles)button.addEventListener('click',()=>{button.setAttribute('aria-pressed',String(button.getAttribute('aria-pressed')!=='true'));update();});
