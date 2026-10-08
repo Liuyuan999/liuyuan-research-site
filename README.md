@@ -1,6 +1,6 @@
 # Liuyuan Jiang — Research, explained
 
-A separate static research website with seven project pages with integrated explanations, interactive teaching diagrams, and narration/storyboard downloads. The recorded videos are not included.
+A separate static research website with seven project pages with integrated explanations, interactive teaching diagrams, and seven separate video pages with narration/storyboard downloads. The recorded videos are not included.
 
 ## Preview
 
@@ -12,6 +12,7 @@ Run `python3 -m http.server 8765 --bind 127.0.0.1 --directory dist` from this fo
 - `content/articles.json`: integrated project explanations, evidence, and narration scenes.
 - `content/explanations/`: editable Markdown exports of the explanations.
 - Old `/blog/` URLs redirect to the matching project page and are excluded from the sitemap.
+- `/videos/<paper>/`: separate video pages. Narration and storyboards appear here, not on project pages.
 - `dist/assets/style.css`: responsive visual design.
 - `dist/assets/site.js`: interactive educational diagrams.
 - `build.py` and `render_articles.py`: generate static pages and editable Markdown exports.
@@ -44,4 +45,4 @@ The initial hosted version is private for review. Public visibility requires cha
 
 ## Recording the videos
 
-Each file in `video-scripts/` contains narration plus on-screen directions. Record the narration, add paper figures with their table/figure identifiers, include captions, and end with the project URL. After uploading a video, add its verified embed URL to the corresponding project page. Do not label a script as a recorded talk.
+Each file in `video-scripts/` contains narration plus on-screen directions. Record the narration, add paper figures with their table/figure identifiers, include captions, and end with the project URL. After uploading a video, add its verified embed URL to the corresponding video page. Do not label a script as a recorded talk.
