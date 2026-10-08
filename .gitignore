@@ -3,3 +3,6 @@ work/
 .env
 .DS_Store
 __pycache__/
+
+# Supplied original; the website copy lives in dist/assets/.
+/jiang.PNG

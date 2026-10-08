@@ -9,6 +9,7 @@ Run `python3 -m http.server 8765 --bind 127.0.0.1 --directory dist` from this fo
 ## Edit
 
 - `content/papers.json`: author order, titles, venues, links, and source records.
+- `content/profile.json`: researcher identity, portrait dimensions, and verified academic/profile/contact links.
 - `content/articles.json`: integrated project explanations, evidence, and narration scenes.
 - `content/explanations/`: editable Markdown exports of the explanations.
 - Old `/blog/` URLs redirect to the matching project page and are excluded from the sitemap.
@@ -66,3 +67,7 @@ SURF is pinned first at the author’s request. Remaining publications are sorte
 The opening headline is “The geometry of learning and decisions.” The direction tabs support clicks, arrow keys, Home/End, and direct direction fragments. The multi-objective example contrasts equally spaced scalarization weights with equal arc-length spacing on the exact toy front `(z², (1−z)⁴)`. The bilevel example lets readers move a constraint in a labeled toy response problem. Applications switches between original BiRQ and RetailAgent architecture figures. With JavaScript disabled, all directions remain available.
 
 `content/paper-figures.json` records each original figure or table, its source URL, local image dimensions, explanatory caption, and any PDF crop. Original artwork lives in `dist/assets/paper-figures/`. arXiv PNG/SVG assets are preserved; RetailAgent Figure 2 and EUSIPCO Table I are extracted from the original PDFs. The project page displays a source link and full-size image link for every figure. Preview charts for RetailAgent and smoothness are explicitly distinguished as reported results and an explanatory toy.
+
+## Researcher portrait and profiles
+
+The opening shows the user-supplied `jiang.PNG` portrait, copied unchanged to `dist/assets/liuyuan-jiang.png`. `content/profile.json` centralizes the academic homepage, Google Scholar, GitHub, and email links displayed in the opening and About area. The academic homepage links to Scholar; the GitHub profile matches the verified research repositories. The supplied root photo is kept locally and excluded from Git because the served copy is versioned.
