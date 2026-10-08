@@ -1,4 +1,4 @@
-# Liuyuan Jiang — Research, explained
+# Liuyuan Jiang — The geometry of learning and decisions
 
 A separate static research website with seven project pages with integrated explanations, interactive teaching diagrams, and seven separate video pages with narration/storyboard downloads. The recorded videos are not included.
 
@@ -55,12 +55,14 @@ The project pages contain explanations, interactive examples, results, technical
 
 ## Mathematical notation and research areas
 
-The hub starts with three topic clusters: Bilevel Optimization (four papers), Multi-Objective Optimization (SURF), and Applications (RetailAgent and BiRQ). `research_hub.py` controls the topic map and publication rows. The rows show each paper’s full title, authors, venue, figure preview, and available resource links. Preview plots are labeled as illustrative or linked to their primary-paper table.
+The hub opens with an interactive direction explorer: Multi-objective Learning (SURF), Bilevel Optimization (four papers), and Applications (RetailAgent and BiRQ). The direction labels do not fix a permanent number of research areas. `research_hub.py` controls the topic map and publication rows. The rows show each paper’s full title, authors, venue, figure preview, and available resource links. Preview plots are labeled as illustrative or linked to their primary-paper table.
 
 `content/equations.json` contains the display and inline TeX. `compile_math.mjs` renders it with the pinned, locally vendored KaTeX 0.19.0 package; `math_typesetting.py` adds accessible MathML and bundles the local stylesheet and fonts. `python3 build.py` requires Node.js (uses the installed Codex runtime as a fallback on this computer). Equations are pre-rendered and do not depend on a CDN or browser JavaScript. Malformed TeX fails the build. Main formulations, interactive constraint-regime formulas, and update steps use the same renderer.
 
 ### Research atlas and original paper figures
 
-The home page lists papers by publication year, newest first; first public release month breaks ties within a year. `content/hub-curation.json` records this ordering and the paper-to-visual evidence notes. Topic-card links jump to stable `#paper-<slug>` publication anchors.
+SURF is pinned first at the author’s request. Remaining publications are sorted by publication year, newest first; first public release month breaks ties within a year. `content/hub-curation.json` records this ordering, descriptive paper-jump labels, and the paper-to-visual evidence notes. Direction links include the paper’s contribution and venue and jump to stable `#paper-<slug>` publication anchors.
+
+The opening headline is “The geometry of learning and decisions.” The direction tabs support clicks, arrow keys, Home/End, and direct direction fragments. The multi-objective example contrasts equally spaced scalarization weights with equal arc-length spacing on the exact toy front `(z², (1−z)⁴)`. The bilevel example lets readers move a constraint in a labeled toy response problem. Applications switches between original BiRQ and RetailAgent architecture figures. With JavaScript disabled, all directions remain available.
 
 `content/paper-figures.json` records each original figure or table, its source URL, local image dimensions, explanatory caption, and any PDF crop. Original artwork lives in `dist/assets/paper-figures/`. arXiv PNG/SVG assets are preserved; RetailAgent Figure 2 and EUSIPCO Table I are extracted from the original PDFs. The project page displays a source link and full-size image link for every figure. Preview charts for RetailAgent and smoothness are explicitly distinguished as reported results and an explanatory toy.

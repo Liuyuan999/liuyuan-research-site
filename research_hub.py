@@ -1,32 +1,34 @@
 CURATION=json.loads((ROOT/'content/hub-curation.json').read_text())
 FIGURES=json.loads((ROOT/'content/paper-figures.json').read_text())
 AREAS=[
- {'id':'bilevel','title':'Bilevel Optimization','type':'Nested decisions','description':'How can we learn efficiently when one optimization problem sits inside another?','papers':['efficient-penalty','pbgd-free','smoothness','blocc']},
- {'id':'moo','title':'Multi-Objective Optimization','type':'Competing objectives','description':'How can we represent the full range of trade-offs between competing objectives?','papers':['surf']},
- {'id':'applications','title':'Applications','type':'Learning & behavior','description':'Better speech-learning targets, and a closer look at how LLM agents make decisions.','papers':['retailagent','birq']}
+ {'id':'moo','title':'Multi-objective Learning','type':'Competing objectives','question':'How do we cover the space of trade-offs?','description':'A preference weight is a dial, but turning it evenly can leave gaps in the solutions. Geometry tells us how to explore the Pareto front.','papers':['surf']},
+ {'id':'bilevel','title':'Bilevel Optimization','type':'Nested decisions','question':'What changes when learning has an inner problem?','description':'An outer decision changes an inner solution. My work studies the curvature, update rules, and constraints that make this learning process efficient.','papers':['efficient-penalty','pbgd-free','smoothness','blocc']},
+ {'id':'applications','title':'Applications','type':'Learning & behavior','question':'What do these ideas reveal in real models?','description':'Build better learning targets for speech, and examine the structure behind an LLM agent’s sequential decisions.','papers':['retailagent','birq']}
 ]
 AREA_BY_SLUG={slug:area for area in AREAS for slug in area['papers']}
 def chronological_papers():
- return sorted(PAPERS,key=lambda p:(p['year'],CURATION['release_months'][p['slug']]),reverse=True)
-def atlas_diagram(area):
- # Functional scientific diagrams, not decorative illustrations.
- common='<defs><marker id="tip-'+area+'" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7" fill="currentColor"/></marker></defs>'
+ priorities=CURATION.get('display_priority',[])
+ return sorted(PAPERS,key=lambda p:(p['slug'] in priorities,p['year'],CURATION['release_months'][p['slug']]),reverse=True)
+def opening_visual(area):
+ if area=='moo':
+  # Same exact illustrative objectives as the project demo: z² and (1-z)^4.
+  def solve(w):
+   if w==0:return 1.
+   if w==1:return 0.
+   lo,hi=0.,1.
+   for _ in range(50):
+    z=(lo+hi)/2
+    if 2*w*z-4*(1-w)*(1-z)**3>0:hi=z
+    else:lo=z
+   return (lo+hi)/2
+  xy=lambda z:(90+280*z*z,305-280*(1-z)**4)
+  points=' '.join(f'{x:.2f},{y:.2f}' for x,y in [xy(i/200) for i in range(201)])
+  dots=''.join(f'<circle data-front-point="{i}" cx="{xy(solve(1-i/8))[0]:.2f}" cy="{xy(solve(1-i/8))[1]:.2f}" r="5.5"/>' for i in range(9))
+  svg=f'<svg class="opening-plot" viewBox="0 0 460 360" role="img" aria-label="Illustrative Pareto front for z squared and one minus z to the fourth power"><path class="plot-grid" d="M90 25 H370 M90 95 H370 M90 165 H370 M90 235 H370"/><path class="plot-axis" d="M90 17 V305 H388"/><polyline class="front-curve" points="{points}"/>{dots}<text x="230" y="339" text-anchor="middle">Objective 1</text><text x="43" y="165" text-anchor="middle" transform="rotate(-90 43 165)">Objective 2</text></svg>'
+  return '<div class="opening-lab" data-opening="pareto"><div class="lab-eyebrow">Explore the idea</div><h3>Same front. Different coverage.</h3><div class="lab-controls" aria-label="Pareto-front sampling"><button type="button" data-spacing="weights" aria-pressed="true">Equal weights</button><button type="button" data-spacing="arc" aria-pressed="false">Equal distances</button></div>'+svg+'<p class="lab-result" data-spacing-result aria-live="polite">Even weight increments produce uneven gaps.</p><p class="lab-note">An exact toy example of the spacing problem behind SURF. Both objectives are minimized.</p></div>'
  if area=='bilevel':
-  inside='<rect x="22" y="18" width="107" height="42" rx="5"/><rect x="196" y="18" width="107" height="42" rx="5"/><text x="76" y="44" text-anchor="middle">Leader x</text><text x="250" y="44" text-anchor="middle">Follower y*</text><path d="M136 39 H188" marker-end="url(#tip-bilevel)"/><path d="M250 69 V85 H76 V69" marker-end="url(#tip-bilevel)"/><text x="163" y="107" text-anchor="middle" class="diagram-note">Learn through the lower-level response</text>'
- elif area=='moo':
-  pts=' '.join(f'{48+222*z*z:.2f},{82-66*(1-z)**4:.2f}' for z in [i/100 for i in range(101)])
-  inside='<path class="diagram-axis" d="M41 12 V89 H288"/><polyline points="'+pts+'"/>'
-  # Equal arc length on an explicit toy front.
-  zs=[i/1000 for i in range(1001)];arc=[0.]
-  for i,z in enumerate(zs[1:],1):arc.append(arc[-1]+math.hypot(z*z-zs[i-1]**2,(1-z)**4-(1-zs[i-1])**4))
-  import bisect
-  for j in range(7):
-   k=min(1000,bisect.bisect_left(arc,j*arc[-1]/6));z=zs[k]
-   inside+=f'<circle cx="{48+222*z*z:.2f}" cy="{82-66*(1-z)**4:.2f}" r="4"/>'
-  inside+='<text x="163" y="110" text-anchor="middle" class="diagram-note">Cover the trade-off curve</text>'
- else:
-  inside='<rect x="12" y="24" width="83" height="43" rx="5"/><rect x="119" y="24" width="85" height="43" rx="5"/><rect x="228" y="24" width="86" height="43" rx="5"/><text x="54" y="50" text-anchor="middle">Data</text><text x="162" y="50" text-anchor="middle">Model</text><text x="271" y="50" text-anchor="middle">Evaluate</text><path d="M99 46 H113" marker-end="url(#tip-applications)"/><path d="M208 46 H222" marker-end="url(#tip-applications)"/><text x="163" y="107" text-anchor="middle" class="diagram-note">Speech representations & agent behavior</text>'
- return '<svg class="atlas-diagram" viewBox="0 0 326 120" aria-hidden="true">'+common+inside+'</svg>'
+  return '<div class="opening-lab" data-opening="bilevel"><div class="lab-eyebrow">Explore the idea</div><h3>A moving constraint changes the response.</h3><div class="lab-range"><label for="opening-leader">Leader’s decision x</label><input id="opening-leader" type="range" min="0" max="3" step="0.1" value="1"><output for="opening-leader" data-leader-value>1.0</output></div><svg class="opening-plot" viewBox="0 0 460 290" role="img" aria-label="Exact constrained quadratic example showing the follower response and a moving feasibility boundary"><g data-response-plot></g></svg><div class="lab-legend"><span>Unconstrained response</span><span>Feasible response</span></div><p class="lab-result" data-response-result aria-live="polite"></p><p class="lab-note">Exact toy: minimize (y − 2x)² subject to 0 ≤ y ≤ x. This illustrates a coupled constraint.</p></div>'
+ return '<div class="opening-lab" data-opening="applications"><div class="lab-eyebrow">Inside the applications</div><div class="lab-controls" aria-label="Application preview"><button type="button" data-application="speech" aria-pressed="true">Speech targets</button><button type="button" data-application="agents" aria-pressed="false">Agent decisions</button></div><div class="application-view" data-application-view="speech"><h3>Learn from the model’s own features.</h3><img class="speech-original" src="assets/paper-figures/birq-figure1.png" width="1938" height="2057" alt="Original BiRQ Figure 1: enhanced targets from intermediate features and anchoring targets from raw input." loading="lazy"><p class="lab-result">Enhanced labels evolve with the encoder; input-based anchors stabilize training.</p><p class="lab-note">Original BiRQ Figure 1. <a href="https://arxiv.org/html/2509.15430v1#S1.F1">Paper source</a></p></div><div class="application-view" data-application-view="agents" hidden><h3>Observe. Decide. Carry state forward.</h3><img class="agents-original" src="assets/paper-figures/retailagent-figure2.png" width="1452" height="708" alt="Original RetailAgent Figure 2 showing observations, self-authored memory, and a frozen LLM’s long-or-flat decisions." loading="lazy"><p class="lab-result">The agent commits to long or flat before the next return is revealed.</p><p class="lab-note">Original RetailAgent Figure 2. <a href="https://arxiv.org/pdf/2608.28399v1#page=3">Paper source</a></p></div></div>'
 def original_paper_figure(p,index=0):
  fs=FIGURES.get(p['slug'],[])
  if index>=len(fs):return ''
@@ -69,13 +71,16 @@ def publication_row(p,number):
  venue=e(p['venue']) if p['venue']!='Preprint' else 'arXiv preprint'
  note='<p class="pub-note">'+e(p['venue_note'])+'</p>' if p.get('venue_note') else ''
  return f'<article id="paper-{slug}" class="publication-row {area["id"]}" aria-labelledby="title-{slug}">{publication_preview(p)}<div class="pub-record"><div class="pub-overline"><span>{number:02} / {p["year"]}</span><span class="topic-label">{e(area["title"])}</span></div><h3 id="title-{slug}"><a href="papers/{slug}/">{e(p["title"])}</a></h3><p class="pub-authors">{authors}</p><p class="pub-venue">{venue}{" · "+str(p["year"]) if str(p["year"]) not in p["venue"] else ""}</p>{note}<p class="pub-summary">{e(p["description"])}</p><div class="pub-links">{links}</div></div></article>'
+def direction_paper(p):
+ c=CURATION['direction_papers'][p['slug']]
+ venue=p['venue'] if p['venue']!='Preprint' else 'Preprint · '+str(p['year'])
+ return '<a class="direction-paper" href="#paper-'+p['slug']+'"><span class="direction-paper-title">'+e(c['headline'])+'</span><span class="direction-paper-idea">'+e(c['idea'])+'</span><span class="direction-paper-meta">'+e(venue)+'<span>View publication below</span></span></a>'
 def home():
- by={p['slug']:p for p in PAPERS};ordered=chronological_papers();rank={p['slug']:i for i,p in enumerate(ordered,1)};map_nodes=''
- for i,area in enumerate(AREAS,1):
-  count=len(area['papers']);paper_links=''
-  for slug in sorted(area['papers'],key=lambda s:rank[s]):
-   p=by[slug]
-   paper_links+='<a class="topic-paper" href="#paper-'+slug+'" aria-label="Jump to '+e(p['title'])+'"><span>'+e(CURATION['paper_labels'][slug])+'</span><small>'+str(p['year'])+'</small></a>'
-  map_nodes+=f'<article id="{area["id"]}" class="research-node {area["id"]}"><div class="atlas-header"><div class="map-meta"><span>{i:02} / {e(area["type"])}</span><span>{count} paper{"s" if count!=1 else ""}</span></div>{atlas_diagram(area["id"])}</div><div class="atlas-body"><h2>{e(area["title"])}</h2><p>{e(area["description"])}</p><nav class="topic-papers" aria-label="{e(area["title"])} papers">{paper_links}</nav></div></article>'
+ by={p['slug']:p for p in PAPERS};ordered=chronological_papers();rank={p['slug']:i for i,p in enumerate(ordered,1)};tabs='';panels=''
+ for i,area in enumerate(AREAS):
+  count=len(area['papers']);active=i==0
+  tabs+=f'<button type="button" id="direction-tab-{area["id"]}" role="tab" aria-controls="{area["id"]}" aria-selected="{str(active).lower()}" tabindex="{0 if active else -1}" data-direction="{area["id"]}"><span>{e(area["title"])}</span><small>{e(area["type"])}</small></button>'
+  paper_links=''.join(direction_paper(by[slug]) for slug in sorted(area['papers'],key=lambda s:rank[s]))
+  panels+=f'<section id="{area["id"]}" class="direction-panel {area["id"]}" role="tabpanel" aria-labelledby="direction-tab-{area["id"]}" tabindex="0" {"" if active else "hidden"}><div class="direction-story"><div class="eyebrow">{e(area["type"])}</div><h2>{e(area["question"])}</h2><p class="direction-intro">{e(area["description"])}</p></div>{opening_visual(area["id"])}<div class="direction-papers">{paper_links}</div></section>'
  rows=''.join(publication_row(p,i) for i,p in enumerate(ordered,1))
- return head('Liuyuan Jiang | Research','Bilevel optimization, multi-objective optimization, and applications in speech learning and LLM agents.')+f'<main id="main" class="wrap"><header class="research-intro"><div><div class="eyebrow">Liuyuan Jiang · University of Rochester</div><h1>Research,<br><em>explained.</em></h1></div><div><p>I study optimization theory and algorithms for learning with nested decisions and competing objectives, alongside applications in speech models and LLM agents.</p><a href="https://liuyuan999.github.io/">Academic homepage</a></div></header><section class="research-overview" aria-label="Research topic map"><div class="atlas-intro"><span>Three connected research directions</span><span>Select a paper to jump to its publication</span></div><div class="research-map">{map_nodes}</div></section><section id="papers" class="publication-collection"><div class="section-top"><h2>Publications &amp; projects</h2><span>Newest first · publication year</span></div><div class="publication-list">{rows}</div></section><section id="about" class="about"><div><div class="eyebrow">Behind the work</div><h2>Liuyuan Jiang</h2></div><div><p>I am a PhD student in Electrical and Computer Engineering at the University of Rochester, advised by Prof. Lisha Chen. Previously, I was a PhD student at Rensselaer Polytechnic Institute, advised by Prof. Tianyi Chen.</p><p>Each project page combines an accessible explanation with the method, results, and technical scope. Video narration and storyboards have their own pages.</p><div class="intro-links"><a href="mailto:ljiang24@ur.rochester.edu">Email</a><a href="https://liuyuan999.github.io/">Academic profile</a></div></div></section></main>'+footer()
+ return head('Liuyuan Jiang | Learning and Decisions','Optimization for multi-objective learning, nested decisions, speech representations, and LLM agents.')+f'<main id="main" class="wrap"><header class="research-intro"><div><div class="eyebrow">Liuyuan Jiang · University of Rochester</div><h1>The geometry of<br><em>learning and decisions.</em></h1></div><div><p>I study how optimization shapes learning: navigating competing objectives, solving nested problems, and understanding model behavior.</p><a href="https://liuyuan999.github.io/">Academic homepage</a></div></header><section class="research-overview" aria-label="Research directions" data-direction-explorer><div class="atlas-intro"><h2>Research directions</h2><span>Explore a direction, then follow the papers.</span></div><div class="direction-tabs" role="tablist" aria-label="Research directions">{tabs}</div>{panels}<noscript><style>.direction-panel[hidden]{{display:grid!important}}.direction-tabs{{display:none}}</style></noscript></section><section id="papers" class="publication-collection"><div class="section-top"><h2>Publications &amp; projects</h2><span>Latest work first</span></div><div class="publication-list">{rows}</div></section><section id="about" class="about"><div><div class="eyebrow">Behind the work</div><h2>Liuyuan Jiang</h2></div><div><p>I am a PhD student in Electrical and Computer Engineering at the University of Rochester, advised by Prof. Lisha Chen. Previously, I was a PhD student at Rensselaer Polytechnic Institute, advised by Prof. Tianyi Chen.</p><p>Each project page combines an accessible explanation with the method, results, and technical scope. Video narration and storyboards have their own pages.</p><div class="intro-links"><a href="mailto:ljiang24@ur.rochester.edu">Email</a><a href="https://liuyuan999.github.io/">Academic profile</a></div></div></section></main>'+footer()

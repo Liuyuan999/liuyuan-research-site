@@ -1,5 +1,5 @@
 {
-  "ordering": "Publication year descending, then first public release within each year.",
+  "ordering": "SURF first at the author\u2019s request; remaining papers by publication year descending, then public release month.",
   "release_months": {
     "retailagent": "2026-08",
     "surf": "2026-05",
@@ -30,5 +30,38 @@
     "pbgd-free": "Definition 1, Algorithm 1, Theorem 3, Figure 1: single-step lower update, no value-function loop; flatness controls omitted-gradient bias.",
     "smoothness": "Section III and IV, Table I: directional-derivative cancellation. Home preview is the exact toy H=x\u00b2/2+\u03b3(y\u2212x)\u00b2 at \u03b3=5 and F=min_y H=x\u00b2/2, not experimental data.",
     "blocc": "Section 2.1, Equation 8, Figure 1: the value-function gradient includes the multiplier contribution from moving constraints."
+  },
+  "display_priority": [
+    "surf"
+  ],
+  "direction_papers": {
+    "surf": {
+      "headline": "SURF \u00b7 Cover the Pareto front evenly",
+      "idea": "Sample scalarization weights using the geometry of the trade-off curve."
+    },
+    "efficient-penalty": {
+      "headline": "Penalty methods \u00b7 Rethink the cost of an update",
+      "idea": "Sharper smoothness analysis, alternating updates, and flatness across constraint regimes."
+    },
+    "pbgd-free": {
+      "headline": "PBGD-Free \u00b7 Remove the value-function loop",
+      "idea": "Use upper-level flatness to support single-loop learning in the analyzed setting."
+    },
+    "smoothness": {
+      "headline": "Smoothness \u00b7 Follow the lower-level response",
+      "idea": "Study reduced curvature to sharpen penalty-method iteration bounds."
+    },
+    "blocc": {
+      "headline": "BLOCC \u00b7 Account for moving constraints",
+      "idea": "Use primal-dual information when the leader changes the follower\u2019s feasible set."
+    },
+    "birq": {
+      "headline": "BiRQ \u00b7 Let a speech model improve its targets",
+      "idea": "Refine labels from intermediate features, with raw-input targets anchoring training."
+    },
+    "retailagent": {
+      "headline": "RetailAgent \u00b7 Audit the timing of LLM decisions",
+      "idea": "Separate market exposure from entry and exit timing, then test self-conditioning."
+    }
   }
 }

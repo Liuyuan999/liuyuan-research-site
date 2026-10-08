@@ -74,3 +74,73 @@ if(contents&&'IntersectionObserver' in window){
  const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){links.forEach(link=>{if(link.getAttribute('href')==='#'+entry.target.id)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');});}}},{rootMargin:'-5% 0px -70% 0px'});
  links.forEach(link=>{const section=document.querySelector(link.getAttribute('href'));if(section)observer.observe(section);});
 }
+
+// The home-page research explorer keeps paper links as native fragment links.
+for (const explorer of document.querySelectorAll('[data-direction-explorer]')) {
+ const tabs=[...explorer.querySelectorAll('[data-direction]')];
+ const select=id=>{
+  for (const tab of tabs) {
+   const active=tab.dataset.direction===id;
+   tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;
+   document.getElementById(tab.getAttribute('aria-controls')).hidden=!active;
+  }
+ };
+ for (const [i,tab] of tabs.entries()) {
+  tab.addEventListener('click',()=>select(tab.dataset.direction));
+  tab.addEventListener('keydown',event=>{
+   let index;
+   if(event.key==='ArrowRight')index=(i+1)%tabs.length;
+   if(event.key==='ArrowLeft')index=(i+tabs.length-1)%tabs.length;
+   if(event.key==='Home')index=0;
+   if(event.key==='End')index=tabs.length-1;
+   if(index!==undefined){event.preventDefault();select(tabs[index].dataset.direction);tabs[index].focus();}
+  });
+ }
+ const followDirectionHash=()=>{const id=location.hash.slice(1);if(tabs.some(tab=>tab.dataset.direction===id))select(id);};
+ followDirectionHash();window.addEventListener('hashchange',followDirectionHash);
+}
+for (const lab of document.querySelectorAll('[data-opening]')) {
+ if(lab.dataset.opening==='pareto') {
+  const solve=w=>{if(w===0)return 1;if(w===1)return 0;let lo=0,hi=1;for(let i=0;i<55;i++){const z=(lo+hi)/2;if(2*w*z-4*(1-w)*(1-z)**3>0)hi=z;else lo=z;}return(lo+hi)/2;};
+  const M=4000,arc=[0];
+  for(let i=1;i<=M;i++){const z=i/M,p=(i-1)/M;arc.push(arc[i-1]+Math.hypot(z*z-p*p,(1-z)**4-(1-p)**4));}
+  const at=z=>{const i=Math.min(M-1,Math.floor(z*M));return arc[i]+(z*M-i)*(arc[i+1]-arc[i]);};
+  const inverse=q=>{const target=q*arc[M];let lo=0,hi=M;while(hi-lo>1){const mid=Math.floor((lo+hi)/2);if(arc[mid]<target)lo=mid;else hi=mid;}return(lo+(target-arc[lo])/(arc[hi]-arc[lo]))/M;};
+  const points=[...lab.querySelectorAll('[data-front-point]')];
+  const update=mode=>{
+   lab.dataset.spacingMode=mode;
+   for(const b of lab.querySelectorAll('[data-spacing]'))b.setAttribute('aria-pressed',String(b.dataset.spacing===mode));
+   const zs=points.map((point,i)=>{const z=mode==='arc'?inverse(i/(points.length-1)):solve(1-i/(points.length-1));point.setAttribute('cx',90+280*z*z);point.setAttribute('cy',305-280*(1-z)**4);return z;});
+   const gaps=zs.slice(1).map((z,i)=>at(z)-at(zs[i]));
+   const ratio=Math.max(...gaps)/Math.min(...gaps);
+   lab.querySelector('[data-spacing-result]').textContent=mode==='arc'?'The points spread into even arc-length gaps.':`The largest arc gap is ${ratio.toFixed(1)}× the smallest.`;
+  };
+  for(const b of lab.querySelectorAll('[data-spacing]'))b.addEventListener('click',()=>update(b.dataset.spacing));
+  update('weights');
+ }
+ if(lab.dataset.opening==='bilevel') {
+  const range=lab.querySelector('input'),g=lab.querySelector('[data-response-plot]');
+  const update=()=>{
+   const x=+range.value,xx=y=>55+350*y/6,yy=y=>225-175*(y-2*x)**2/36;
+   g.replaceChildren();
+   g.append(node('rect',{x:55,y:25,width:xx(x)-55,height:200,fill:'#e6f3f0'}));
+   g.append(node('path',{d:'M55 25 V225 H422',fill:'none',stroke:'#9aabc7'}));
+   g.append(node('polyline',{points:Array.from({length:121},(_,i)=>`${xx(i/20)},${yy(i/20)}`).join(' '),fill:'none',stroke:'#a6b2c9','stroke-width':2.5}));
+   g.append(node('path',{d:`M${xx(x)} 25 V225`,stroke:'#007c70','stroke-width':2,'stroke-dasharray':'5 5'}));
+   g.append(node('circle',{cx:xx(2*x),cy:yy(2*x),r:6,fill:'#354ac6',stroke:'white','stroke-width':2}));
+   g.append(node('circle',{cx:xx(x),cy:yy(x),r:6,fill:'#007c70',stroke:'white','stroke-width':2}));
+   g.append(node('text',{x:235,y:263,'text-anchor':'middle'},'Follower decision y (0 to 6)'));
+   g.append(node('text',{x:20,y:135,'text-anchor':'middle',transform:'rotate(-90 20 135)'},'Inner loss'));
+   lab.querySelector('[data-leader-value]').textContent=x.toFixed(1);
+   lab.querySelector('[data-response-result]').textContent=`Without the constraint: y* = ${(2*x).toFixed(1)}. With it: y* = ${x.toFixed(1)}.`;
+  };range.addEventListener('input',update);update();
+ }
+ if(lab.dataset.opening==='applications') {
+  const select=id=>{
+   for(const b of lab.querySelectorAll('[data-application]'))b.setAttribute('aria-pressed',String(b.dataset.application===id));
+   for(const view of lab.querySelectorAll('[data-application-view]'))view.hidden=view.dataset.applicationView!==id;
+  };
+  for(const b of lab.querySelectorAll('[data-application]'))b.addEventListener('click',()=>select(b.dataset.application));
+  select('speech');
+ }
+}
