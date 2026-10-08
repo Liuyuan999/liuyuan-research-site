@@ -23,11 +23,11 @@
     "reasoning": [
       [
         "A scalarization induces a path",
-        "Write r(w) for the objective vector at a scalarized optimum. The norm of r′(w) is the speed of that path in objective space. A fixed weight interval can therefore correspond to a very different distance at another part of the front."
+        "Write f_PF(w) for the objective vector at a scalarized optimum. The norm of ∂f_PF(w)/∂w is the speed of that path in objective space. A fixed weight interval can therefore correspond to a very different distance at another part of the front."
       ],
       [
         "Normalize distance into a distribution",
-        "Integrating speed and dividing by total arc length gives a cumulative distribution C(w). Choosing equal quantiles q and applying C⁻¹ moves the uniform sampling grid from distance space back into weight space."
+        "Integrating v(w) gives s(w), and normalization gives the paper’s CDF Φ(w). Rule 1 assigns wₙ = Φ⁻¹(n/N), for n = 0, …, N."
       ],
       [
         "Reconstruction creates an error floor",
@@ -37,19 +37,27 @@
     "notation": [
       [
         "w",
-        "The scalarization weight in the bi-objective setting."
+        "Scalar weight; the bi-objective weight vector is [w, 1 − w]."
       ],
       [
-        "r(w)",
-        "The resulting point in objective space."
+        "f_PF(w)",
+        "Objective vector on the scalarization-induced Pareto-front path."
       ],
       [
-        "C(w)",
-        "Normalized cumulative arc length of that path."
+        "v(w)",
+        "Traversal speed: the norm of the weight derivative of f_PF(w)."
+      ],
+      [
+        "s(w)",
+        "Arc length traversed from weight 0 to weight w."
+      ],
+      [
+        "Φ(w)",
+        "Normalized arc length s(w)/s(1), exactly as in Equation 5."
       ],
       [
         "N",
-        "The number of sampled Pareto solutions."
+        "Number of front segments; n runs from 0 to N, giving N + 1 solutions."
       ]
     ],
     "anchor": "Section 3 · Algorithm 1 and Theorem 1",
@@ -100,7 +108,7 @@
     "reasoning": [
       [
         "Center the action sequence",
-        "For a stock-day, p̄ is the fraction of intervals spent long. The constant-exposure comparator earns p̄ times the sum of interval returns. Subtracting it from the schedule’s return gives the timing sum shown below."
+        "For a stock-day, p̄_id is the fraction of intervals spent long. The constant-exposure comparator earns p̄_id times the sum of interval returns. Subtracting it from the schedule’s return gives the timing sum shown below."
       ],
       [
         "Separate direction from sequential alignment",
@@ -113,20 +121,28 @@
     ],
     "notation": [
       [
-        "pₜ",
-        "A binary decision: long (1) or flat (0)."
+        "(i, d)",
+        "Stock i and trading date d, the experimental stock-day unit."
       ],
       [
-        "p̄",
-        "Average exposure on that stock-day."
+        "t",
+        "Sequential decision interval; t runs from 1 to T."
       ],
       [
-        "rₜ",
-        "The interval return observed after the action."
+        "p_idt",
+        "Binary action before interval t: long (1) or flat (0)."
       ],
       [
-        "A(p, r)",
-        "Timing relative to constant exposure p̄ on that path."
+        "r_idt",
+        "Research-return label for that interval, revealed after the action."
+      ],
+      [
+        "p̄_id",
+        "Mean long exposure on stock-day (i, d)."
+      ],
+      [
+        "A_id(p, r)",
+        "Exposure-matched timing on that stock-day, Equation 1."
       ]
     ],
     "anchor": "Equation 1 · Timing decomposition",
@@ -195,24 +211,36 @@
     ],
     "notation": [
       [
+        "x / x̃",
+        "Unmasked normalized speech sequence and its masked view."
+      ],
+      [
         "θ",
-        "Parameters of the acoustic encoder."
+        "Parameters of the K-layer acoustic encoder."
       ],
       [
-        "F(θ)",
-        "Enhanced-label cross-entropy objective."
+        "z^(k)(θ; x)",
+        "Normalized intermediate representation at layer k."
       ],
       [
-        "G(θ)",
-        "Anchoring-label cross-entropy objective."
+        "y(x)",
+        "Raw-input anchoring label, Equation 2."
       ],
       [
-        "δ",
-        "Allowed lower-level suboptimality in the anchoring objective."
+        "y^(k)(θ; x)",
+        "Differentiable enhanced label, Equation 4."
       ],
       [
-        "WER",
-        "Word error rate after downstream recognition fine-tuning."
+        "F(θ) / G(θ)",
+        "Enhanced-label and anchoring-label masked-frame cross-entropy."
+      ],
+      [
+        "S_δ(θ)",
+        "Anchor-loss feasible set, Equation 8."
+      ],
+      [
+        "w₁, w₂",
+        "Loss weights; w₂/w₁ is the penalty constant in Equation 9."
       ]
     ],
     "anchor": "Section 3 · Equation 8 and Algorithm 1",
@@ -263,7 +291,7 @@
     "reasoning": [
       [
         "Cancellation changes the smoothness analysis",
-        "Fγ = γ(vγ − v) is built from nearby value functions. Their directional curvature terms can cancel. Theorem 1 establishes O(1) reduced smoothness in the uncoupled case; Theorem 4 extends the analysis under the coupled-case assumptions."
+        "Fγ = γ(vγ − v) is built from nearby value functions. Their directional curvature terms can cancel. Theorem 3.1 establishes O(1) reduced smoothness with fixed constraints; Theorem 5.1 extends it under Assumptions 1–5 for coupled constraints."
       ],
       [
         "Flatness changes which correction is necessary",
@@ -276,27 +304,35 @@
     ],
     "notation": [
       [
+        "F̃γ(x, y)",
+        "Joint penalty objective in Equation 3."
+      ],
+      [
         "Fγ(x)",
-        "The reduced penalty objective γ[vγ(x) − v(x)]."
+        "Reduced objective γ(vγ(x) − v(x)), Equation 5."
       ],
       [
-        "Ỹ",
-        "A fixed lower-level feasible set: uncoupled constraints."
+        "v(x) / vγ(x)",
+        "Original and perturbed lower-level value functions."
       ],
       [
-        "Y(x)",
-        "A feasible set that depends on x: coupled constraints."
+        "Ỹ / Y(x)",
+        "Fixed feasible set and coupled feasible set, respectively."
+      ],
+      [
+        "λ_g^*(x)",
+        "Original lower-level constraint multiplier used in the coupled analysis."
       ],
       [
         "γ",
-        "The penalty parameter, distinct from an iteration count."
+        "Penalty parameter, distinct from the outer iteration count."
       ]
     ],
-    "anchor": "Theorems 1 and 4 · Sections 4–5",
+    "anchor": "Theorems 3.1, 4.1, 5.1, and 5.2 · current arXiv version",
     "result_title": "A framework with theorem-specific guarantees",
-    "result_context": "The primary evidence here is analytical. Read Table 1 with its squared generalized-gradient criterion and its separate accounting of outer iterations and inner work. Theorems 1 and 4 establish reduced smoothness in their respective regimes.",
-    "result_reference": "Table 1 · Theorems 1 and 4",
-    "second_result": "The experiments examine SVM hyperparameter optimization and LLM fine-tuning. Their purpose is to test the proposed updates in the specified applications; they do not make every coupled bilevel problem fully single-loop.",
+    "result_context": "Read each result with its algorithm, constraint regime, stationarity metric, and inner-solve work.",
+    "result_reference": "Theorems 3.1, 4.1, 5.1, and 5.2 · Table 7",
+    "second_result": "The SVM benchmark compares accuracy and training time under a recorded stopping rule; the coupled PBGD-Free method retains an inner solve.",
     "connection": "This broader preprint develops and extends the ideas in the NeurIPS 2025 PBGD-Free paper. The EUSIPCO 2025 paper concentrates on the reduced-smoothness analysis. Reading these pages together distinguishes the algorithmic and analytical contributions."
   },
   "pbgd-free": {
@@ -327,7 +363,7 @@
       ],
       [
         "Flatness measures upper-loss sensitivity",
-        "Definition 1 states |f(x, y*) − f(x, y)| ≤ c‖y* − y‖^α + δ. The residual δ permits local variation, while α controls how the distance contribution shrinks near a lower-level optimum. The paper generally studies δ > 0 and α > 1."
+        "Definition 1 states |f(x, y_g^*(x)) − f(x, y)| ≤ c‖y_g^*(x) − y‖^α + δ. The residual δ permits local variation, while α controls how the distance contribution shrinks near a lower-level optimum. The paper generally studies δ > 0 and α > 1."
       ],
       [
         "The simplified update still has a scope",
@@ -336,20 +372,28 @@
     ],
     "notation": [
       [
-        "y*",
-        "A lower-level optimal response at the current x."
+        "y_g^*(x)",
+        "A lower-level optimum in S_g^*(x)."
       ],
       [
-        "c",
-        "The modulus in the upper-level flatness bound."
+        "y_γ^*(x)",
+        "A minimizer of the perturbed penalty objective; distinct from y_g^*(x)."
       ],
       [
-        "α",
-        "The exponent controlling the distance contribution."
+        "y_t^γ",
+        "The perturbed lower-level iterate after K tracking steps at outer iteration t."
       ],
       [
-        "δ",
-        "The residual in the flatness condition."
+        "c, α, δ",
+        "Modulus, exponent, and residual in Definition 1."
+      ],
+      [
+        "γ",
+        "Penalty constant, independent of the iteration counters."
+      ],
+      [
+        "η / η^γ",
+        "Outer and lower tracking step sizes in Algorithm 1."
       ]
     ],
     "anchor": "Definition 1 · Section 3",
@@ -389,7 +433,7 @@
       "y ← y − ηγ [γ⁻¹ ∇ᵧf(x, y) + ∇ᵧg(x, y)]",
       "x ← x − η ∇ₓf(x, y)"
     ],
-    "update_caption": "Algorithm 1, with the common choice K = 1: update the lower variable, then use the updated lower iterate for the upper step. ηγ and η are the lower and upper step sizes. The missing value-function correction is precisely what the flatness analysis must account for."
+    "update_caption": "Equation 8 and Algorithm 1 use y_{t,k}^γ for the lower tracking steps and y_t^γ after the K steps. The fully single-loop result sets K = 1. The outer direction is the upper partial gradient; the original value-function correction is omitted under the analyzed flatness conditions."
   },
   "smoothness": {
     "headline": "The curvature bound was hiding a cancellation.",
@@ -428,16 +472,24 @@
     ],
     "notation": [
       [
-        "v(x)",
-        "The optimal value of the original lower-level problem."
-      ],
-      [
-        "vγ(x)",
-        "The optimal value after adding f/γ to the lower objective."
+        "Hγ(x, y)",
+        "Joint penalty objective, Equation 2."
       ],
       [
         "Fγ(x)",
-        "The reduced objective γ[vγ(x) − v(x)]."
+        "Reduced penalty objective, Equation 3."
+      ],
+      [
+        "v(x) / vγ(x)",
+        "Original and perturbed lower-level value functions, Equation 3."
+      ],
+      [
+        "y_g^*(x) / y_γ^*(x)",
+        "Original and perturbed lower-level optimal responses."
+      ],
+      [
+        "λ_g^*(x)",
+        "Original lower-level multiplier in Equation 7."
       ],
       [
         "ε",
@@ -455,11 +507,11 @@
     "headline": "The leader changes the follower’s choices.",
     "deck": "In a coupled bilevel problem, the outer decision changes the inner feasible set. BLOCC uses primal-dual information to keep that moving boundary in the optimization.",
     "figure_title": "A moving boundary / exact toy problem",
-    "figure_caption": "For g(x, y) = (y − 2x)² and 0 ≤ y ≤ x, the unconstrained minimizer is 2x but the feasible response is y* = x. This illustration is not a BLOCC run.",
+    "figure_caption": "For g(x, y) = (y − 2x)² and 0 ≤ y ≤ x, the unconstrained minimizer is 2x but the feasible response is y_g^*(x) = x. This illustration is not a BLOCC run.",
     "steps": [
       [
         "Model the changing feasible set",
-        "Represent the follower’s constraints as c(x, y) ≤ 0 rather than using a fixed inner domain."
+        "Represent the follower’s constraints as g^c(x, y) ≤ 0 rather than using a fixed inner domain."
       ],
       [
         "Track primal and dual information",
@@ -475,11 +527,11 @@
     "reasoning": [
       [
         "The lower-level value changes through two routes",
-        "The derivative of v(x) contains an objective term ∇xg and a constraint term involving λ* and ∇xc. The multiplier-weighted term accounts for the movement of active constraints."
+        "The derivative of v(x) contains an objective term ∇xg and a constraint term involving μ_g^*(x) and ∇xg^c. The multiplier-weighted term accounts for the movement of active constraints."
       ],
       [
         "The toy example makes the multiplier tangible",
-        "For x > 0, the optimum y* = x lies on y ≤ x. The derivative of g with respect to y there is −2x, so stationarity gives multiplier λ* = 2x for that active upper bound. The lower bound is inactive."
+        "In Figure 1, y_g^*(x) = 3x and μ_g^*(x) = 2x for x > 0. The partial objective derivative is −4x, while the constraint term contributes 6x. Together they give the true value gradient 2x."
       ],
       [
         "The algorithm requires more than a toy KKT identity",
@@ -489,19 +541,27 @@
     "notation": [
       [
         "x",
-        "The leader’s decision, which can change the follower’s constraints."
+        "Upper-level variable in the domain 𝒳."
       ],
       [
-        "y*",
-        "The follower’s constrained optimal response."
+        "y_g^*(x)",
+        "Unique constrained lower-level optimum, Equation 1b."
       ],
       [
-        "c(x, y)",
-        "The lower-level inequality constraints."
+        "g^c(x, y)",
+        "Coupled lower-level inequality constraints, Equation 1b."
       ],
       [
-        "λ*",
-        "Multipliers associated with those constraints."
+        "μ_g^*(x)",
+        "Lower-level Lagrange multiplier in Equation 7."
+      ],
+      [
+        "y_F^*(x), μ_F^*(x)",
+        "Primal-dual solution of the penalty subproblem, Equation 5."
+      ],
+      [
+        "Fγ(x) / v(x)",
+        "Penalty reformulation and original lower-level value, Equation 2."
       ]
     ],
     "anchor": "Section 3 · Value-function derivative and convergence",

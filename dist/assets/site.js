@@ -15,23 +15,27 @@ const cv=a=>{const m=a.reduce((s,x)=>s+x,0)/a.length;return Math.sqrt(a.reduce((
 for(const d of document.querySelectorAll('[data-demo]')){
  const type=d.dataset.demo,range=d.querySelector('input[type=range]');
  if(type==='surf'){
-  // Solve w*z^2 +(1-w)*(1-z)^4 over [0,1] using its monotone derivative.
-  const solve=w=>{if(w===0)return 1;if(w===1)return 0;let lo=0,hi=1;for(let j=0;j<55;j++){const z=(lo+hi)/2;const derivative=2*w*z-4*(1-w)*(1-z)**3;if(derivative>0)hi=z;else lo=z;}return(lo+hi)/2;};
-  const M=4000,zs=Array.from({length:M+1},(_,i)=>i/M),cs=[0];
-  for(let i=1;i<=M;i++){const z=zs[i],prev=zs[i-1];cs.push(cs[i-1]+Math.hypot(z*z-prev*prev,(1-z)**4-(1-prev)**4));}
-  const total=cs[M],at=z=>{const idx=Math.min(M-1,Math.floor(z*M)),f=z*M-idx;return cs[idx]+f*(cs[idx+1]-cs[idx]);};
-  const inverse=q=>{const target=q*total;let lo=0,hi=M;while(hi-lo>1){const mid=Math.floor((lo+hi)/2);if(cs[mid]<target)lo=mid;else hi=mid;}return (lo+(target-cs[lo])/(cs[hi]-cs[lo]))/M;};
-  const xy=z=>[65+510*z*z,245-210*(1-z)**4];
-  const update=()=>{const n=+range.value;d.querySelector('[data-count]').textContent=n;
-   const uniform=Array.from({length:n},(_,i)=>solve(1-i/(n-1))),arc=Array.from({length:n},(_,i)=>inverse(i/(n-1)));
-   const gaps=uniform.slice(1).map((z,i)=>at(z)-at(uniform[i]));
-   draw(d,[{points:zs.filter((_,i)=>i%20===0).map(xy),color:'#adb7ca'}],uniform.map(z=>{const[x,y]=xy(z);return{x,y,color:'#354ac6',r:6}}).concat(arc.map(z=>{const[x,y]=xy(z);return{x,y,color:'#008274',r:4}})),[],'f₁(z) = z²','f₂(z)');
-   d.querySelector('[data-metric]').textContent=`Arc-gap CV: ${cv(gaps).toFixed(2)} for equal weights; approximately 0 for equal arc length.`;};range.addEventListener('input',update);update();
+  // Appendix F.1: exact raw scalarization solution and fixed evaluation front.
+  const gear=d.querySelector('[data-gear]'),segments=d.querySelector('[data-segments]');
+  const M=4000,xs=Array.from({length:M+1},(_,i)=>i/M),arcLengths=[0];
+  for(let i=1;i<=M;i++){const x=xs[i],previous=xs[i-1];arcLengths.push(arcLengths[i-1]+Math.hypot((1-x)**2-(1-previous)**2,x*x-previous*previous));}
+  const total=arcLengths[M],lengthAt=x=>{const index=Math.min(M-1,Math.floor(x*M)),fraction=x*M-index;return arcLengths[index]+fraction*(arcLengths[index+1]-arcLengths[index]);};
+  const inverse=fraction=>{const target=fraction*total;let lo=0,hi=M;while(hi-lo>1){const mid=Math.floor((lo+hi)/2);if(arcLengths[mid]<target)lo=mid;else hi=mid;}return (lo+(target-arcLengths[lo])/(arcLengths[hi]-arcLengths[lo]))/M;};
+  const xy=x=>[65+510*(1-x)**2,245-210*x*x];
+  const update=()=>{const p=+gear.value,N=+segments.value,root=Math.sqrt(p);
+   d.querySelector('[data-gear-count]').textContent=p;d.querySelector('[data-count]').textContent=N;
+   const uniform=Array.from({length:N+1},(_,n)=>{const w=n/N;return root*w/(1+(root-1)*w);}),arc=Array.from({length:N+1},(_,n)=>inverse(n/N));
+   const gaps=uniform.slice(1).map((x,n)=>lengthAt(x)-lengthAt(uniform[n]));
+   draw(d,[{points:xs.filter((_,i)=>i%20===0).map(xy),color:'#adb7ca'}],uniform.map(x=>{const[px,py]=xy(x);return{x:px,y:py,color:'#354ac6',r:6}}).concat(arc.map(x=>{const[px,py]=xy(x);return{x:px,y:py,color:'#008274',r:4}})),[],'First evaluation objective','Second evaluation objective');
+   d.querySelector('[data-metric]').textContent=`${N+1} solutions on the same front · arc-gap CV: ${cv(gaps).toFixed(2)} for equal weights; approximately 0 for equal arc length.`;};
+  gear.addEventListener('input',update);segments.addEventListener('input',update);update();
  }
  if(type==='constraint'){
-  const update=()=>{const x=+range.value;d.querySelector('[data-count]').textContent=x.toFixed(2);const yy=y=>245-210*(y-2*x)**2/36;
-   draw(d,[{points:Array.from({length:121},(_,i)=>[65+510*i/120,yy(6*i/120)]),color:'#a2aeca'},{points:[[65+85*x,25],[65+85*x,250]],color:'#008274',dash:'6 5'}],[{x:65+85*x,y:yy(x),color:'#008274',r:7},{x:65+170*x,y:yy(2*x),color:'#354ac6',r:6}],[],'y (0 to 6)','Loss (0 to 36)');
-   d.querySelector('[data-plot]').prepend(node('rect',{x:65,y:25,width:85*x,height:225,fill:'#e1f2ee'}));d.querySelector('[data-metric]').textContent=`x = ${x.toFixed(2)} · feasible y* = ${x.toFixed(2)} · unconstrained 2x = ${(2*x).toFixed(2)}${x>0?' · active-bound multiplier λ* = '+(2*x).toFixed(2):''}`;};range.addEventListener('input',update);update();
+  const update=()=>{const x=+range.value;d.querySelector('[data-count]').textContent=x.toFixed(2);const yy=y=>245-210*(y-2*x)**2/100;
+   draw(d,[{points:Array.from({length:121},(_,i)=>[65+510*i/120,yy(10*i/120)]),color:'#a2aeca'},{points:[[65+153*x,25],[65+153*x,250]],color:'#008274',dash:'6 5'}],[{x:65+102*x,y:yy(2*x),color:'#354ac6',r:6},{x:65+153*x,y:yy(3*x),color:'#008274',r:7}],[],'Lower-level variable y (0 to 10)','Lower-level objective (0 to 100)');
+   d.querySelector('[data-plot]').prepend(node('rect',{x:65+153*x,y:25,width:510-153*x,height:225,fill:'#e1f2ee'}));
+   d.querySelector('[data-metric]').textContent=`Constrained response: ${(3*x).toFixed(2)} · unconstrained minimum: ${(2*x).toFixed(2)} · constraint multiplier: ${(2*x).toFixed(2)}. Value gradient: ${(2*x).toFixed(2)} = partial objective derivative ${(-4*x).toFixed(2)} + constraint contribution ${(6*x).toFixed(2)}.`;
+  };range.addEventListener('input',update);update();
  }
  if(type==='timing'){
   const rs=[-20,15,-10,25,-15,5];let ps=[1,0,1,0,1,0];
@@ -54,8 +58,8 @@ for(const d of document.querySelectorAll('[data-demo]')){
  if(type==='flatness'){
   const update=()=>{const v=+range.value;d.querySelector('[data-count]').textContent=v.toFixed(2);d.querySelector('[data-linear]').textContent=v.toFixed(4);d.querySelector('[data-flat]').textContent=(v**1.5+.003).toFixed(4);
    const pts=f=>Array.from({length:101},(_,i)=>[65+510*i/100,245-210*f(i/100)/1.05]);
-   draw(d,[{points:pts(x=>x),color:'#354ac6'},{points:pts(x=>x**1.5+.003),color:'#008274'}],[{x:65+510*v,y:245-210*v/1.05,color:'#354ac6'},{x:65+510*v,y:245-210*(v**1.5+.003)/1.05,color:'#008274'}],[],'Distance d (0 to 1)','Bound (0 to 1.05)');
-   d.querySelector('[data-metric]').textContent=`Distance term d^1.5 = ${(v**1.5).toFixed(4)} · residual δ = 0.0030`;};range.addEventListener('input',update);update();
+   draw(d,[{points:pts(x=>x),color:'#354ac6'},{points:pts(x=>x**1.5+.003),color:'#008274'}],[{x:65+510*v,y:245-210*v/1.05,color:'#354ac6'},{x:65+510*v,y:245-210*(v**1.5+.003)/1.05,color:'#008274'}],[],'Distance to lower optimum (0 to 1)','Bound (0 to 1.05)');
+   d.querySelector('[data-metric]').textContent=`Distance contribution: ${(v**1.5).toFixed(4)} · residual: 0.0030`;};range.addEventListener('input',update);update();
  }
  if(type==='regime'){
   const update=mode=>{const coupled=mode==='coupled';d.querySelectorAll('[data-regime]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.regime===mode));b.classList.toggle('primary',b.dataset.regime===mode);});d.querySelectorAll('[data-regime-formula]').forEach(form=>form.hidden=form.dataset.regimeFormula!==mode);d.querySelector('[data-regime-title]').textContent=coupled?'Coupled constraints / inner solve retained':'Uncoupled constraints / fully single-loop';d.querySelector('[data-regime-description]').textContent=coupled?'The feasible set moves with x. Constraint multipliers enter the value-function derivative, and the coupled PBGD-Free extension retains an inner loop. Its work belongs in the total complexity.':'The feasible set is fixed as x changes. Under flatness and the stated assumptions, the analyzed PBGD-Free update removes the value-function loop and is fully single-loop.';};
@@ -101,21 +105,46 @@ for (const explorer of document.querySelectorAll('[data-direction-explorer]')) {
 }
 for (const lab of document.querySelectorAll('[data-opening]')) {
  if(lab.dataset.opening==='pareto') {
-  const solve=w=>{if(w===0)return 1;if(w===1)return 0;let lo=0,hi=1;for(let i=0;i<55;i++){const z=(lo+hi)/2;if(2*w*z-4*(1-w)*(1-z)**3>0)hi=z;else lo=z;}return(lo+hi)/2;};
+  const a=.5,k=5,A=(1-a)*k/(1-Math.exp(-k));
+  const loss=z=>a*(1-z)+(1-a)*(Math.exp(-k*z)-Math.exp(-k))/(1-Math.exp(-k));
+  const slope=z=>a+A*Math.exp(-k*z);
+  const wLo=slope(1)/(1+slope(1)),wHi=slope(0)/(1+slope(0));
+  const solve=w=>w<=wLo?1:w>=wHi?0:Math.min(1,Math.max(0,-Math.log((w/(1-w)-a)/A)/k));
   const M=4000,arc=[0];
-  for(let i=1;i<=M;i++){const z=i/M,p=(i-1)/M;arc.push(arc[i-1]+Math.hypot(z*z-p*p,(1-z)**4-(1-p)**4));}
+  for(let i=1;i<=M;i++){const z=i/M,p=(i-1)/M;arc.push(arc[i-1]+Math.hypot(z-p,loss(z)-loss(p)));}
   const at=z=>{const i=Math.min(M-1,Math.floor(z*M));return arc[i]+(z*M-i)*(arc[i+1]-arc[i]);};
   const inverse=q=>{const target=q*arc[M];let lo=0,hi=M;while(hi-lo>1){const mid=Math.floor((lo+hi)/2);if(arc[mid]<target)lo=mid;else hi=mid;}return(lo+(target-arc[lo])/(arc[hi]-arc[lo]))/M;};
-  const points=[...lab.querySelectorAll('[data-front-point]')];
-  const update=mode=>{
-   lab.dataset.spacingMode=mode;
+  const points=[...lab.querySelectorAll('[data-front-point]')],range=lab.querySelector('#front-candidate');
+  let mode='weights',zs=[],selected=4;
+  const select=index=>{
+   selected=Math.min(points.length-1,Math.max(0,index));range.value=String(selected+1);
+   for(const [i,point] of points.entries()){point.setAttribute('aria-pressed',String(i===selected));point.setAttribute('r',i===selected?8:5.5);point.setAttribute('tabindex',i===selected?'0':'-1');}
+   const z=zs[selected];
+   lab.querySelector('[data-candidate-number]').textContent=`${selected+1} of ${points.length}`;
+   lab.querySelector('[data-quality-score]').textContent=(1-z).toFixed(2);
+   lab.querySelector('[data-faithfulness-score]').textContent=(1-loss(z)).toFixed(2);
+  };
+  const update=newMode=>{
+   mode=newMode;lab.dataset.spacingMode=mode;
    for(const b of lab.querySelectorAll('[data-spacing]'))b.setAttribute('aria-pressed',String(b.dataset.spacing===mode));
-   const zs=points.map((point,i)=>{const z=mode==='arc'?inverse(i/(points.length-1)):solve(1-i/(points.length-1));point.setAttribute('cx',90+280*z*z);point.setAttribute('cy',305-280*(1-z)**4);return z;});
-   const gaps=zs.slice(1).map((z,i)=>at(z)-at(zs[i]));
-   const ratio=Math.max(...gaps)/Math.min(...gaps);
-   lab.querySelector('[data-spacing-result]').textContent=mode==='arc'?'The points spread into even arc-length gaps.':`The largest arc gap is ${ratio.toFixed(1)}× the smallest.`;
+   zs=points.map((point,i)=>{const z=mode==='arc'?inverse(i/(points.length-1)):solve(wHi-i*(wHi-wLo)/(points.length-1));point.setAttribute('cx',90+280*(1-z));point.setAttribute('cy',305-280*(1-loss(z)));point.setAttribute('aria-label',`Candidate ${i+1}: quality ${(1-z).toFixed(2)}, faithfulness ${(1-loss(z)).toFixed(2)}`);return z;});
+   const gaps=zs.slice(1).map((z,i)=>at(z)-at(zs[i])),ratio=Math.max(...gaps)/Math.min(...gaps);
+   lab.querySelector('[data-spacing-result]').textContent=mode==='arc'?'The candidates now cover the curve with even arc-length gaps.':`The largest gap is ${ratio.toFixed(1)}× the smallest. Some compromises are easier to miss.`;
+   select(selected);
   };
   for(const b of lab.querySelectorAll('[data-spacing]'))b.addEventListener('click',()=>update(b.dataset.spacing));
+  for(const [i,point] of points.entries()) {
+   point.addEventListener('click',()=>select(i));
+   point.addEventListener('keydown',event=>{
+    let next=i;
+    if(event.key==='ArrowRight'||event.key==='ArrowDown')next=Math.min(points.length-1,i+1);
+    if(event.key==='ArrowLeft'||event.key==='ArrowUp')next=Math.max(0,i-1);
+    if(event.key==='Home')next=0;
+    if(event.key==='End')next=points.length-1;
+    if(['Enter',' ','ArrowRight','ArrowLeft','ArrowUp','ArrowDown','Home','End'].includes(event.key)){event.preventDefault();select(next);points[next].focus();}
+   });
+  }
+  range.addEventListener('input',()=>select(+range.value-1));
   update('weights');
  }
  if(lab.dataset.opening==='bakery') {
@@ -163,4 +192,28 @@ for (const lab of document.querySelectorAll('[data-opening]')) {
   for(const b of lab.querySelectorAll('[data-application]'))b.addEventListener('click',()=>select(b.dataset.application));
   select('speech');
  }
+}
+
+// Evidence controls switch between source-reported comparisons, never simulated results.
+for (const lab of document.querySelectorAll('[data-evidence-lab]')) {
+ const list=lab.querySelector('[role=tablist]'),tabs=[...lab.querySelectorAll('[data-evidence-tab]')],panels=[...lab.querySelectorAll('[data-evidence-panel]')];
+ const select=index=>{
+  tabs.forEach((tab,i)=>{const active=i===index;tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;panels[i].hidden=!active;panels[i].setAttribute('role','tabpanel');panels[i].setAttribute('aria-labelledby',tab.id);});
+  updateTableHints();
+ };
+ const updateTableHints=()=>panels.forEach(panel=>{const table=panel.querySelector('.table-scroll'),hint=panel.querySelector('.table-hint');hint.hidden=panel.hidden||table.scrollWidth<=table.clientWidth+1;});
+ window.addEventListener('resize',updateTableHints);
+ list.hidden=false;
+ tabs.forEach((tab,i)=>{
+  tab.addEventListener('click',()=>select(i));
+  tab.addEventListener('keydown',event=>{
+   let index;
+   if(event.key==='ArrowRight')index=(i+1)%tabs.length;
+   if(event.key==='ArrowLeft')index=(i+tabs.length-1)%tabs.length;
+   if(event.key==='Home')index=0;
+   if(event.key==='End')index=tabs.length-1;
+   if(index!==undefined){event.preventDefault();select(index);tabs[index].focus();}
+  });
+ });
+ select(0);
 }

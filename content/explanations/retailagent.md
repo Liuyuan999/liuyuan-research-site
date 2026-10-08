@@ -2,25 +2,17 @@
 
 Holding a stock often and holding it at favorable moments are different behaviors. RetailAgent separates exposure from timing to audit sequential LLM decisions.
 
-## Exposure and timing answer different questions
+## The decision
 
-Suppose an agent is long during half of the intervals in a trading day. Its return depends on what the stock did and on which half it chose. Comparing it with a policy that holds the stock at half exposure throughout the same day separates a timing component from the average amount invested.
+At each interval, a frozen LLM sees an anonymized price history and chooses long or flat before the next return is revealed. The experiment can also show charts, account state, or the agent’s earlier self-authored memories.
 
-## Decide first, observe the next return afterward
+## The bottleneck
 
-RetailAgent gives the LLM an anonymized intraday history and condition-specific state. The agent then chooses long or flat before the next interval return is revealed. Concealing stock identity and other information keeps the decision boundary controlled and makes the tested policy easier to interpret.
+A positive return alone does not establish good timing. A policy can benefit from a rising stock while being flat during its strongest intervals. Average exposure and alignment with the next return need separate measurements.
 
-## Subtract average exposure
+## The idea
 
-The timing score sums each following return multiplied by the action minus that stock-day’s mean action. A negative score means exposure was allocated to relatively unfavorable intervals on that path. The score is a diagnostic of alignment, rather than a complete accounting of an executable strategy’s profitability.
-
-## Shuffle the schedule to test the alignment
-
-Same-day shuffling preserves a stock-day’s action count while disrupting interval alignment. Global shuffling provides a different control. In the principal text condition, both controls attenuate the negative timing. The study also examines memory and persistence using matched panels; those comparisons need their stated conditioning and sampling frames.
-
-## Keep the conclusion at the level tested
-
-The paper documents negative timing across tested configurations and recoverable structure in action traces. It does not resolve how another participant would exploit that structure in a live market with costs and feedback. The contribution is a controlled behavioral audit and a way to study the timing of sequential decisions.
+Subtract the return of constant exposure on the same stock-day. Audit the remaining timing term, shuffle saved actions to disrupt sequence alignment, and inspect how memory changes the policy’s persistence.
 
 ## Source
 

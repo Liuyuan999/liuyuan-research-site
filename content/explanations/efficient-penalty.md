@@ -2,25 +2,17 @@
 
 A large penalty can make a joint objective stiff. A better analysis and a different update rule can change which costs the algorithm must pay.
 
-## A large penalty is not one single cost
+## The decision
 
-A penalty parameter asks an optimization method to respect lower-level optimality more strongly. That can make a joint objective steep. It can also increase the effort needed to track a lower-level response. These effects live in different parts of the algorithm, so combining them into one crude cost estimate loses information.
+A bilevel learner chooses an outer variable while its inner variable solves another objective. A penalty makes inner suboptimality costly, but the chosen formulation and the update schedule determine which computation is actually required.
 
-## Follow the objective the outer update actually sees
+## The bottleneck
 
-An alternating method first works on the lower-level variables and then takes an upper-level step. The outer step acts on a reduced objective induced by the inner response. Its smoothness can differ from the smoothness of the full joint objective. Analyzing the reduced objective is therefore central to deciding which step sizes are justified.
+There are three distinct costs: a penalty-scaled step-size restriction, two lower-level response estimates, and the extra structure of constraints that move with the outer decision. Treating them as one difficulty obscures which improvement applies.
 
-## Constraints change the story
+## The idea
 
-For an uncoupled feasible set, the lower-level domain stays fixed as the outer decision changes. Coupled constraints make that domain move. A variable that was feasible before an outer update can cease to be feasible afterward. The paper treats this dependence explicitly through constrained analysis rather than carrying over an unconstrained conclusion.
-
-## Two routes to less work
-
-Sharper smoothness analysis supports alternating penalty updates with larger outer steps. Flatness supports removing the lower-level value-function tracking component in PBGD-Free. These are related ideas, but they address different obstacles. The broader paper brings them into one analysis and separates their constrained regimes.
-
-## Compare total work in the right regime
-
-The uncoupled version of PBGD-Free is fully single-loop. The coupled version retains an inner loop with reduced complexity. A comparison should therefore include the work inside that loop. The SVM and LLM experiments make the theory concrete without turning the single-loop claim into a statement about every constrained problem.
+Analyze the reduced objective to recover curvature cancellation; alternate responses and outer updates; then use upper-level flatness to justify removing a value-function correction. Extend the analysis to coupled constraints with their own multiplier and regularity assumptions.
 
 ## Source
 

@@ -2,25 +2,17 @@
 
 Penalty methods can look increasingly stiff as the penalty grows. Follow the optimized lower-level response, and the reduced objective can have a different curvature scale.
 
-## Step sizes follow a curvature bound
+## The decision
 
-A gradient method usually limits its step size using a smoothness bound. A larger bound leads to a smaller safe step. In penalty methods, a generic bound often grows with the penalty, making a stronger approximation of lower-level optimality look intrinsically expensive for the outer loop.
+Penalty methods make a lower-level optimality gap expensive. A generic joint smoothness bound grows with the penalty, suggesting smaller gradient steps as the approximation is tightened.
 
-## Joint and reduced objectives differ
+## The bottleneck
 
-The joint penalty objective is a function of both optimization variables. An alternating method instead responds to an objective obtained after lower-level minimization. The lower-level response moves with the outer variable. Accounting for that movement can reveal cancellation that is invisible in a bound over arbitrary joint directions.
+The outer algorithm follows a reduced objective after lower-level optimization. Bounding arbitrary joint directions can miss cancellation between the perturbed and original value functions. Constraints also invalidate the unconstrained shortcut that the inner gradient is zero.
 
-## Analyze the cancellation directly
+## The idea
 
-The paper writes the reduced objective as a scaled difference of two value functions. One uses the original lower-level objective. The other uses a perturbed objective containing the upper-level loss. Relating their second-order directional derivatives yields a sharper smoothness estimate under the stated conditions.
-
-## Constraints require their own analysis
-
-In an unconstrained lower-level problem, the gradient vanishes at the optimum. At a constrained optimum, the gradient can be balanced by an active constraint instead. The proof must incorporate that structure. The paper develops the uncoupled analysis and then extends it to nonlinear coupled constraints.
-
-## What the rate measures
-
-The improved outer iteration bound is expressed using a squared generalized-gradient stationarity criterion. That definition matters when comparing exponents across papers. So does inner-solve work. The result changes what the outer loop needs to do; translating it into runtime requires accounting for the complete implementation.
+Analyze their second-order directional derivatives together. For a fixed feasible set, the response direction is orthogonal to the lower gradient; for coupled constraints, multipliers account for the moving boundary. The resulting smoothness bound changes the outer iteration analysis.
 
 ## Source
 

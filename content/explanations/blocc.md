@@ -2,25 +2,17 @@
 
 In a coupled bilevel problem, the outer decision changes the inner feasible set. BLOCC uses primal-dual information to keep that moving boundary in the optimization.
 
-## A leader changes the follower’s choices
+## The decision
 
-Consider a network operator deciding which infrastructure to provide. Users then respond within the network that exists. The operator’s decision changes the set of available routes. A bilevel model expresses the sequence, and coupled constraints express the changing feasible set.
+A network operator chooses infrastructure; passengers respond within the resulting network. In a constrained SVM, outer hyperparameters set violation limits and the inner model learns within those limits. Both are bilevel problems with a feasible set that changes with x.
 
-## The response moves with its boundary
+## The bottleneck
 
-In an ordinary unconstrained inner problem, we can study how an optimum changes through the objective. Here the feasible boundary moves too. A lower-level optimum can sit on an active constraint, so the effect of an outer decision must include both objective and constraint terms.
+The lower-level value changes through the objective and through active constraints. An objective-only gradient can point in the wrong direction. A joint projection onto the full coupled feasible set can also become costly at large dimensions.
 
-## Dual variables carry constraint information
+## The idea
 
-The primal-dual perspective attaches multipliers to the lower-level constraints. These variables help describe how the constrained optimum responds to the outer decision. BLOCC combines this information with a penalty formulation and first-order updates.
-
-## The theory has a specific regime
-
-The paper assumes a strongly convex lower-level objective and constraints convex in the lower-level variable. It also requires feasible domains and constraint qualification. Under these conditions, the response and its dual description support the approximation and convergence analysis.
-
-## From a toy boundary to applications
-
-The interactive example uses a bound that moves with the outer variable. The paper goes further with SVM hyperparameter selection and transportation design, including a network based on Seville. The connection is structural: an outer decision determines the lower-level problem that will actually be solved.
+Use primal-dual responses to estimate the moving-boundary contribution. BLOCC combines them with a penalty reformulation and first-order updates, avoiding the full joint projection used by a direct constrained formulation.
 
 ## Source
 

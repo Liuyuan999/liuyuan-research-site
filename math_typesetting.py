@@ -12,7 +12,8 @@ def extra_math(key,label='',attributes=''):
 def paper_math(slug):
  return '<div class="equation-set">'+''.join(display_math(v['tex'],v['label']) for v in MATH_CONFIG['papers'][slug])+'</div>'
 class TypesetProse(HTMLParser):
- def __init__(self):super().__init__(convert_charrefs=False);self.out=[];self.stack=[]
+ def __init__(self,mapping):
+  super().__init__(convert_charrefs=False);self.out=[];self.stack=[];self.mapping=mapping;self.pattern=re.compile("|".join(re.escape(k) for k in sorted(mapping,key=len,reverse=True)))
  def handle_starttag(self,tag,attrs):
   self.out.append(self.get_starttag_text());a=dict(attrs)
   if tag not in ['meta','link','img','input','br','hr','source','area','base','embed','param','wbr']:
@@ -24,13 +25,14 @@ class TypesetProse(HTMLParser):
    if self.stack[i][0]==tag:self.stack=self.stack[:i];break
  def handle_data(self,data):
   if any(skip for _,skip in self.stack):self.out.append(data);return
-  self.out.append(MATH_PATTERN.sub(lambda m:MATH_HTML['inline:'+MATH_CONFIG['inline'][m.group()]],data))
+  self.out.append(self.pattern.sub(lambda m:MATH_HTML['inline:'+self.mapping[m.group()]],data))
  def handle_entityref(self,name):self.out.append('&'+name+';')
  def handle_charref(self,name):self.out.append('&#'+name+';')
  def handle_comment(self,data):self.out.append('<!--'+data+'-->')
  def handle_decl(self,data):self.out.append('<!'+data+'>')
-def typeset_prose(document):
- parser=TypesetProse();parser.feed(document);return ''.join(parser.out)
+def typeset_prose(document,slug=None):
+ mapping={**MATH_CONFIG['inline'],**MATH_CONFIG.get('paper_inline',{}).get(slug,{})}
+ parser=TypesetProse(mapping);parser.feed(document);return ''.join(parser.out)
 # Bundle stylesheet and fonts with the site. Typesetting does not require browser JavaScript.
 (D/'assets/katex').mkdir(parents=True,exist_ok=True)
 shutil.copy2(ROOT/'vendor/katex/dist/katex.min.css',D/'assets/katex/katex.min.css')

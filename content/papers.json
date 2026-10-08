@@ -45,7 +45,7 @@
       "Lisha Chen"
     ],
     "year": 2026,
-    "venue": "Preprint",
+    "venue": "NeurIPS 2026 · IAB Workshop",
     "topic": "LLM agents",
     "arxiv": "2608.28399",
     "paper": "https://arxiv.org/abs/2608.28399",
@@ -56,8 +56,14 @@
       {
         "label": "Primary paper",
         "url": "https://arxiv.org/abs/2608.28399"
+      },
+      {
+        "label": "Interpreting Agent Behavior workshop",
+        "url": "https://iab-agents.github.io/"
       }
-    ]
+    ],
+    "venue_record": "Author-provided venue update, October 8, 2026.",
+    "bib_venue": "NeurIPS 2026 Workshop on Interpreting Agent Behavior (IAB)"
   },
   {
     "slug": "birq",

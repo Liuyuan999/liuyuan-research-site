@@ -2,25 +2,17 @@
 
 PBGD-Free removes the value-function loop from a penalty method. The reason this can work is upper-level flatness—not simply using fewer updates.
 
-## One objective sits inside another
+## The decision
 
-A bilevel learning problem has two roles. The lower-level problem learns a response for the current outer decision. The upper-level problem chooses the outer decision by evaluating that response. Even writing the problem is nested, so a straightforward solver often repeats many inner updates before making one outer update.
+In the paper’s LLM application, x contains LoRA parameters in the backbone and y is the output head. The head learns supervised fine-tuning (SFT); the backbone is guided by direct preference optimization (DPO) through that adapted head.
 
-## A penalty can still hide a solve
+## The bottleneck
 
-Penalty methods offer a first-order route: encourage the lower-level variable to reach a small objective gap. Yet evaluating that gap requires the lower-level optimum value. Maintaining the associated response introduces another stream of updates. The real question is which correction can be removed while controlling the resulting error.
+A full penalty gradient estimates both the original SFT-optimal head and a perturbed head. Dropping the value-function correction saves one response estimate, but the removed term is multiplied by the penalty and can remain important.
 
-## The shortcut has a bias
+## The idea
 
-PBGD-Free removes the value-function tracking component. Its lower-level variable takes gradient steps on a scaled penalty objective, while the upper-level variable follows the upper-level gradient. This is simpler, but the dropped term generally matters. The paper’s examples make that failure concrete rather than assuming that cheap updates must be correct.
-
-## Flatness gives the shortcut a regime
-
-The flatness condition bounds how much the upper-level objective changes when the lower-level iterate moves away from a lower-level optimum. It includes an exponent, a modulus, and an additive allowance. These parameters help control the gap between the simplified update and the direction needed by the bilevel objective.
-
-## The structure comes before the speedup
-
-The experiments study settings including LLM post-training, where a backbone and head play different optimization roles. The useful lesson is to look for a structural reason that a correction is small. Single-loop updates gain their justification from that structure and the convergence analysis. Their low per-iteration cost alone cannot provide it.
+Make the reason for omission explicit: upper-level flatness bounds how the DPO objective varies around an SFT-optimal head. Under that condition and the other regularity assumptions, one lower update and one outer update yield controlled stationarity error.
 
 ## Source
 
