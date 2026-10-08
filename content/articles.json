@@ -1,6 +1,5 @@
 {
   "surf": {
-    "blog_title": "Why uniform weights do not give uniform trade-offs",
     "lead": "A preference is an input to optimization. The distance between the resulting solutions is a property of the problem’s geometry.",
     "takeaway": "SURF selects scalarization weights using an arc-length map of the Pareto front, so a limited solution budget can represent trade-offs more evenly.",
     "problem": [
@@ -25,28 +24,6 @@
       ]
     ],
     "boundary": "Uniform coverage is defined using the objective-space metric. Rescaling an objective changes arc length, so objective units and normalization are part of the coverage choice. The convergence result also depends on the paper’s regularity and reconstruction assumptions.",
-    "blog": [
-      [
-        "A small budget makes spacing matter",
-        "Imagine training only a handful of models to represent different compromises between two rewards. If most of them end up near the same compromise, they spend computation on similar answers. The issue is visible even before deciding which model is best: the collection offers fewer distinct options than its size suggests."
-      ],
-      [
-        "Weights act through a geometry",
-        "A scalarization weight describes how a solver values objectives. It does not directly specify a location on the Pareto front. The solver and the problem jointly create the map from weights to objective values. This map can accelerate and slow down. Sampling the input evenly then produces uneven spacing at the output."
-      ],
-      [
-        "Measure distance before choosing the next input",
-        "The central idea is to change coordinates. Instead of asking for the next equally spaced weight, ask for the next equally spaced amount of distance along the front. Normalize cumulative distance to the interval from zero to one. Invert that cumulative map to recover the weights needed for those distance targets."
-      ],
-      [
-        "The map can be learned",
-        "The front is usually unknown before optimization. SURF reconstructs the map from solutions already obtained and uses it to choose the next weights. Repeating this process refines the map. The theory describes conditional contraction toward a floor caused by representing a continuous curve with finitely many points."
-      ],
-      [
-        "Read quality and coverage together",
-        "A collection can be evenly spaced and still far from the desired front. That is why the experiments report coverage alongside approximation quality. The practical question is whether a method uses the available solve budget to find both useful and diverse compromises. Objective normalization also matters because distance changes with the units of the rewards."
-      ]
-    ],
     "scenes": [
       [
         "0:00–0:20",
@@ -76,10 +53,32 @@
     ],
     "related": [
       "pbgd-free"
-    ]
+    ],
+    "explanation": [
+      [
+        "A small budget makes spacing matter",
+        "Imagine training only a handful of models to represent different compromises between two rewards. If most of them end up near the same compromise, they spend computation on similar answers. The issue is visible even before deciding which model is best: the collection offers fewer distinct options than its size suggests."
+      ],
+      [
+        "Weights act through a geometry",
+        "A scalarization weight describes how a solver values objectives. It does not directly specify a location on the Pareto front. The solver and the problem jointly create the map from weights to objective values. This map can accelerate and slow down. Sampling the input evenly then produces uneven spacing at the output."
+      ],
+      [
+        "Measure distance before choosing the next input",
+        "The central idea is to change coordinates. Instead of asking for the next equally spaced weight, ask for the next equally spaced amount of distance along the front. Normalize cumulative distance to the interval from zero to one. Invert that cumulative map to recover the weights needed for those distance targets."
+      ],
+      [
+        "The map can be learned",
+        "The front is usually unknown before optimization. SURF reconstructs the map from solutions already obtained and uses it to choose the next weights. Repeating this process refines the map. The theory describes conditional contraction toward a floor caused by representing a continuous curve with finitely many points."
+      ],
+      [
+        "Read quality and coverage together",
+        "A collection can be evenly spaced and still far from the desired front. That is why the experiments report coverage alongside approximation quality. The practical question is whether a method uses the available solve budget to find both useful and diverse compromises. Objective normalization also matters because distance changes with the units of the rewards."
+      ]
+    ],
+    "explanation_title": "Why uniform weights do not give uniform trade-offs"
   },
   "pbgd-free": {
-    "blog_title": "When bilevel learning can skip a nested solve",
     "lead": "Bilevel optimization asks how one learning problem should shape another. The cost often comes from repeatedly solving the inner problem.",
     "takeaway": "PBGD-Free uses first-order updates without tracking the lower-level value function. Flatness conditions control the bias introduced by removing that correction.",
     "problem": [
@@ -104,28 +103,6 @@
       ]
     ],
     "boundary": "The simplified update is not a general recipe for every bilevel objective. Outside the analyzed flatness regime, the omitted correction can remain large and convergence can stop in a neighborhood of a stationary point.",
-    "blog": [
-      [
-        "One objective sits inside another",
-        "A bilevel learning problem has two roles. The lower-level problem learns a response for the current outer decision. The upper-level problem chooses the outer decision by evaluating that response. Even writing the problem is nested, so a straightforward solver often repeats many inner updates before making one outer update."
-      ],
-      [
-        "A penalty can still hide a solve",
-        "Penalty methods offer a first-order route: encourage the lower-level variable to reach a small objective gap. Yet evaluating that gap requires the lower-level optimum value. Maintaining the associated response introduces another stream of updates. The real question is which correction can be removed while controlling the resulting error."
-      ],
-      [
-        "The shortcut has a bias",
-        "PBGD-Free removes the value-function tracking component. Its lower-level variable takes gradient steps on a scaled penalty objective, while the upper-level variable follows the upper-level gradient. This is simpler, but the dropped term generally matters. The paper’s examples make that failure concrete rather than assuming that cheap updates must be correct."
-      ],
-      [
-        "Flatness gives the shortcut a regime",
-        "The flatness condition bounds how much the upper-level objective changes when the lower-level iterate moves away from a lower-level optimum. It includes an exponent, a modulus, and an additive allowance. These parameters help control the gap between the simplified update and the direction needed by the bilevel objective."
-      ],
-      [
-        "The structure comes before the speedup",
-        "The experiments study settings including LLM post-training, where a backbone and head play different optimization roles. The useful lesson is to look for a structural reason that a correction is small. Single-loop updates gain their justification from that structure and the convergence analysis. Their low per-iteration cost alone cannot provide it."
-      ]
-    ],
     "scenes": [
       [
         "0:00–0:20",
@@ -157,10 +134,32 @@
       "efficient-penalty",
       "smoothness",
       "blocc"
-    ]
+    ],
+    "explanation": [
+      [
+        "One objective sits inside another",
+        "A bilevel learning problem has two roles. The lower-level problem learns a response for the current outer decision. The upper-level problem chooses the outer decision by evaluating that response. Even writing the problem is nested, so a straightforward solver often repeats many inner updates before making one outer update."
+      ],
+      [
+        "A penalty can still hide a solve",
+        "Penalty methods offer a first-order route: encourage the lower-level variable to reach a small objective gap. Yet evaluating that gap requires the lower-level optimum value. Maintaining the associated response introduces another stream of updates. The real question is which correction can be removed while controlling the resulting error."
+      ],
+      [
+        "The shortcut has a bias",
+        "PBGD-Free removes the value-function tracking component. Its lower-level variable takes gradient steps on a scaled penalty objective, while the upper-level variable follows the upper-level gradient. This is simpler, but the dropped term generally matters. The paper’s examples make that failure concrete rather than assuming that cheap updates must be correct."
+      ],
+      [
+        "Flatness gives the shortcut a regime",
+        "The flatness condition bounds how much the upper-level objective changes when the lower-level iterate moves away from a lower-level optimum. It includes an exponent, a modulus, and an additive allowance. These parameters help control the gap between the simplified update and the direction needed by the bilevel objective."
+      ],
+      [
+        "The structure comes before the speedup",
+        "The experiments study settings including LLM post-training, where a backbone and head play different optimization roles. The useful lesson is to look for a structural reason that a correction is small. Single-loop updates gain their justification from that structure and the convergence analysis. Their low per-iteration cost alone cannot provide it."
+      ]
+    ],
+    "explanation_title": "When bilevel learning can skip a nested solve"
   },
   "efficient-penalty": {
-    "blog_title": "Separate the sources of cost in penalty-based bilevel learning",
     "lead": "Large penalties, response tracking, and moving constraints create different costs. A useful analysis treats them separately.",
     "takeaway": "The paper sharpens smoothness analysis for alternating penalty updates and extends PBGD-Free. Uncoupled constraints admit fully single-loop updates; coupled constraints retain an inner loop with reduced complexity.",
     "problem": [
@@ -185,28 +184,6 @@
       ]
     ],
     "boundary": "A fully single-loop claim applies to the uncoupled-constraint case analyzed in the paper. The coupled-constraint version still uses an inner loop, whose work must be counted when comparing total computation.",
-    "blog": [
-      [
-        "A large penalty is not one single cost",
-        "A penalty parameter asks an optimization method to respect lower-level optimality more strongly. That can make a joint objective steep. It can also increase the effort needed to track a lower-level response. These effects live in different parts of the algorithm, so combining them into one crude cost estimate loses information."
-      ],
-      [
-        "Follow the objective the outer update actually sees",
-        "An alternating method first works on the lower-level variables and then takes an upper-level step. The outer step acts on a reduced objective induced by the inner response. Its smoothness can differ from the smoothness of the full joint objective. Analyzing the reduced objective is therefore central to deciding which step sizes are justified."
-      ],
-      [
-        "Constraints change the story",
-        "For an uncoupled feasible set, the lower-level domain stays fixed as the outer decision changes. Coupled constraints make that domain move. A variable that was feasible before an outer update can cease to be feasible afterward. The paper treats this dependence explicitly through constrained analysis rather than carrying over an unconstrained conclusion."
-      ],
-      [
-        "Two routes to less work",
-        "Sharper smoothness analysis supports alternating penalty updates with larger outer steps. Flatness supports removing the lower-level value-function tracking component in PBGD-Free. These are related ideas, but they address different obstacles. The broader paper brings them into one analysis and separates their constrained regimes."
-      ],
-      [
-        "Compare total work in the right regime",
-        "The uncoupled version of PBGD-Free is fully single-loop. The coupled version retains an inner loop with reduced complexity. A comparison should therefore include the work inside that loop. The SVM and LLM experiments make the theory concrete without turning the single-loop claim into a statement about every constrained problem."
-      ]
-    ],
     "scenes": [
       [
         "0:00–0:20",
@@ -238,10 +215,32 @@
       "pbgd-free",
       "smoothness",
       "blocc"
-    ]
+    ],
+    "explanation": [
+      [
+        "A large penalty is not one single cost",
+        "A penalty parameter asks an optimization method to respect lower-level optimality more strongly. That can make a joint objective steep. It can also increase the effort needed to track a lower-level response. These effects live in different parts of the algorithm, so combining them into one crude cost estimate loses information."
+      ],
+      [
+        "Follow the objective the outer update actually sees",
+        "An alternating method first works on the lower-level variables and then takes an upper-level step. The outer step acts on a reduced objective induced by the inner response. Its smoothness can differ from the smoothness of the full joint objective. Analyzing the reduced objective is therefore central to deciding which step sizes are justified."
+      ],
+      [
+        "Constraints change the story",
+        "For an uncoupled feasible set, the lower-level domain stays fixed as the outer decision changes. Coupled constraints make that domain move. A variable that was feasible before an outer update can cease to be feasible afterward. The paper treats this dependence explicitly through constrained analysis rather than carrying over an unconstrained conclusion."
+      ],
+      [
+        "Two routes to less work",
+        "Sharper smoothness analysis supports alternating penalty updates with larger outer steps. Flatness supports removing the lower-level value-function tracking component in PBGD-Free. These are related ideas, but they address different obstacles. The broader paper brings them into one analysis and separates their constrained regimes."
+      ],
+      [
+        "Compare total work in the right regime",
+        "The uncoupled version of PBGD-Free is fully single-loop. The coupled version retains an inner loop with reduced complexity. A comparison should therefore include the work inside that loop. The SVM and LLM experiments make the theory concrete without turning the single-loop claim into a statement about every constrained problem."
+      ]
+    ],
+    "explanation_title": "Separate the sources of cost in penalty-based bilevel learning"
   },
   "smoothness": {
-    "blog_title": "A sharper curvature bound can change an algorithm’s pace",
     "lead": "A penalty objective can be steep in joint coordinates while its reduced outer objective has much milder curvature.",
     "takeaway": "Analyzing second-order directional derivatives of the reduced penalty objective gives an O(1) smoothness bound in the paper’s regime and improves outer iteration bounds for alternating penalty methods.",
     "problem": [
@@ -266,28 +265,6 @@
       ]
     ],
     "boundary": "These are conditional complexity results. The O(ε⁻¹) outer iteration count should not be read as an unconditional wall-clock speedup or a count that omits the cost of inner solves.",
-    "blog": [
-      [
-        "Step sizes follow a curvature bound",
-        "A gradient method usually limits its step size using a smoothness bound. A larger bound leads to a smaller safe step. In penalty methods, a generic bound often grows with the penalty, making a stronger approximation of lower-level optimality look intrinsically expensive for the outer loop."
-      ],
-      [
-        "Joint and reduced objectives differ",
-        "The joint penalty objective is a function of both optimization variables. An alternating method instead responds to an objective obtained after lower-level minimization. The lower-level response moves with the outer variable. Accounting for that movement can reveal cancellation that is invisible in a bound over arbitrary joint directions."
-      ],
-      [
-        "Analyze the cancellation directly",
-        "The paper writes the reduced objective as a scaled difference of two value functions. One uses the original lower-level objective. The other uses a perturbed objective containing the upper-level loss. Relating their second-order directional derivatives yields a sharper smoothness estimate under the stated conditions."
-      ],
-      [
-        "Constraints require their own analysis",
-        "In an unconstrained lower-level problem, the gradient vanishes at the optimum. At a constrained optimum, the gradient can be balanced by an active constraint instead. The proof must incorporate that structure. The paper develops the uncoupled analysis and then extends it to nonlinear coupled constraints."
-      ],
-      [
-        "What the rate measures",
-        "The improved outer iteration bound is expressed using a squared generalized-gradient stationarity criterion. That definition matters when comparing exponents across papers. So does inner-solve work. The result changes what the outer loop needs to do; translating it into runtime requires accounting for the complete implementation."
-      ]
-    ],
     "scenes": [
       [
         "0:00–0:20",
@@ -319,10 +296,32 @@
       "blocc",
       "efficient-penalty",
       "pbgd-free"
-    ]
+    ],
+    "explanation": [
+      [
+        "Step sizes follow a curvature bound",
+        "A gradient method usually limits its step size using a smoothness bound. A larger bound leads to a smaller safe step. In penalty methods, a generic bound often grows with the penalty, making a stronger approximation of lower-level optimality look intrinsically expensive for the outer loop."
+      ],
+      [
+        "Joint and reduced objectives differ",
+        "The joint penalty objective is a function of both optimization variables. An alternating method instead responds to an objective obtained after lower-level minimization. The lower-level response moves with the outer variable. Accounting for that movement can reveal cancellation that is invisible in a bound over arbitrary joint directions."
+      ],
+      [
+        "Analyze the cancellation directly",
+        "The paper writes the reduced objective as a scaled difference of two value functions. One uses the original lower-level objective. The other uses a perturbed objective containing the upper-level loss. Relating their second-order directional derivatives yields a sharper smoothness estimate under the stated conditions."
+      ],
+      [
+        "Constraints require their own analysis",
+        "In an unconstrained lower-level problem, the gradient vanishes at the optimum. At a constrained optimum, the gradient can be balanced by an active constraint instead. The proof must incorporate that structure. The paper develops the uncoupled analysis and then extends it to nonlinear coupled constraints."
+      ],
+      [
+        "What the rate measures",
+        "The improved outer iteration bound is expressed using a squared generalized-gradient stationarity criterion. That definition matters when comparing exponents across papers. So does inner-solve work. The result changes what the outer loop needs to do; translating it into runtime requires accounting for the complete implementation."
+      ]
+    ],
+    "explanation_title": "A sharper curvature bound can change an algorithm’s pace"
   },
   "blocc": {
-    "blog_title": "When an outer decision changes what the inner problem can do",
     "lead": "Some bilevel decisions change both a follower’s objective and its feasible choices. Coupled constraints encode that dependence.",
     "takeaway": "BLOCC combines penalty reformulation with primal-dual information to optimize bilevel problems whose lower-level constraints depend on the upper-level decision.",
     "problem": [
@@ -347,28 +346,6 @@
       ]
     ],
     "boundary": "The analyzed lower-level objective is strongly convex in y, and the lower-level constraints are convex in y with the stated constraint qualification. Those conditions are part of the convergence guarantee.",
-    "blog": [
-      [
-        "A leader changes the follower’s choices",
-        "Consider a network operator deciding which infrastructure to provide. Users then respond within the network that exists. The operator’s decision changes the set of available routes. A bilevel model expresses the sequence, and coupled constraints express the changing feasible set."
-      ],
-      [
-        "The response moves with its boundary",
-        "In an ordinary unconstrained inner problem, we can study how an optimum changes through the objective. Here the feasible boundary moves too. A lower-level optimum can sit on an active constraint, so the effect of an outer decision must include both objective and constraint terms."
-      ],
-      [
-        "Dual variables carry constraint information",
-        "The primal-dual perspective attaches multipliers to the lower-level constraints. These variables help describe how the constrained optimum responds to the outer decision. BLOCC combines this information with a penalty formulation and first-order updates."
-      ],
-      [
-        "The theory has a specific regime",
-        "The paper assumes a strongly convex lower-level objective and constraints convex in the lower-level variable. It also requires feasible domains and constraint qualification. Under these conditions, the response and its dual description support the approximation and convergence analysis."
-      ],
-      [
-        "From a toy boundary to applications",
-        "The interactive example uses a bound that moves with the outer variable. The paper goes further with SVM hyperparameter selection and transportation design, including a network based on Seville. The connection is structural: an outer decision determines the lower-level problem that will actually be solved."
-      ]
-    ],
     "scenes": [
       [
         "0:00–0:20",
@@ -399,10 +376,32 @@
     "related": [
       "smoothness",
       "efficient-penalty"
-    ]
+    ],
+    "explanation": [
+      [
+        "A leader changes the follower’s choices",
+        "Consider a network operator deciding which infrastructure to provide. Users then respond within the network that exists. The operator’s decision changes the set of available routes. A bilevel model expresses the sequence, and coupled constraints express the changing feasible set."
+      ],
+      [
+        "The response moves with its boundary",
+        "In an ordinary unconstrained inner problem, we can study how an optimum changes through the objective. Here the feasible boundary moves too. A lower-level optimum can sit on an active constraint, so the effect of an outer decision must include both objective and constraint terms."
+      ],
+      [
+        "Dual variables carry constraint information",
+        "The primal-dual perspective attaches multipliers to the lower-level constraints. These variables help describe how the constrained optimum responds to the outer decision. BLOCC combines this information with a penalty formulation and first-order updates."
+      ],
+      [
+        "The theory has a specific regime",
+        "The paper assumes a strongly convex lower-level objective and constraints convex in the lower-level variable. It also requires feasible domains and constraint qualification. Under these conditions, the response and its dual description support the approximation and convergence analysis."
+      ],
+      [
+        "From a toy boundary to applications",
+        "The interactive example uses a bound that moves with the outer variable. The paper goes further with SVM hyperparameter selection and transportation design, including a network based on Seville. The connection is structural: an outer decision determines the lower-level problem that will actually be solved."
+      ]
+    ],
+    "explanation_title": "When an outer decision changes what the inner problem can do"
   },
   "birq": {
-    "blog_title": "Let a speech model improve its own learning targets",
     "lead": "Unlabeled audio contains information, but a self-supervised model still needs a target. How that target is made shapes what the model learns.",
     "takeaway": "BiRQ reuses intermediate model representations to generate enhanced pseudo-labels and combines them with raw-input anchors in a bilevel training framework.",
     "problem": [
@@ -427,28 +426,6 @@
       ]
     ],
     "boundary": "The reported WER comparisons belong to their stated architecture, pretraining data, fine-tuning data, and decoding setup. The target-source diagram explains the design and does not measure the effect of changing its controls.",
-    "blog": [
-      [
-        "A target without a transcript",
-        "Speech is continuous. A self-supervised learner can hide part of a recording and predict a discrete label for that part, but somebody still has to define those labels. A random quantizer creates them cheaply. A representation learned by another encoder can make them more informative, at the cost of maintaining that encoder and its training pipeline."
-      ],
-      [
-        "Use representations already being learned",
-        "BiRQ takes intermediate representations from the speech model itself and discretizes them with a random-projection quantizer. This gives the model a route to richer targets without requiring a separate external label encoder. The labels and representations can improve within the same training process."
-      ],
-      [
-        "An evolving target needs an anchor",
-        "When a learner also helps construct its targets, the target can move as the learner changes. BiRQ includes labels obtained directly from the raw input as an anchor. This stable source complements the enhanced labels produced from intermediate representations."
-      ],
-      [
-        "Optimization connects the two roles",
-        "The paper formulates the interaction as a bilevel learning problem. Differentiable Gumbel-softmax selection supports end-to-end training of the label-selection mechanism. The exact losses and update rules are in the method section; the page’s diagram focuses on what each component contributes."
-      ],
-      [
-        "Evaluate with speech recognition",
-        "The reported experiments use word error rate after downstream fine-tuning. In the 155M Conformer LibriSpeech comparison, BiRQ reports 5.0% test-clean and 12.6% test-other WER, compared with 6.8% and 19.6% for BEST-RQ. The AMI experiment reports improvements in its own setting. Those numbers describe the specified model, data, and decoding configurations."
-      ]
-    ],
     "scenes": [
       [
         "0:00–0:20",
@@ -478,10 +455,32 @@
     ],
     "related": [
       "pbgd-free"
-    ]
+    ],
+    "explanation": [
+      [
+        "A target without a transcript",
+        "Speech is continuous. A self-supervised learner can hide part of a recording and predict a discrete label for that part, but somebody still has to define those labels. A random quantizer creates them cheaply. A representation learned by another encoder can make them more informative, at the cost of maintaining that encoder and its training pipeline."
+      ],
+      [
+        "Use representations already being learned",
+        "BiRQ takes intermediate representations from the speech model itself and discretizes them with a random-projection quantizer. This gives the model a route to richer targets without requiring a separate external label encoder. The labels and representations can improve within the same training process."
+      ],
+      [
+        "An evolving target needs an anchor",
+        "When a learner also helps construct its targets, the target can move as the learner changes. BiRQ includes labels obtained directly from the raw input as an anchor. This stable source complements the enhanced labels produced from intermediate representations."
+      ],
+      [
+        "Optimization connects the two roles",
+        "The paper formulates the interaction as a bilevel learning problem. Differentiable Gumbel-softmax selection supports end-to-end training of the label-selection mechanism. The exact losses and update rules are in the method section; the page’s diagram focuses on what each component contributes."
+      ],
+      [
+        "Evaluate with speech recognition",
+        "The reported experiments use word error rate after downstream fine-tuning. In the 155M Conformer LibriSpeech comparison, BiRQ reports 5.0% test-clean and 12.6% test-other WER, compared with 6.8% and 19.6% for BEST-RQ. The AMI experiment reports improvements in its own setting. Those numbers describe the specified model, data, and decoding configurations."
+      ]
+    ],
+    "explanation_title": "Let a speech model improve its own learning targets"
   },
   "retailagent": {
-    "blog_title": "Audit a trading agent’s timing, not just its exposure",
     "lead": "A policy can hold a stock frequently and still choose comparatively unfavorable moments. An exposure-matched metric helps isolate that timing.",
     "takeaway": "RetailAgent audits sequential long-or-flat decisions using within-stock timing after removing average exposure. The paper reports negative timing and studies how it changes with trajectory shuffling and self-authored memory.",
     "problem": [
@@ -506,28 +505,6 @@
       ]
     ],
     "boundary": "These scores are research timing measures on the evaluated historical paths. The paper leaves transaction costs, market impact, strategic feedback, and whether the pattern remains actionable to further study. Magnitudes from different sampling frames are descriptive comparisons.",
-    "blog": [
-      [
-        "Exposure and timing answer different questions",
-        "Suppose an agent is long during half of the intervals in a trading day. Its return depends on what the stock did and on which half it chose. Comparing it with a policy that holds the stock at half exposure throughout the same day separates a timing component from the average amount invested."
-      ],
-      [
-        "Decide first, observe the next return afterward",
-        "RetailAgent gives the LLM an anonymized intraday history and condition-specific state. The agent then chooses long or flat before the next interval return is revealed. Concealing stock identity and other information keeps the decision boundary controlled and makes the tested policy easier to interpret."
-      ],
-      [
-        "Subtract average exposure",
-        "The timing score sums each following return multiplied by the action minus that stock-day’s mean action. A negative score means exposure was allocated to relatively unfavorable intervals on that path. The score is a diagnostic of alignment, rather than a complete accounting of an executable strategy’s profitability."
-      ],
-      [
-        "Shuffle the schedule to test the alignment",
-        "A shuffle preserves an action count while disrupting when the actions occur. In the principal text condition, the intact schedule has substantially more negative timing than the reported shuffle controls. The study also examines memory and persistence using matched panels. These controls help characterize the sequence rather than explaining the result through exposure alone."
-      ],
-      [
-        "Keep the conclusion at the level tested",
-        "The paper documents negative timing across tested configurations and recoverable structure in action traces. It does not resolve how another participant would exploit that structure in a live market with costs and feedback. The contribution is a controlled behavioral audit and a way to study the timing of sequential decisions."
-      ]
-    ],
     "scenes": [
       [
         "0:00–0:20",
@@ -557,6 +534,29 @@
     ],
     "related": [
       "surf"
-    ]
+    ],
+    "explanation": [
+      [
+        "Exposure and timing answer different questions",
+        "Suppose an agent is long during half of the intervals in a trading day. Its return depends on what the stock did and on which half it chose. Comparing it with a policy that holds the stock at half exposure throughout the same day separates a timing component from the average amount invested."
+      ],
+      [
+        "Decide first, observe the next return afterward",
+        "RetailAgent gives the LLM an anonymized intraday history and condition-specific state. The agent then chooses long or flat before the next interval return is revealed. Concealing stock identity and other information keeps the decision boundary controlled and makes the tested policy easier to interpret."
+      ],
+      [
+        "Subtract average exposure",
+        "The timing score sums each following return multiplied by the action minus that stock-day’s mean action. A negative score means exposure was allocated to relatively unfavorable intervals on that path. The score is a diagnostic of alignment, rather than a complete accounting of an executable strategy’s profitability."
+      ],
+      [
+        "Shuffle the schedule to test the alignment",
+        "A shuffle preserves an action count while disrupting when the actions occur. In the principal text condition, the intact schedule has substantially more negative timing than the reported shuffle controls. The study also examines memory and persistence using matched panels. These controls help characterize the sequence rather than explaining the result through exposure alone."
+      ],
+      [
+        "Keep the conclusion at the level tested",
+        "The paper documents negative timing across tested configurations and recoverable structure in action traces. It does not resolve how another participant would exploit that structure in a live market with costs and feedback. The contribution is a controlled behavioral audit and a way to study the timing of sequential decisions."
+      ]
+    ],
+    "explanation_title": "Audit a trading agent’s timing, not just its exposure"
   }
 }

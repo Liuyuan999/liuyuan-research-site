@@ -1,6 +1,6 @@
 # Liuyuan Jiang — Research, explained
 
-A separate static research website with seven project pages, seven blog explainers, interactive teaching diagrams, and narration/storyboard downloads. The recorded videos are not included.
+A separate static research website with seven project pages with integrated explanations, interactive teaching diagrams, and narration/storyboard downloads. The recorded videos are not included.
 
 ## Preview
 
@@ -9,7 +9,9 @@ Run `python3 -m http.server 8765 --bind 127.0.0.1 --directory dist` from this fo
 ## Edit
 
 - `content/papers.json`: author order, titles, venues, links, and source records.
-- `content/articles.json`: project explanations, blog prose, evidence, and narration scenes.
+- `content/articles.json`: integrated project explanations, evidence, and narration scenes.
+- `content/explanations/`: editable Markdown exports of the explanations.
+- Old `/blog/` URLs redirect to the matching project page and are excluded from the sitemap.
 - `dist/assets/style.css`: responsive visual design.
 - `dist/assets/site.js`: interactive educational diagrams.
 - `build.py` and `render_articles.py`: generate static pages and editable Markdown exports.
