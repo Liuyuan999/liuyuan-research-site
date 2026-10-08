@@ -179,28 +179,15 @@ for (const lab of document.querySelectorAll('[data-opening]')) {
   });
   selectPlot(0);
   const xx=p=>55+340*(p-1)/7,yy=q=>205-175*q/7;
-  const profitColor=value=>{
-   const stops=[[251,252,255],[219,230,243],[130,183,199],[36,125,135],[7,85,83]];
-   const scaled=Math.min(4,Math.max(0,value/49*4)),index=Math.min(3,Math.floor(scaled)),fraction=scaled-index;
-   return 'rgb('+stops[index].map((start,c)=>Math.round(start+(stops[index+1][c]-start)*fraction)).join(',')+')';
-  };
-  for(let i=0;i<56;i++)for(let j=0;j<35;j++) {
-   const price=1+7*(i+.5)/56,amount=7*(j+.5)/35;
-   profitBase.append(node('rect',{x:55+340*i/56,y:30+175*(34-j)/35,width:340/56+.2,height:175/35+.2,fill:profitColor((price-1)*amount)}));
+  const profitX=p=>65+330*(p-1)/7,profitY=value=>205-175*value/15;
+  for(const value of [0,5,10,15]) {
+   profitBase.append(node('path',{d:`M65 ${profitY(value)} H395`,fill:'none',stroke:'#e0e5ef','stroke-width':1}));
+   profitBase.append(node('text',{x:54,y:profitY(value)+6,'text-anchor':'end','data-profit-tick':value},String(value)));
   }
-  for(const value of [5,10,20,35]) {
-   const start=1+value/7;
-   const points=Array.from({length:101},(_,i)=>{const price=start+(8-start)*i/100;return `${xx(price)},${yy(value/(price-1))}`;}).join(' ');
-   profitBase.append(node('polyline',{points,fill:'none',stroke:value>=20?'#fff':'#627c8e','stroke-opacity':.55,'stroke-width':1}));
-   profitBase.append(node('text',{x:390,y:yy(value/7)-4,'text-anchor':'end',class:'profit-contour-label',style:'fill:'+(value>=20?'#fff':'#324758')},'$'+value));
-  }
-  const axisGroup=node('g');
-  for(const q of [0,3,7])axisGroup.append(node('text',{x:44,y:yy(q)+6,'text-anchor':'end'},String(q)));
-  axisGroup.append(node('path',{d:'M55 24 V205 H400',fill:'none',stroke:'#9aabc7'}));
-  for(const p of [1,4,8])axisGroup.append(node('text',{x:xx(p),y:228,'text-anchor':'middle'},'$'+p));
-  axisGroup.append(node('text',{x:228,y:252,'text-anchor':'middle'},'Price per kg, x'));
-  axisGroup.append(node('text',{x:18,y:115,'text-anchor':'middle',transform:'rotate(-90 18 115)'},'Bread bought, y (kg)'));
-  profitBase.append(axisGroup);
+  profitBase.append(node('path',{d:'M65 24 V205 H400',fill:'none',stroke:'#9aabc7'}));
+  for(const price of [1,4,8])profitBase.append(node('text',{x:profitX(price),y:228,'text-anchor':'middle'},'$'+price));
+  profitBase.append(node('text',{x:230,y:252,'text-anchor':'middle'},'Price per kg, x'));
+  profitBase.append(node('text',{x:18,y:115,'text-anchor':'middle',transform:'rotate(-90 18 115)'},'Profit ($)'));
   const toggles=[...lab.querySelectorAll('[data-bakery-constraint]')];
   const money=x=>'$'+x.toFixed(2),quantity=x=>x.toFixed(2).replace(/\.?0+$/,'');
   const update=()=>{
@@ -232,18 +219,16 @@ for (const lab of document.querySelectorAll('[data-opening]')) {
    g.append(node('text',{x:228,y:252,'text-anchor':'middle'},'Price per kg, x'));
    g.append(node('text',{x:18,y:115,'text-anchor':'middle',transform:'rotate(-90 18 115)'},'Bread bought, y (kg)'));
    profitOverlay.replaceChildren();
-   if(budget) {
-    const boundary=Array.from({length:141},(_,i)=>{const p=1+7*i/140;return `${xx(p)},${yy(Math.min(7,12/p))}`;}).join(' ');
-    profitOverlay.append(node('polygon',{points:`55,30 395,30 ${boundary.split(' ').reverse().join(' ')}`,fill:'url(#bakery-infeasible)'}));
-   }
-   if(stock)profitOverlay.append(node('rect',{x:55,y:30,width:340,height:yy(3)-30,fill:'url(#bakery-infeasible)'}));
-   const responsePoints=curve(purchase);
-   profitOverlay.append(node('polyline',{points:responsePoints,fill:'none',stroke:'#fff','stroke-width':7,'stroke-linejoin':'round'}));
-   profitOverlay.append(node('polyline',{points:responsePoints,fill:'none',stroke:'#007c70','stroke-width':3.5,'stroke-linejoin':'round','data-profit-response':''}));
-   profitOverlay.append(node('path',{d:`M${xx(price)} 30 V205`,stroke:'#354ac6','stroke-width':1.5,'stroke-dasharray':'3 5'}));
-   profitOverlay.append(node('circle',{cx:xx(price),cy:yy(bought),r:6,fill:'#354ac6',stroke:'#fff','stroke-width':2,'data-profit-selected':''}));
-   lab.querySelector('[data-bakery-infeasible-key]').hidden=!budget&&!stock;
-   lab.querySelector('.bakery-profit-plot').setAttribute('aria-label',`Profit equals (price minus one dollar per kg) times bread bought. Color scale stays between zero and 49 dollars. At ${money(price)} per kg, the customer chooses ${quantity(bought)} kg and the bakery earns ${money(profit)}. The curve shows the customer’s response at every price.`);
+   const profitCurve=response=>Array.from({length:141},(_,i)=>{const p=1+7*i/140;return `${profitX(p)},${profitY((p-1)*response(p))}`;}).join(' ');
+   const currentProfitPoints=profitCurve(purchase);
+   profitOverlay.append(node('polygon',{points:`65,205 ${currentProfitPoints} 395,205`,fill:'#007c70','fill-opacity':.07}));
+   profitOverlay.append(node('polyline',{points:profitCurve(preferred),fill:'none',stroke:'#9caac2','stroke-width':3,'stroke-dasharray':'7 5','data-profit-baseline':''}));
+   profitOverlay.append(node('polyline',{points:currentProfitPoints,fill:'none',stroke:'#007c70','stroke-width':3.5,'stroke-linejoin':'round','data-profit-curve':''}));
+   profitOverlay.append(node('path',{d:`M${profitX(price)} 30 V205 M65 ${profitY(profit)} H${profitX(price)}`,fill:'none',stroke:'#354ac6','stroke-width':1.5,'stroke-dasharray':'3 5'}));
+   profitOverlay.append(node('circle',{cx:profitX(price),cy:profitY(profit),r:6,fill:'#354ac6',stroke:'#fff','stroke-width':2,'data-profit-selected':'','data-price':price,'data-profit':profit}));
+   profitOverlay.append(node('text',{x:profitX(price)+(price>5.5?-10:10),y:profitY(profit)-12,'text-anchor':price>5.5?'end':'start',class:'profit-point-label'},money(profit)));
+   lab.querySelector('.bakery-profit-plot').setAttribute('aria-label',`Bakery profit versus bread price, using the customer's purchase at every price. The horizontal axis is price from one to eight dollars per kg. The vertical axis is profit from zero to fifteen dollars. At ${money(price)} per kg, the customer buys ${quantity(bought)} kg and profit is ${money(profit)}.`);
+
   };
   range.addEventListener('input',update);
   for(const button of toggles)button.addEventListener('click',()=>{button.setAttribute('aria-pressed',String(button.getAttribute('aria-pressed')!=='true'));update();});
