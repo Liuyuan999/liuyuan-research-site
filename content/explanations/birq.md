@@ -1,18 +1,18 @@
-# Let a speech model improve its own learning targets
+# Target refinement within a shared speech encoder
 
-BiRQ turns intermediate speech representations into pseudo-labels, while raw-input targets anchor the learner as those representations evolve.
+BiRQ refines speech pretraining targets using intermediate features of the acoustic encoder, with a fixed raw-input labeling task as an anchor.
 
-## The decision
+## From fixed labels to learned representations
 
-A self-supervised speech model learns by predicting pseudo-labels at masked frames. BEST-RQ obtains those labels from a fixed random projection of the unmasked audio features, avoiding an external pretrained label model.
+BEST-RQ turns unmasked audio features into pseudo-labels using a fixed random projection and codebook, then trains an encoder to predict those labels from masked audio. The targets remain unchanged as the encoder learns. HuBERT-style relabeling uses learned features to refine targets through separate labeling stages.
 
-## The bottleneck
+## A target generator inside the prediction model
 
-Raw-input labels stay fixed as the encoder learns. Intermediate-feature labels evolve with the same encoder that predicts them. Training must coordinate the changing targets with a stable reference task.
+BiRQ reuses the first part of the acoustic encoder to generate targets from unmasked speech. Normalized intermediate features pass through a fixed random projection and a Gumbel-softmax quantizer. The resulting enhanced targets depend differentiably on the same encoder parameters used for masked prediction.
 
-## The idea
+## An anchoring task for joint learning
 
-Keep both branches. BiRQ builds enhanced targets from unmasked intermediate features and preserves raw-input anchor targets. A differentiable Gumbel-softmax target and a penalty formulation connect label construction to the same training loop.
+The raw-input targets are retained as a reference task independent of the encoder parameters. BiRQ minimizes the enhanced-target loss while requiring the anchoring loss to stay near its minimum. The penalty implementation brings both tasks into one training loop, with gradients through target construction as well as prediction.
 
 ## Source
 

@@ -1,18 +1,18 @@
-# Separate the sources of cost in penalty-based bilevel learning
+# Reduced curvature and value-function removal under constraints
 
-Reduced-curvature analysis permits larger outer steps. Flatness-based updates remove one response computation, with separate methods for fixed and coupled constraints.
+A reduced penalty formulation admits outer step sizes independent of the penalty. Flatness then controls the bias of removing one lower-level response computation, with distinct algorithms for fixed and coupled constraints.
 
-## The decision
+## The curvature of an alternating update
 
-A bilevel learner chooses an outer variable while its inner variable solves another objective. A penalty makes inner suboptimality costly, but the chosen formulation and the update schedule determine which computation is actually required.
+The lower variable is optimized before the outer step. The relevant objective is therefore a difference between nearby lower-level value functions. Its curvature can stay bounded even as the joint penalty objective becomes steeper.
 
-## The bottleneck
+## The cost of the value-function correction
 
-There are three distinct costs: a penalty-scaled step-size restriction, two lower-level response estimates, and the extra structure of constraints that move with the outer decision. Treating them as one difficulty obscures which improvement applies.
+The full outer gradient combines two response estimates. Dropping the original-response correction saves a computation, but introduces a bias that need not vanish as the penalty grows.
 
-## The idea
+## Flatness and moving constraints
 
-Analyze the reduced objective to capture curvature cancellation, then alternate lower responses and outer updates. Upper-level flatness controls the bias from removing a value-function correction. The coupled extension incorporates constraint multipliers and boundary regularity.
+Upper-level flatness bounds this omission bias. Coupled constraints require a separate analysis because multipliers encode the effect of moving the lower-level feasible boundary.
 
 ## Source
 

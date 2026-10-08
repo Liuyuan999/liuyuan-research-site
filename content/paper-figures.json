@@ -26,7 +26,7 @@
     {
       "file": "birq-figure1.png",
       "label": "Figure 1 · Two sources of speech-learning targets",
-      "caption": "Intermediate encoder features supply the enhanced labels. A parallel random quantizer maps the raw input to anchoring labels. Both supervise the same masked-input prediction model.",
+      "caption": "A shared encoder processes unmasked speech to generate enhanced targets from intermediate features through Gumbel-softmax selection. A fixed random quantizer maps raw input to anchoring targets. The masked prediction task learns from both branches, with gradients through enhanced-target generation.",
       "alt": "Original BiRQ architecture: a shared speech encoder generates enhanced labels from intermediate features, alongside anchoring labels from raw input.",
       "source": "https://arxiv.org/html/2509.15430v1#S1.F1",
       "asset_source": "https://arxiv.org/html/2509.15430v1/figure/BiRQ.png",
@@ -39,8 +39,8 @@
   "pbgd-free": [
     {
       "file": "pbgd-free-figure1.png",
-      "label": "Figure 1 · Which inner updates disappear?",
-      "caption": "The original comparison shows the original and penalized-response updates used by earlier methods. PBGD-Free keeps one lower-level step followed by an upper-level step, with flatness controlling the omitted correction.",
+      "label": "Figure 1 · Single-loop update structure",
+      "caption": "The diagram compares the original and perturbed response updates in V-PBGD and F2SA with PBGD-Free’s single-loop update. With K = 1, PBGD-Free takes one perturbed-response step followed by one upper-variable step. The flatness analysis bounds the omitted original-response correction.",
       "alt": "Original update comparison: V-PBGD and F2SA have inner refinements; PBGD-Free has one lower step followed by an upper step.",
       "source": "https://arxiv.org/html/2507.20400v1#S1.F2",
       "asset_source": "https://arxiv.org/html/2507.20400v1/Figure/PBGD-flow.png",
@@ -66,7 +66,7 @@
     {
       "file": "efficient-penalty-figure3.svg",
       "label": "Figure 3 · Joint gradients versus reduced gradients",
-      "caption": "The paper’s example compares the joint penalty gradient with the reduced-objective gradient at different penalty values. Following the optimized lower-level response reveals the cancellation used in the reduced-smoothness analysis.",
+      "caption": "Example 3 compares the upper partial gradient of the joint penalty objective with the reduced-objective gradient at different penalty values. Evaluating along the optimized lower response reveals the cancellation analyzed by the reduced-smoothness theorems.",
       "alt": "Original penalty-method Figure 3 comparing joint-gradient spheres and reduced-gradient lines for different penalty constants.",
       "source": "https://arxiv.org/html/2511.16796v1#S3.F3",
       "asset_source": "https://arxiv.org/html/2511.16796v1/gradient.svg",
@@ -79,8 +79,8 @@
     {
       "file": "retailagent-figure2.png",
       "label": "Figure 2 · Observation, action, and self-conditioning",
-      "caption": "Price text, charts, and permitted state feed a frozen LLM that chooses long or flat before the subsequent return is revealed. The dashed routes carry policy state and self-authored memory forward. The learned soft-token branch is a separate experimental condition.",
-      "alt": "Original RetailAgent architecture showing price observations, state and memory pathways, a latent adapter, and the frozen LLM long/flat decision.",
+      "caption": "Numerical-text, visual, memory, and learned soft-token pathways into RetailAgent’s frozen LLM. Numerical-text histories use completed intervals. The chart and encoder branches use archived reconstructed one-minute inputs, whose provenance is documented in Appendix A.1.",
+      "alt": "RetailAgent architecture with text and vision inputs, a self-authored memory route, and a GRU-and-adapter soft-token branch connected to a frozen LLM and a long-or-flat action.",
       "source": "https://arxiv.org/pdf/2608.28399v1#page=3",
       "asset_source": "https://arxiv.org/pdf/2608.28399v1",
       "width": 1452,

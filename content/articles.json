@@ -1,7 +1,7 @@
 {
   "surf": {
     "lead": "A weight chooses a compromise. SURF asks how far that choice moves us along the Pareto front—and uses the answer to spread solutions more evenly.",
-    "takeaway": "When a model must balance competing goals, changing their weights evenly can leave large gaps between the resulting solutions. SURF adjusts the weights using distance along the Pareto front. The result is more evenly spaced choices from the same number of trained models.",
+    "takeaway": "Linear scalarization converts competing objectives into a weighted optimization problem, but equal increments in the weight generally produce unequal distances along the Pareto front. SURF corrects this mismatch by estimating cumulative arc length and selecting weights at equal distance quantiles. The scalarized inner solver remains unchanged.",
     "problem": [
       "Suppose a model must balance two objectives. A common approach combines them into one weighted loss, solves it, and repeats for several weights. Equal gaps between the weights look like an even way to explore preferences. But the resulting points can cluster on the Pareto front.",
       "The missing ingredient is traversal speed: changing a weight by a fixed amount can move the solution a little in one region and a lot in another. Uniformity in weight space therefore does not imply uniformity in objective space."
@@ -11,8 +11,8 @@
       "For structured bi-objective problems, the paper derives analytical rules. For general problems, SURF alternates scalarized solves with reconstruction of the arc-length map. This makes the choice of the next weights depend on the geometry seen so far."
     ],
     "formula": "Φ(w) = s(w)/s(1); wₙ = Φ⁻¹(n/N), n = 0, …, N.",
-    "formula_note": "Equations 4–5 define f_PF(w), v(w), s(w), and Φ(w). Rule 1 uses the targets n/N for n = 0, …, N. Algorithm 1 uses damping α to update Φₜ.",
-    "formal": "Under Assumptions 1–3 and the stated inner-solver budget, SURF’s combined CDF estimation and optimization error contracts geometrically toward an O(N⁻²) discretization floor. N counts segments, so there are N + 1 sampled solutions. The theorem assumes hidden-space strong convexity, path regularity, and a sufficiently accurate monotone reconstruction.",
+    "formula_note": "The path f_PF(w) in Equation 4 records the objective vector at a scalarized optimum. Equation 5 defines its speed v(w), cumulative arc length s(w), and normalized map Φ(w). Rule 1 inverts Φ at n/N to obtain N + 1 solutions separated by equal arc length.",
+    "formal": "Theorem 1 assumes a strongly convex hidden-space representation, fixed active constraints satisfying LICQ, a Lipschitz-continuous Lagrangian Hessian, and a nonzero projected trade-off throughout the scalarization path. These are Assumptions 1–3. With sufficiently many segments, α ≤ 0.5, and the inner-solver budget in Remark 1, the combined CDF sup-norm error and C(N)-weighted maximum hidden-space solution error contracts by a factor 1 − α/4 per outer iteration toward O(N⁻²), with C(N) = Θ(N). Equation 16 and Appendix E.3 relate this bound to spacing CV = O(N⁻¹) after sufficiently many outer iterations.",
     "evidence": [
       [
         "Coverage and quality",
@@ -23,7 +23,7 @@
         "In the reported Reddit summarization experiment, SURF improves hypervolume and spacing metrics compared with uniform weights under the same per-slot PPO budget. See Table 2 for the metrics, variability, and reward definitions."
       ]
     ],
-    "boundary": "Uniform coverage is measured by arc length in objective space. Rescaling an objective changes that geometry, so units and normalization determine which trade-offs receive equal spacing.",
+    "boundary": "Equal arc length is defined in the chosen objective-space metric. Rescaling either objective changes that metric and therefore changes the allocation of weights. The geometric analysis specifies what uniform coverage means before constructing it.",
     "scenes": [
       [
         "0:00–0:20",
@@ -71,30 +71,30 @@
     "explanation_title": "Why uniform weights do not give uniform trade-offs"
   },
   "pbgd-free": {
-    "lead": "PBGD-Free uses upper-level flatness to bound the bias from removing the value-function loop, yielding a single-loop penalty method.",
-    "takeaway": "Bilevel training can require refining a lower-level model component repeatedly before updating the upper-level decision. PBGD-Free replaces that nested procedure with one lower-level tracking step and one upper-level update per iteration. Its flatness condition describes when this simplification is valid: the outer loss changes little as the lower variable moves near an optimum.",
+    "lead": "PBGD-Free removes the original lower-level response from a penalty-gradient update. Upper-level flatness controls the resulting bias and permits one first-order update per level.",
+    "takeaway": "The gradient of a bilevel penalty objective depends on two lower-level responses: a minimizer of the original lower loss and a minimizer perturbed by the upper loss. PBGD-Free retains the perturbed response and removes the computation of the original response. A function-value flatness condition controls the omitted correction, giving a single-loop method with a quantified stationarity residual. The paper develops this analysis for nonconvex lower problems and evaluates the method in language-model fine-tuning.",
     "problem": [
-      "In a bilevel problem, the upper-level objective is evaluated at a lower-level solution. Computing that response and its effect on the outer decision can require nested optimization or second-order operations.",
-      "A penalty formulation replaces exact lower-level optimality with an objective gap. But computing the lower-level optimal value can still require another solve. Removing this solve saves work while introducing a gradient bias that needs analysis."
+      "The paper studies optimistic bilevel optimization: the upper objective f is minimized over x and over lower-level solutions y in S_g^*(x). The lower loss g can have multiple minimizers. The penalty formulation replaces lower optimality with the gap between g(x, y) and its minimum value.",
+      "Differentiating the reduced penalty objective requires an original lower minimizer y_g^*(x) and a perturbed minimizer y_γ^*(x). Estimating both responses introduces duplicated lower-level optimization. Their gradient difference is multiplied by γ, so a small response difference can still produce a persistent outer-gradient bias."
     ],
     "method": [
-      "PBGD-Free maintains one lower-level iterate. It updates that iterate using a scaled combination of the upper- and lower-level gradients, then updates the upper-level variable using the upper-level gradient.",
-      "The key condition is flatness of the upper-level objective with respect to the lower-level variable near a lower-level optimum. The paper quantifies this condition and uses it to bound the omitted value-function correction."
+      "PBGD-Free maintains only the perturbed lower iterate. For K = 1, each outer iteration takes one gradient step on γ⁻¹f + g in the lower variable, followed by an upper update using ∇xf at the resulting iterate.",
+      "The analysis bounds upper-loss variation relative to an original lower minimizer through the (δ, α)-flatness condition. Together with smoothness and lower-level Polyak–Łojasiewicz regularity, this condition bounds the bias from omitting the value-function correction."
     ],
     "formula": "|f(x, y_g^*(x)) − f(x, y)| ≤ c ‖y_g^*(x) − y‖^α + δ.",
-    "formula_note": "Definition 1 bounds upper-objective variation around any lower-level solution y_g^*(x) ∈ S_g^*(x), using modulus c, exponent α, and residual δ. Algorithm 1 distinguishes the original solution from the perturbed tracking iterate y_t^γ.",
-    "formal": "The convergence analysis combines smoothness, lower-level PL-type conditions, the flatness parameters, and algorithmic step-size choices. It quantifies stationarity error and the bias from omitting the value-function term. See Definition 1 and the convergence results in Section 3.",
+    "formula_note": "Definition 1 holds for all y: y_g^*(x) is an original lower-level minimizer, c ≥ 0 is the modulus, α ≥ 1 is the distance exponent, and δ ≥ 0 is the permitted residual. The convergence theorem uses 1 < α ≤ 1.5 and a trajectory-dependent residual δ(x_t). The perturbed minimizer y_γ^*(x) minimizes the joint penalty objective, and y_t^γ is its tracked iterate.",
+    "formal": "Assumption 2 requires smooth f and g, Lipschitz Hessians, and a uniform Polyak–Łojasiewicz inequality in y for the scaled upper/lower combinations specified there. Theorem 3 uses K = 1, a common flatness exponent 1 < α ≤ 1.5 and bounded modulus along the trajectory, the stated penalty choice, and the step-size conditions. Its criterion is the average squared gradient norm of Fγ(x), with a residual determined by the average flatness parameter. The proof gives the compatible outer and lower step sizes in Equation 63. Lemma 3 separately relates penalty stationarity to approximate KKT stationarity of the original bilevel problem under its accuracy conditions.",
     "evidence": [
       [
-        "Why flatness is necessary",
-        "The paper gives examples where dropping the value-function correction leaves a non-vanishing bias. This establishes why the simplified update needs structural conditions."
+        "Bias from the omitted correction",
+        "Example 1 and Proposition 2 show that ordinary Lipschitz regularity permits a non-vanishing stationarity residual after removing the correction. Definition 1 and Theorem 3 quantify a sufficient flatness regime for the simplified update."
       ],
       [
-        "LLM post-training",
-        "The experiments include bilevel parameter-efficient fine-tuning with preference optimization at the upper level and supervised fine-tuning at the lower level, together with an additional post-SFT transfer evaluation. See Section 4."
+        "Preference learning and supervised adaptation",
+        "Table 2 reports DPO and SFT losses for the trained Llama-3-3b model and for head adaptation with its backbone fixed. PBGD-Free has the lowest loss in each of the four reported columns under the fixed-time comparison."
       ]
     ],
-    "boundary": "Flatness controls the bias left by the omitted correction. The convergence bound combines a decaying iteration term with a residual determined by the flatness parameters.",
+    "boundary": "Theorem 3 bounds the average squared gradient norm of the reduced penalty objective by an O(T⁻¹) term plus a flatness-dependent residual. With that residual at the target tolerance, the deterministic method needs O(ε⁻¹) iterations, each with constant first-order work. Lemma 3 gives the separate accuracy conditions for transferring penalty stationarity to the original bilevel problem.",
     "scenes": [
       [
         "0:00–0:20",
@@ -129,45 +129,49 @@
     ],
     "explanation": [
       [
-        "The decision",
-        "In the paper’s LLM application, x contains LoRA parameters in the backbone and y is the output head. The head learns supervised fine-tuning (SFT); the backbone is guided by direct preference optimization (DPO) through that adapted head."
+        "Two responses in the penalty gradient",
+        "The original response minimizes g. The perturbed response minimizes the lower-variable part of f + γg. The reduced penalty gradient combines the upper partial gradient with the γ-scaled difference between lower-loss gradients at these responses."
       ],
       [
-        "The bottleneck",
-        "A full penalty gradient estimates both the original SFT-optimal head and a perturbed head. Dropping the value-function correction saves one response estimate, but the removed term is multiplied by the penalty and can remain important."
+        "One response in PBGD-Free",
+        "PBGD-Free tracks the perturbed response and uses the upper partial gradient for x. This removes the original-response estimate. Proposition 2 shows that the resulting bias can persist under ordinary Lipschitz regularity."
       ],
       [
-        "The idea",
-        "Upper-level flatness bounds how the DPO objective varies around an SFT-optimal head. Together with the lower-level regularity conditions, it controls the stationarity error of one lower update followed by one outer update."
+        "Upper-level flatness",
+        "Definition 1 bounds the difference in upper loss between an original lower minimizer and any lower variable. The distance exponent and residual determine how accurately the simplified direction represents the reduced penalty gradient."
       ]
     ],
-    "explanation_title": "When bilevel learning can skip a nested solve"
+    "explanation_title": "Value-function removal under upper-level flatness"
   },
   "efficient-penalty": {
-    "lead": "Reduced-curvature analysis permits larger outer steps. Flatness-based updates remove one response computation, with separate methods for fixed and coupled constraints.",
-    "takeaway": "Repeated inner solves can dominate the cost of bilevel training. This paper sharpens the curvature analysis to allow larger outer steps and removes one response computation when the outer objective changes little near a lower-level optimum. Fixed constraints admit one update per level. When the constraints move with the outer decision, the method retains a constrained inner solve.",
+    "lead": "A reduced penalty formulation admits outer step sizes independent of the penalty. Flatness then controls the bias of removing one lower-level response computation, with distinct algorithms for fixed and coupled constraints.",
+    "takeaway": "Penalty-based bilevel methods repeatedly solve a lower-level problem before updating the upper variable. This work identifies two ways to reduce that cost. An analysis of the objective after lower-level minimization permits outer step sizes that stay constant as the penalty increases. A flatness condition bounds the error from removing the original lower-level response computation. The resulting PBGD-Free method uses one tracking update with fixed constraints and retains a constrained inner solve when the feasible set depends on the upper variable.",
     "problem": [
-      "Penalty-based bilevel methods face two costs: step sizes can shrink as a penalty grows, and inner solves can consume many updates. Coupled constraints add another dependence because the outer variable changes the inner feasible set.",
-      "A joint smoothness bound on all variables can obscure the geometry seen by alternating updates. The paper studies a reduced penalty formulation that separates these roles."
+      "A large penalty enforces lower-level optimality, but a gradient step on the joint upper and lower variables sees curvature that grows with the penalty. Alternating methods also compute two lower-level responses: one for the original objective and one for its upper-objective perturbation.",
+      "Constraints introduce an additional analytical difficulty. The lower-level optimum can move along a boundary or change its active constraints, so the solution map need not have an ordinary derivative. The paper asks which curvature governs the outer update after the lower variable has been optimized."
     ],
     "method": [
-      "The analysis decouples upper- and lower-level variables and obtains a sharper smoothness bound for the reduced penalty objective. This supports larger outer steps in ALT-PBGD under the stated conditions.",
-      "The paper then develops PBGD-Free and a curvature condition for upper-level flatness. It distinguishes uncoupled constraints, where the proposed method is fully single-loop, from coupled constraints, where an inner loop remains but has a reduced complexity bound."
+      "The reduced penalty objective is the penalty-scaled difference between the perturbed and original lower-level value functions. The analysis compares their second directional derivatives and proves a smoothness bound independent of the penalty, first for fixed feasible sets and then for coupled constraints.",
+      "PBGD-Free replaces the full reduced-penalty gradient by the upper partial gradient at a tracked perturbed response. The paper bounds the omitted correction under upper-level flatness. Fixed-set and coupled-constraint results use different stationarity objectives and different inner-solve schedules."
     ],
     "formula": "Fγ(x) = γ [vγ(x) − v(x)]; Y(x) = {y ∈ Y : c(x, y) ≤ 0}.",
-    "formula_note": "The joint objective F̃γ(x, y) in Equation 3 and the reduced objective Fγ(x) in Equation 5 are distinct. Reduced smoothness controls the outer step; dependence of Y(x) on x determines whether moving constraints and multipliers enter the method.",
-    "formal": "Theorems 3.1 and 5.1 establish reduced smoothness. Theorems 4.1 and 5.2 analyze PBGD-Free under flatness, with a fully single-loop fixed-set update and a retained inner solve for coupled constraints. The coupled results use bounded multipliers, strict complementarity, and boundary regularity.",
+    "formula_note": "The joint objective F̃γ(x, y) and the reduced objective Fγ(x) describe different update geometries. ALT-PBGD differentiates the reduced objective using both lower-level responses. PBGD-Free retains the upper partial gradient and uses flatness to control the omitted correction. For coupled constraints, Theorem 5.2 analyzes the multiplier-based surrogate Fγ^λ(x) defined in Equation 62.",
+    "formal": "The fixed-set smoothness theorem uses a closed, convex, nonempty lower-level domain, lower-level strong convexity, jointly smooth objectives, upper-level Lipschitz continuity in the lower variable, and Hessians Lipschitz in the lower variable. The coupled extension adds Assumptions 3 and 5: constraints convex in the lower variable, LICQ near the lower optimum, bounded optimal multipliers, strict complementarity, a smooth boundary for the base domain, and constraint Hessian regularity. Theorem 4.1 assumes trajectory-wise flatness with 1 < α ≤ 1.5 and bounds the average squared generalized gradient of Fγ(x). Theorem 5.2 uses 1 < α < 1.5 and bounds the corresponding quantity for Fγ^λ(x). Both bounds contain a residual determined by average flatness along the trajectory.",
     "evidence": [
       [
-        "Optimization analysis",
-        "The reformulation and smoothness results explain why a bound for joint updates need not dictate the outer step size in an alternating method."
+        "Penalty and step size",
+        "In the fixed-set example, ALT-PBGD converges with step size 0.1 at penalty 10 while JNT-PBGD fails to converge. In the coupled example, PBGD-BLOCC converges with step size 0.05 at penalties 10 and 100. Figures 9–10 test the step-size consequence of reduced smoothness."
       ],
       [
-        "Applications",
-        "The experiments examine SVM hyperparameter optimization and LLM fine-tuning. They evaluate the proposed update rules in settings with different constraint structures. See the experimental section."
+        "Constrained hyperparameter learning",
+        "On the diabetes SVM problem, PBGD-Free has mean test accuracy 0.7699 and mean runtime 0.17 seconds. PBGD-BLOCC has mean test accuracy 0.7758 and mean runtime 2.64 seconds under the recorded stopping rule. Table 7 reports standard deviations across the random splits."
+      ],
+      [
+        "Preference-backbone adaptation",
+        "The LLM experiments train LoRA backbone weights for preference learning and an output head for supervised fine-tuning. Table 3 evaluates both the trained model and a new supervised head fitted with the learned backbone fixed. PBGD-Free has the lowest reported DPO and SFT losses among the listed methods in that comparison."
       ]
     ],
-    "boundary": "The fixed-set PBGD-Free method is fully single-loop. With coupled constraints, it retains a constrained inner solve, which contributes to the total complexity alongside the outer iterations.",
+    "boundary": "The complexity statements count outer iterations separately from the work inside a response solve. ALT-PBGD and PBGD-BLOCC estimate both the original and perturbed responses. PBGD-Free removes the original response computation. Its fixed-set version takes one tracking update per outer step, while its coupled version solves the remaining constrained subproblem to the prescribed accuracy.",
     "scenes": [
       [
         "0:00–0:20",
@@ -202,45 +206,45 @@
     ],
     "explanation": [
       [
-        "The decision",
-        "A bilevel learner chooses an outer variable while its inner variable solves another objective. A penalty makes inner suboptimality costly, but the chosen formulation and the update schedule determine which computation is actually required."
+        "The curvature of an alternating update",
+        "The lower variable is optimized before the outer step. The relevant objective is therefore a difference between nearby lower-level value functions. Its curvature can stay bounded even as the joint penalty objective becomes steeper."
       ],
       [
-        "The bottleneck",
-        "There are three distinct costs: a penalty-scaled step-size restriction, two lower-level response estimates, and the extra structure of constraints that move with the outer decision. Treating them as one difficulty obscures which improvement applies."
+        "The cost of the value-function correction",
+        "The full outer gradient combines two response estimates. Dropping the original-response correction saves a computation, but introduces a bias that need not vanish as the penalty grows."
       ],
       [
-        "The idea",
-        "Analyze the reduced objective to capture curvature cancellation, then alternate lower responses and outer updates. Upper-level flatness controls the bias from removing a value-function correction. The coupled extension incorporates constraint multipliers and boundary regularity."
+        "Flatness and moving constraints",
+        "Upper-level flatness bounds this omission bias. Coupled constraints require a separate analysis because multipliers encode the effect of moving the lower-level feasible boundary."
       ]
     ],
-    "explanation_title": "Separate the sources of cost in penalty-based bilevel learning"
+    "explanation_title": "Reduced curvature and value-function removal under constraints"
   },
   "smoothness": {
-    "lead": "Penalty methods can look increasingly stiff as the penalty grows. Follow the optimized lower-level response, and the reduced objective can have a different curvature scale.",
-    "takeaway": "Stronger penalties enforce that response more accurately, but the joint objective can bend more sharply and suggest smaller gradient steps. By analyzing the objective after lower-level optimization, this paper reveals a curvature cancellation. Under its smoothness and constraint-regularity conditions, the outer curvature bound stays constant as the penalty grows.",
+    "lead": "A large penalty need not make the outer objective harder to optimize. This paper proves a penalty-independent smoothness bound for the reduced formulation of constrained bilevel optimization.",
+    "takeaway": "Penalty methods replace the lower-level optimality requirement with a penalty on its objective gap. Joint optimization then has a smoothness bound that grows with the penalty. This paper analyzes the objective obtained after lower-level minimization and proves that its smoothness bound stays of order O(1), under the stated regularity conditions. The sharper bound gives O(ε⁻¹) outer iterations for a squared projected-gradient tolerance ε, with total work determined by the lower-level solver.",
     "problem": [
-      "Existing smoothness estimates for joint penalty objectives scale with the penalty parameter. A gradient method then needs small steps, which worsens the iteration bound.",
-      "The quantity that matters to an alternating outer update is the reduced objective after lower-level minimization. The paper analyzes its curvature directly instead of applying the joint bound unchanged."
+      "Penalty-based bilevel methods use first-order gradients to avoid differentiating the lower-level solution through a Hessian inverse. Their convergence analysis depends on the smoothness of the penalized objective.",
+      "A smoothness bound of order O(γ) for the joint objective requires the gradient step to shrink as the penalty grows. Alternating methods optimize a different object: the reduced objective after the lower problem has been solved. The paper asks whether analyzing that reduced objective directly removes the penalty dependence."
     ],
     "method": [
-      "The analysis relates directional derivatives of two lower-level value functions: one for the original lower objective and one for the perturbed lower objective used by the penalty formulation.",
-      "It first handles uncoupled constraints and then extends the reasoning to general nonlinear coupled constraints, using the stated lower-level and constraint regularity assumptions."
+      "Write the reduced objective as Fγ(x) = γ[vγ(x) − v(x)], where the two value functions come from the original lower problem and its perturbation by the upper objective. The analysis compares their second-order directional derivatives before applying the factor γ.",
+      "For a fixed feasible set, the lower-response direction is orthogonal to the lower-objective gradient. This identity replaces the unconstrained stationarity equation. For coupled constraints, the value-function derivative also includes the constraint multiplier and the derivative of the moving boundary."
     ],
     "formula": "Fγ(x) = γ [vγ(x) − v(x)], where vγ(x) = min over Y(x) of [g(x, y) + f(x, y)/γ].",
-    "formula_note": "v(x) is the minimum of g(x, y) over Y(x). The paper analyzes the reduced objective Fγ, which differs from the joint penalty objective Hγ(x, y).",
-    "formal": "Under the paper’s assumptions, the reduced objective has a smoothness bound of order O(1) with respect to the penalty parameter. The outer iteration rate improves from O(ε⁻¹·⁵) to O(ε⁻¹) for the compared penalty schemes. ε refers to the paper’s squared generalized-gradient stationarity criterion. Inner-solve work introduces additional factors.",
+    "formula_note": "The original value v(x) minimizes g over Y(x). The perturbed value vγ(x) minimizes g + f/γ over the same set. Hγ(x, y) is the joint penalty objective, and Fγ(x) is its minimum over the lower variable. The cancellation identity below compares directional derivatives along the unit direction d. The projected-gradient mapping Gη(x) measures stationarity of Fγ on the upper domain X.",
+    "formal": "Assumptions 1–4 specify Lipschitz objective gradients, Lipschitz objective Hessians in the lower variable, strong convexity of g in that variable, closed convex domains, convex lower constraints, and linear independence of active constraint gradients. Theorems 1 and 3 establish O(1) reduced smoothness for sufficiently large γ. The coupled-constraint result also uses Assumption 5: a smooth boundary for Y and twice-differentiable constraints with Lipschitz Hessians in the lower variable. Propositions 2 and 4 use the squared projected-gradient criterion ‖Gη(x)‖² < ε. Their O(ε⁻¹) bound counts outer updates. The total bounds include approximate inner solves.",
     "evidence": [
       [
-        "Directional curvature",
-        "The paper compares directional derivatives of the original and perturbed value functions to expose cancellation that a generic joint smoothness bound misses."
+        "Directional-curvature analysis",
+        "Lemma 3 compares the second-order directional derivatives of the original and perturbed value functions under fixed constraints. Theorem 1 turns this comparison into a penalty-independent smoothness bound. Theorem 3 extends the result to coupled constraints under additional boundary regularity."
       ],
       [
-        "Iteration accounting",
-        "The analysis revisits ALT-PBGD and BLOCC. See Section III for uncoupled constraints and Section IV for coupled constraints. The convergence metric and inner-loop accounting are part of the comparison."
+        "Convergence and solver cost",
+        "Proposition 2 gives the ALT-PBGD outer rate and the total rate with projected-gradient inner solves. Proposition 4 and Remark 1 give the BLOCC outer rate and separate the total costs for general nonlinear and affine-in-y coupled constraints."
       ]
     ],
-    "boundary": "The sharper smoothness bound controls the outer iteration count. Total work combines those iterations with the lower-level solver cost, as shown separately for each constraint regime.",
+    "boundary": "Each outer update computes the original and perturbed lower responses. Fixed constraints permit linearly convergent projected-gradient inner solves. Coupled constraints require primal-dual solves, whose cost depends on the constraint structure. These costs account for the different total complexity bounds below.",
     "scenes": [
       [
         "0:00–0:20",
@@ -275,23 +279,23 @@
     ],
     "explanation": [
       [
-        "The decision",
-        "Penalty methods make a lower-level optimality gap expensive. A generic joint smoothness bound grows with the penalty, suggesting smaller gradient steps as the approximation is tightened."
+        "The smoothness bound that controls the step",
+        "The joint penalty objective Hγ(x, y) measures changes in both variables. Its O(γ) smoothness bound leads to a penalty-dependent step size. ALT-PBGD and BLOCC instead update the upper variable using the reduced objective Fγ(x), after estimating the lower responses."
       ],
       [
-        "The bottleneck",
-        "The outer algorithm follows a reduced objective after lower-level optimization. Bounding arbitrary joint directions can miss cancellation between the perturbed and original value functions. Constraints also invalidate the unconstrained shortcut that the inner gradient is zero."
+        "Cancellation between constrained value functions",
+        "The reduced objective is γ times the difference between two related lower-level minimum values. Strong convexity controls the change in the lower response, and Hessian regularity controls the resulting change in directional curvature. Analyzing the difference preserves the cancellation of the penalty factor."
       ],
       [
-        "The idea",
-        "Analyze their second-order directional derivatives together. For a fixed feasible set, the response direction is orthogonal to the lower gradient; for coupled constraints, multipliers account for the moving boundary. The resulting smoothness bound changes the outer iteration analysis."
+        "From smoothness to complexity",
+        "The O(1) reduced bound permits a step-size order independent of γ. This gives O(ε⁻¹) outer iterations for the squared projected-gradient criterion. The lower-level solver determines the additional cost within each iteration."
       ]
     ],
-    "explanation_title": "A sharper curvature bound can change an algorithm’s pace"
+    "explanation_title": "Reduced smoothness in constrained bilevel optimization"
   },
   "blocc": {
     "lead": "In a coupled bilevel problem, the outer decision changes the inner feasible set. BLOCC uses primal-dual information to keep that moving boundary in the optimization.",
-    "takeaway": "In transportation planning, changing network capacity also changes which traffic allocations are feasible. BLOCC handles this kind of bilevel problem by tracking both the optimized lower response and the influence of its active constraints. The resulting gradient-based method accounts for moving feasible boundaries, with convergence analysis and experiments on constrained classifiers and network design.",
+    "takeaway": "Coupled constraints make the lower-level feasible set depend on the outer variable. This changes the derivative of the lower-level value and can make joint feasibility projections expensive. BLOCC addresses both effects with a primal-dual penalty formulation: constraint multipliers enter the value gradient, and first-order updates use projections onto separate domains. The paper establishes finite-time convergence and evaluates the method on constrained SVM training and transportation network design.",
     "problem": [
       "In infrastructure planning, a network design affects the choices available to users. In hyperparameter selection, outer parameters can affect the constraints used to train a model. A lower-level feasible set that depends on an outer variable captures this coupling.",
       "Methods built for an unconstrained or fixed-domain lower-level problem do not directly capture how the feasible boundary moves. The algorithm needs to track the role of constraints in the lower-level response."
@@ -301,8 +305,8 @@
       "The paper establishes approximation and convergence results under smoothness, strong convexity of the lower-level objective, convex lower-level constraints, domain feasibility, and constraint qualification."
     ],
     "formula": "min over x ∈ X of f(x, y_g^*(x)); y_g^*(x) minimizes g(x, y) over Y(x).",
-    "formula_note": "The feasible set Y(x) depends on x through g^c(x, y). Figure 1 and the interactive example both use g^c(x, y) = 3x − y, so y ≥ 3x. The boundary’s movement contributes to the value gradient in Equation 8.",
-    "formal": "The penalty reformulation approximates lower-level optimality with a quantified error. The analysis uses strong convexity in y, convex constraints in y, nonempty feasible domains, Lipschitz regularity, and LICQ. See Assumptions 1–4 and the approximation and convergence theorems in Section 3.",
+    "formula_note": "The coupled constraint g^c(x, y) defines the feasible set Y(x). The lower-level response y_g^*(x) minimizes g over that set, and v(x) is the resulting minimum value. Equation 8 differentiates v(x) using both the objective derivative and the multiplier-weighted constraint derivative.",
+    "formal": "Assumptions 1–4 impose Lipschitz regularity, strong convexity of g in y, convexity of g^c in y, nonempty closed convex domains, lower-level feasibility, and linear independence of active constraint gradients in y (LICQ). Lemmas 2–3 also use bounded optimal multipliers. A sufficiently large γ preserves strong convexity of the penalized inner objective. The general inner-solver analysis in Theorem 3 additionally uses Assumption 5 on dual curvature near the optimum. Theorem 4 treats constraints affine in y with Y equal to the full lower-variable Euclidean space and uniformly bounded, positive singular values of the constraint matrix. The outer objective can be nonconvex.",
     "evidence": [
       [
         "SVM hyperparameters",
@@ -313,7 +317,7 @@
         "The infrastructure-planning experiments include synthetic networks and a 26-node network based on Seville. The upper-level design is evaluated through lower-level passenger responses. See Section 4.3."
       ]
     ],
-    "boundary": "Multipliers account for the moving constraints, and the penalty controls lower-level suboptimality. The analysis gives stationarity and total-complexity bounds for general and affine-in-y constraints.",
+    "boundary": "The complexity bounds combine projected outer updates with the work needed to solve both primal-dual subproblems. The target is the averaged squared generalized-gradient criterion for Fγ, together with the lower-level response approximation specified in Equation 4.",
     "scenes": [
       [
         "0:00–0:20",
@@ -362,30 +366,30 @@
     "explanation_title": "When an outer decision changes what the inner problem can do"
   },
   "birq": {
-    "lead": "BiRQ turns intermediate speech representations into pseudo-labels, while raw-input targets anchor the learner as those representations evolve.",
-    "takeaway": "BiRQ learns from audio without transcripts. It creates training targets from the model’s intermediate speech features and combines them with targets from the raw audio features. This lets the targets improve with the encoder while the raw-input targets anchor learning. The trained model makes fewer transcription errors in the reported comparisons with BEST-RQ.",
+    "lead": "BiRQ refines speech pretraining targets using intermediate features of the acoustic encoder, with a fixed raw-input labeling task as an anchor.",
+    "takeaway": "Self-supervised speech models learn by predicting targets at masked audio frames. BiRQ constructs those targets from the encoder’s own intermediate representations and trains them jointly with the encoder. A second set of targets, obtained by random quantization of raw audio features, retains a fixed reference task. This combines representation-dependent target refinement with the single-loop training structure of BEST-RQ.",
     "problem": [
-      "Self-supervised speech learning predicts labels derived from audio without requiring a transcript for every recording. A simple random quantizer provides inexpensive labels, while an external representation model can supply richer labels with additional training stages.",
-      "BiRQ studies how to improve labels inside the same model. The target generator and the learner then interact, making stabilization part of the design."
+      "The targets used in masked speech prediction determine what information an encoder learns. BEST-RQ obtains them from a fixed random projection and codebook. HuBERT-style refinement instead extracts targets from a previously trained encoder and introduces separate labeling stages.",
+      "BiRQ studies target refinement within the encoder being trained. Because the target generator and prediction model share parameters, the targets change with the representations. The method couples this evolving task to the original raw-input labeling task."
     ],
     "method": [
-      "Intermediate speech representations are discretized with a random-projection quantizer to create enhanced labels. Raw-input labels provide an anchoring signal alongside those learned-representation labels.",
-      "The framework formulates the interaction as bilevel optimization and uses differentiable Gumbel-softmax selection for end-to-end training. It avoids a separate external label encoder."
+      "The unmasked input supplies two target branches. One applies fixed random-projection quantization to the raw audio features. The other takes normalized features from an intermediate encoder layer and applies a fixed random projection followed by Gumbel-softmax selection. The latter operation makes the enhanced target differentiable in the encoder parameters.",
+      "The masked input passes through the full encoder to predict both targets. The bilevel formulation minimizes enhanced-label cross-entropy subject to a prescribed gap above the minimum anchoring loss. Its penalty implementation combines the two gradients in each minibatch and differentiates through the enhanced-target branch."
     ],
-    "formula": "Audio → intermediate representation → random-projection quantizer → enhanced pseudo-labels.",
-    "formula_note": "Equation 8 minimizes the enhanced-label loss F(θ) while requiring the anchoring-label loss G(θ) to stay within δ of its optimum. Both losses average masked-frame cross-entropy over the training data. Section 3 defines the label generators, losses, and training updates.",
-    "formal": "Equation 8 formulates enhanced-target learning subject to near-optimal anchor loss. Lemma 1 relates the penalty to that formulation under its error-bound condition. Algorithm 1 implements the weighted-gradient update with differentiable target generation.",
+    "formula": "Unmasked speech features supply fixed anchor targets and representation-dependent enhanced targets for the shared masked-frame prediction task.",
+    "formula_note": "In Equation 8, F(θ) is cross-entropy against enhanced targets and G(θ) is cross-entropy against fixed anchor targets. The allowed anchor-loss gap δ defines S_δ(θ). Equation 9 penalizes that gap. Its minimum anchor-loss term is constant with respect to θ, so Algorithm 1 uses the weighted gradients of F(θ) and G(θ) without computing the minimum.",
+    "formal": "Lemma 1 assumes bounded enhanced-loss subgradients on exact anchor minimizers and a Hölderian error bound for the anchor-loss gap, with exponent greater than one. A sufficiently large loss-weight ratio, chosen according to the error-bound exponent and allowed anchor gap, then transfers approximate optimality from the penalty problem in Equation 9 to the constrained problem in Equation 8. Algorithm 1 specifies the gradient implementation.",
     "evidence": [
       [
         "155M Conformer · LibriSpeech",
-        "Table 2 reports test-clean WER of 6.8% for BEST-RQ and 5.0% for BiRQ, and test-other WER of 19.6% and 12.6%, respectively. Both use 960h SSL pretraining and 100h labeled fine-tuning in the reported C2 setting."
+        "With 100 self-supervised pretraining epochs on 960h LibriSpeech and 100h labeled fine-tuning, Table 2 reports test-clean/test-other WER of 5.0%/12.6% for BiRQ and 6.8%/19.6% for BEST-RQ. Both methods use the 10-layer C2 architecture."
       ],
       [
         "275M Conformer · AMI",
-        "Table 3 reports WER of 18.4% versus 16.3% on ami-ihm and 37.2% versus 34.0% on ami-sdm for BEST-RQ and BiRQ. The setting uses 5k-hour YODAS pretraining and 150h AMI fine-tuning."
+        "With 100 self-supervised pretraining epochs on 5k hours of YODAS and 150h labeled AMI fine-tuning, Table 3 reports IHM/SDM WER of 16.3%/34.0% for BiRQ and 18.4%/37.2% for BEST-RQ. Both methods use the 10-layer C3 architecture."
       ]
     ],
-    "boundary": "The LibriSpeech and AMI tables report word error rate after pretraining, labeled fine-tuning, and decoding. Each setup specifies the architecture, data, and training budget used for its comparison.",
+    "boundary": "Tables 2 and 3 evaluate the pretrained representations after CTC fine-tuning and 4-gram language-model decoding. They report point estimates of word error rate for the specified data and architecture configurations.",
     "scenes": [
       [
         "0:00–0:20",
@@ -418,45 +422,45 @@
     ],
     "explanation": [
       [
-        "The decision",
-        "A self-supervised speech model learns by predicting pseudo-labels at masked frames. BEST-RQ obtains those labels from a fixed random projection of the unmasked audio features, avoiding an external pretrained label model."
+        "From fixed labels to learned representations",
+        "BEST-RQ turns unmasked audio features into pseudo-labels using a fixed random projection and codebook, then trains an encoder to predict those labels from masked audio. The targets remain unchanged as the encoder learns. HuBERT-style relabeling uses learned features to refine targets through separate labeling stages."
       ],
       [
-        "The bottleneck",
-        "Raw-input labels stay fixed as the encoder learns. Intermediate-feature labels evolve with the same encoder that predicts them. Training must coordinate the changing targets with a stable reference task."
+        "A target generator inside the prediction model",
+        "BiRQ reuses the first part of the acoustic encoder to generate targets from unmasked speech. Normalized intermediate features pass through a fixed random projection and a Gumbel-softmax quantizer. The resulting enhanced targets depend differentiably on the same encoder parameters used for masked prediction."
       ],
       [
-        "The idea",
-        "Keep both branches. BiRQ builds enhanced targets from unmasked intermediate features and preserves raw-input anchor targets. A differentiable Gumbel-softmax target and a penalty formulation connect label construction to the same training loop."
+        "An anchoring task for joint learning",
+        "The raw-input targets are retained as a reference task independent of the encoder parameters. BiRQ minimizes the enhanced-target loss while requiring the anchoring loss to stay near its minimum. The penalty implementation brings both tasks into one training loop, with gradients through target construction as well as prediction."
       ]
     ],
-    "explanation_title": "Let a speech model improve its own learning targets"
+    "explanation_title": "Target refinement within a shared speech encoder"
   },
   "retailagent": {
-    "lead": "Holding a stock often and holding it at favorable moments are different behaviors. RetailAgent separates exposure from timing to audit sequential LLM decisions.",
-    "takeaway": "A trading agent can earn positive returns simply by staying invested in a rising stock. RetailAgent matches average exposure to isolate whether the agent chooses favorable intervals to hold the stock. In the numerical-text experiment, its timing is negative and becomes much less negative when the action sequence is shuffled.",
+    "lead": "RetailAgent studies the timing of sequential LLM decisions on anonymized intraday equity paths. Its exposure-matched metric separates how often an agent holds a stock from whether it holds during favorable intervals.",
+    "takeaway": "Aggregate return combines a stock’s overall movement with an agent’s choice of holding intervals. RetailAgent separates these components and finds negative within-stock timing across the evaluated configurations. Saved-action shuffles attenuate the effect, while self-authored memory changes persistence and conditional timing.",
     "problem": [
-      "An LLM agent sees an anonymized intraday price history and chooses whether to hold a stock during the next interval. The next return is revealed only after the action.",
-      "Aggregate return mixes the amount of exposure with the timing of exposure. A timing audit asks whether the agent is long during relatively favorable intervals on the same stock-day after accounting for its average long fraction."
+      "At each decision interval, the agent chooses long or flat on an anonymized stock. A long decision holds the stock over the next interval. The research-return label for that interval is revealed after the decision.",
+      "Positive action-weighted return does not establish favorable timing. An agent can benefit from a rising stock while allocating its exposure to comparatively weak intervals. The relevant comparison holds the stock-day and average exposure fixed."
     ],
     "method": [
-      "For each stock-day, RetailAgent subtracts average exposure from every binary action and weights the residual by the following interval return. This isolates the alignment between actions and subsequent returns.",
-      "The study changes input modality, decision horizon, permitted state, and model family. It also shuffles saved action sequences and studies conditioning on self-authored memories to examine sequential structure."
+      "RetailAgent centers each binary action by the stock-day’s mean long exposure. The resulting action-return sum measures the schedule’s alignment with subsequent returns relative to a constant-exposure comparator on the same path.",
+      "The experiments vary observation representation, decision interval, account state, model family, and self-conditioning. Saved-action shuffles examine temporal alignment. A two-pass memory protocol changes the earlier self-authored notes visible to the decision policy."
     ],
     "formula": "A_id(p, r) = Σₜ (p_idt − p̄_id) r_idt, where p̄_id = (1/T) Σₜ p_idt.",
-    "formula_note": "p_idt is 1 for long and 0 for flat, and r_idt is the following interval return. The score compares a binary schedule with constant exposure p̄_id on the same realized path. Basis points are used for the interactive toy returns.",
-    "formal": "RetailAgent audits directional and sequential policy structure on historical equity paths with controlled decision-time information. Equation 1 defines exposure-matched timing, and the experimental panels specify the observed policies, state conditions, and sampling frames.",
+    "formula_note": "The indices i and d identify a stock-day, t indexes its T scored intervals, p_idt is the binary long-or-flat action, and r_idt is the subsequent interval return. Mean exposure p̄_id is the fraction of scored intervals spent long. A_id(p, r) is measured in basis points per stock-day, where one basis point equals 0.01%.",
+    "formal": "Equations 1–2 give an exact decomposition of the action-weighted return into passive exposure and centered timing. Complementing every long-or-flat action reverses the timing sign. The experiments estimate mean timing among stock-days containing both actions and examine its sensitivity to observation and policy state.",
     "evidence": [
       [
-        "Timing and shuffle controls",
-        "For the principal 10-minute Qwen3.5 text condition, Table 1 reports −45.7 bps timing alpha, with a 95% interval of [−49.4, −41.8]. Global shuffling gives −3.5 bps and same-day shuffling gives −8.7 bps."
+        "Sequential alignment in saved actions",
+        "The principal 10-minute Qwen3.5-9B text condition has mean timing of −45.7 bps per scored stock-day, with a 95% interval of [−49.4, −41.8]. Global shuffling gives −3.5 bps and same-day shuffling gives −8.7 bps. Same-day shuffling preserves each day’s action count while disrupting interval alignment."
       ],
       [
-        "Sequential conditioning",
-        "The matched-panel analyses examine how self-authored memory affects action persistence and conditional timing. See Section 3 and the appendix for conditioning, sampling frames, and reporting details."
+        "Memory visibility and persistence",
+        "Under the consistency directive, main-period timing is −62.8 bps with the current note alone and −74.1 bps when one earlier note is also visible. The separate later-period panel reports 2.5 and 1.7 position changes per stock-day, respectively. These comparisons associate memory visibility with greater persistence and more negative conditional timing."
       ]
     ],
-    "boundary": "The timing score compares a saved long-or-flat schedule with constant exposure on the same historical stock-day. Date-resampled confidence intervals describe variability across the evaluated paths.",
+    "boundary": "The reported timing means condition on stock-days containing both long and flat actions. Standard-arm confidence intervals use 3,000 date-resampled bootstrap draws and narrative intervals use 2,000. Modality and model-family rows have distinct sampling frames, so their repeated negative signs support the configuration-level finding.",
     "scenes": [
       [
         "0:00–0:20",
@@ -489,18 +493,18 @@
     ],
     "explanation": [
       [
-        "The decision",
-        "At each interval, a frozen LLM sees an anonymized price history and chooses long or flat before the next return is revealed. The experiment can also show charts, account state, or the agent’s earlier self-authored memories."
+        "The evaluation question",
+        "A stock’s rise can give a long-only policy positive return even when its entries and exits are poorly timed. RetailAgent compares the saved schedule with constant exposure on the same stock-day to isolate interval selection."
       ],
       [
-        "The bottleneck",
-        "A policy can benefit from a rising stock while being flat during its strongest intervals. Measuring average exposure and alignment with the next return separately reveals when the policy allocated its exposure."
+        "A recursive decision policy",
+        "The agent’s account state and self-authored notes depend on its earlier actions. RetailAgent records that state alongside the observation, binary decision, and subsequent return, so sequential conditioning can be studied at the trajectory level."
       ],
       [
-        "The idea",
-        "Subtract the return of constant exposure on the same stock-day. Audit the remaining timing term, shuffle saved actions to disrupt sequence alignment, and inspect how memory changes the policy’s persistence."
+        "Evidence from action sequences",
+        "Exposure-matched timing is negative across the evaluated standard configurations. Shuffling saved actions substantially attenuates it. The memory comparisons then examine persistence and timing among trajectories that contain both long and flat actions."
       ]
     ],
-    "explanation_title": "Audit a trading agent’s timing, not just its exposure"
+    "explanation_title": "Separating exposure from the timing of sequential decisions"
   }
 }

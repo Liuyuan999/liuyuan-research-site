@@ -54,6 +54,18 @@
       {
         "label": "Equation 5 · Reduced penalty objective",
         "tex": "F_\\gamma(x)=\\gamma\\bigl(v_\\gamma(x)-v(x)\\bigr)"
+      },
+      {
+        "label": "Equation 32 · Upper-level flatness",
+        "tex": "\\bigl|f(x,y_g^*(x))-f(x,y)\\bigr|\\leq c\\lVert y_g^*(x)-y\\rVert^\\alpha+\\delta,\\qquad\\forall y\\in\\mathcal Y"
+      },
+      {
+        "label": "Equation 52 · Multiplier-based lower objective",
+        "tex": "g^\\lambda(x,y)=g(x,y)+\\langle\\lambda_g^*(x),c(x,y)\\rangle"
+      },
+      {
+        "label": "Equation 62 · Coupled-analysis surrogate",
+        "tex": "F_\\gamma^\\lambda(x)=\\min_{y\\in\\mathcal Y}\\left[f(x,y)+\\gamma\\left(g^\\lambda(x,y)-\\min_{y\\in\\mathcal Y}g^\\lambda(x,y)\\right)\\right]"
       }
     ],
     "pbgd-free": [
@@ -104,6 +116,10 @@
       {
         "label": "Equation 2b · Lower-level value",
         "tex": "v(x)=\\min_{y\\in\\mathcal Y(x)}g(x,y)"
+      },
+      {
+        "label": "Equation 2a · Primal-dual penalty objective",
+        "tex": "F_\\gamma(x)=\\max_{\\mu\\geq0}\\min_{y\\in\\mathcal Y}\\bigl[f(x,y)+\\gamma(g(x,y)-v(x))+\\langle\\mu,g^c(x,y)\\rangle\\bigr]"
       }
     ]
   },
@@ -125,7 +141,10 @@
     "pbgd-floor": "\\frac1T\\sum_{t=0}^{T-1}\\lVert\\nabla F_\\gamma(x_t)\\rVert^2\\leq\\mathcal O\\!\\left(T^{-1}+\\delta^{\\frac{2(\\alpha-1)}{\\alpha}}\\right)",
     "surf-gear": "\\begin{aligned}h_1^p(x)&=\\frac{\\sqrt p}{2}(x-1)^2\\\\h_2(x)&=\\frac{x^2}{2}\\\\x_w^*&=\\frac{\\sqrt p\\,w}{1+(\\sqrt p-1)w}\\\\\\bar{\\mathbf h}(x)&=\\bigl((1-x)^2,x^2\\bigr)\\end{aligned}",
     "flatness-demo": "c=1,\\qquad\\alpha=1.5,\\qquad\\delta=0.003",
-    "smoothness-gradient": "G_\\eta(x)=\\frac{x-\\operatorname{Proj}_{\\mathcal X}\\!\\left(x-\\eta\\nabla F_\\gamma(x)\\right)}{\\eta}"
+    "smoothness-gradient": "G_\\eta(x)=\\frac{x-\\operatorname{Proj}_{\\mathcal X}\\!\\left(x-\\eta\\nabla F_\\gamma(x)\\right)}{\\eta}",
+    "pbgd-gradient": "\\nabla F_\\gamma(x)=\\nabla_x f(x,y_\\gamma^*(x))+\\gamma\\bigl[\\nabla_x g(x,y_\\gamma^*(x))-\\nabla_x g(x,y_g^*(x))\\bigr]",
+    "birq-penalty": "\\min_{\\theta} w_1F(\\theta)+w_2\\bigl(G(\\theta)-\\min_{\\theta^\\prime}G(\\theta^\\prime)\\bigr)",
+    "smoothness-value-gradient": "\\nabla v(x)=\\nabla_xg(x,y_g^*(x))+\\left\\langle\\lambda_g^*(x),\\nabla_xc(x,y_g^*(x))\\right\\rangle"
   },
   "inline": {
     "O(ε⁻¹·⁵)": "\\mathcal O(\\varepsilon^{-3/2})",
@@ -176,7 +195,9 @@
     "N = 5": "N=5",
     "N = 11": "N=11",
     "w = 0": "w=0",
-    "w = 1": "w=1"
+    "w = 1": "w=1",
+    "O(N⁻¹)": "\\mathcal O(N^{-1})",
+    "O(T⁻¹)": "\\mathcal O(T^{-1})"
   },
   "paper_inline": {
     "surf": {
@@ -194,7 +215,11 @@
       "h̄(x)": "\\bar{\\mathbf h}(x)",
       "p = 9": "p=9",
       "Φ̃ₜ": "\\tilde\\Phi_t",
-      "x_w^*": "x_w^*"
+      "x_w^*": "x_w^*",
+      "α ≤ 0.5": "\\alpha\\leq0.5",
+      "1 − α/4": "1-\\alpha/4",
+      "C(N) = Θ(N)": "C(N)=\\Theta(N)",
+      "C(N)": "C(N)"
     },
     "retailagent": {
       "p_idt": "p_{idt}",
@@ -222,7 +247,11 @@
       "‖y_g^*(x) − y‖^α": "\\lVert y_g^*(x)-y\\rVert^\\alpha",
       "‖y_g^*(x) − y‖": "\\lVert y_g^*(x)-y\\rVert",
       "|f(x, y_g^*(x)) − f(x, y)| ≤ c‖y_g^*(x) − y‖^α + δ": "|f(x,y_g^*(x))-f(x,y)|\\leq c\\lVert y_g^*(x)-y\\rVert^\\alpha+\\delta",
-      "S_γ^*(x)": "S_\\gamma^*(x)"
+      "S_γ^*(x)": "S_\\gamma^*(x)",
+      "δ(x_t)": "\\delta(x_t)",
+      "d_x": "d_x",
+      "d_y": "d_y",
+      "∇Fγ(x)": "\\nabla F_\\gamma(x)"
     },
     "blocc": {
       "g^c(x, y)": "g^c(x,y)",
@@ -233,7 +262,11 @@
       "g^c(x, y) ≤ 0": "g^c(x,y)\\leq0",
       "y_g^*(x) = 3x": "y_g^*(x)=3x",
       "μ_g^*(x) = 2x": "\\mu_g^*(x)=2x",
-      "𝒳": "\\mathcal X"
+      "𝒳": "\\mathcal X",
+      "y_F^*(x)": "y_F^*(x)",
+      "μ_F^*(x)": "\\mu_F^*(x)",
+      "∇Fγ(x)": "\\nabla F_\\gamma(x)",
+      "∇v(x)": "\\nabla v(x)"
     },
     "efficient-penalty": {
       "F̃γ(x, y)": "\\tilde F_\\gamma(x,y)",
@@ -241,7 +274,15 @@
       "Ỹ": "\\tilde{\\mathcal Y}",
       "y_g": "y_g",
       "y_γ": "y_\\gamma",
-      "c(x, y) ≤ 0": "c(x,y)\\leq0"
+      "c(x, y) ≤ 0": "c(x,y)\\leq0",
+      "O(γ⁻¹)": "\\mathcal O(\\gamma^{-1})",
+      "Fγ^λ(x)": "F_\\gamma^\\lambda(x)",
+      "g^λ(x, y)": "g^\\lambda(x,y)",
+      "y_g^*(x)": "y_g^*(x)",
+      "y_γ^*(x)": "y_\\gamma^*(x)",
+      "O(T⁻¹ + δ^{2(α−1)/α})": "\\mathcal O\\!\\left(T^{-1}+\\delta^{\\frac{2(\\alpha-1)}{\\alpha}}\\right)",
+      "1 < α < 1.5": "1<\\alpha<1.5",
+      "g(x, y) + ⟨λ_g^*(x), c(x, y)⟩": "g(x,y)+\\langle\\lambda_g^*(x),c(x,y)\\rangle"
     },
     "smoothness": {
       "y_g^*(x) / y_γ^*(x)": "y_g^*(x)\\;/\\;y_\\gamma^*(x)",
@@ -296,7 +337,17 @@
       "F̃γ(x, y)": "\\tilde F_\\gamma(x,y)",
       "Fγ(x)": "F_\\gamma(x)",
       "λ_g^*(x)": "\\lambda_g^*(x)",
-      "α, δ": "\\alpha,\\;\\delta"
+      "α, δ": "\\alpha,\\;\\delta",
+      "X, Y, Ỹ, Y(x)": "\\mathcal X,\\;\\mathcal Y,\\;\\tilde{\\mathcal Y},\\;\\mathcal Y(x)",
+      "y_g^*(x), y_γ^*(x)": "y_g^*(x),\\;y_\\gamma^*(x)",
+      "F̃γ(x, y), Fγ(x)": "\\tilde F_\\gamma(x,y),\\;F_\\gamma(x)",
+      "g^λ(x, y)": "g^\\lambda(x,y)",
+      "Fγ^λ(x)": "F_\\gamma^\\lambda(x)",
+      "c, α, δ(x), δ": "c,\\;\\alpha,\\;\\delta(x),\\;\\delta",
+      "t, T": "t,\\;T",
+      "η": "\\eta",
+      "G_{Fγ,X}(x), G_{Fγ^λ,X}(x)": "G_{F_\\gamma,\\mathcal X}(x),\\;G_{F_\\gamma^\\lambda,\\mathcal X}(x)",
+      "ε": "\\epsilon"
     },
     "pbgd-free": {
       "x, y": "x,\\;y",
@@ -308,7 +359,10 @@
       "c, α, δ": "c,\\;\\alpha,\\;\\delta",
       "t, T, k, K": "t,\\;T,\\;k,\\;K",
       "y_{t,k}^γ, y_t^γ": "y_{t,k}^\\gamma,\\;y_t^\\gamma",
-      "η, η^γ": "\\eta,\\;\\eta^\\gamma"
+      "η, η^γ": "\\eta,\\;\\eta^\\gamma",
+      "δ(x_t), δ": "\\delta(x_t),\\;\\delta",
+      "ε": "\\varepsilon",
+      "d_x, d_y": "d_x,\\;d_y"
     },
     "smoothness": {
       "x, y": "x,\\;y",
@@ -333,7 +387,8 @@
       "y_F^*(x), μ_F^*(x)": "y_F^*(x),\\;\\mu_F^*(x)",
       "v(x)": "v(x)",
       "Fγ(x), γ": "F_\\gamma(x),\\;\\gamma",
-      "ε": "\\varepsilon"
+      "ε": "\\varepsilon",
+      "μ": "\\mu"
     }
   }
 }
