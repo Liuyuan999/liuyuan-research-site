@@ -16,7 +16,7 @@ When a learner also helps construct its targets, the target can move as the lear
 
 ## Optimization connects the two roles
 
-The paper formulates the interaction as a bilevel learning problem. Differentiable Gumbel-softmax selection supports end-to-end training of the label-selection mechanism. The exact losses and update rules are in the method section; the page’s diagram focuses on what each component contributes.
+The paper formulates the interaction as a bilevel learning problem. Differentiable Gumbel-softmax selection supports end-to-end training of the label-selection mechanism. The exact losses and update rules are in Section 3; the page’s diagram focuses on what each component contributes.
 
 ## Evaluate with speech recognition
 

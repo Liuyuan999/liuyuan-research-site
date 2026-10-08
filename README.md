@@ -52,3 +52,9 @@ Each file in `video-scripts/` contains narration plus on-screen directions. Reco
 `content/project-stories.json` controls each paper’s human-readable headline, hero figure captions, three-step method, technical reasoning, notation, result context, measured chart values, and connections to other papers. `content/articles.json` holds the integrated explanation and video scenes. Measured charts cite their specific table or section. Interactive geometry and bound envelopes are clearly labeled as toy or schematic.
 
 The project pages contain explanations, interactive examples, results, technical details, and citations. Narration and storyboards live at `/videos/<slug>/`; these are production drafts, with no recorded videos yet. Legacy `/blog/<slug>/` URLs redirect to the integrated explanation.
+
+## Mathematical notation and research areas
+
+The hub starts with three topic clusters: Bilevel Optimization (four papers), Multi-Objective Optimization (SURF), and Applications (RetailAgent and BiRQ). `research_hub.py` controls the topic map and publication rows. The rows show each paper’s full title, authors, venue, figure preview, and available resource links. Preview plots are labeled as illustrative or linked to their primary-paper table.
+
+`content/equations.json` contains the display and inline TeX. `compile_math.mjs` renders it with the pinned, locally vendored KaTeX 0.19.0 package; `math_typesetting.py` adds accessible MathML and bundles the local stylesheet and fonts. `python3 build.py` requires Node.js (uses the installed Codex runtime as a fallback on this computer). Equations are pre-rendered and do not depend on a CDN or browser JavaScript. Malformed TeX fails the build. Main formulations, interactive constraint-regime formulas, and update steps use the same renderer.

@@ -1,0 +1,149 @@
+{
+  "papers": {
+    "surf": [
+      {
+        "label": "Normalized cumulative arc length",
+        "tex": "C(w)=\\frac{\\displaystyle\\int_0^w\\lVert r'(t)\\rVert_2\\,dt}{\\displaystyle\\int_0^1\\lVert r'(t)\\rVert_2\\,dt}"
+      },
+      {
+        "label": "Weights for equally spaced distance targets",
+        "tex": "w_i=C^{-1}(q_i)"
+      }
+    ],
+    "retailagent": [
+      {
+        "label": "Exposure-matched timing",
+        "tex": "A(p,r)=\\sum_{t=1}^{T}(p_t-\\bar p)\\,r_t"
+      },
+      {
+        "label": "Average exposure on the stock-day",
+        "tex": "\\bar p=\\frac{1}{T}\\sum_{t=1}^{T}p_t"
+      }
+    ],
+    "birq": [
+      {
+        "label": "Learn with enhanced pseudo-labels",
+        "tex": "\\min_{\\theta}\\;F(\\theta)"
+      },
+      {
+        "label": "Stay near-optimal on anchoring labels",
+        "tex": "G(\\theta)-\\min_{\\theta'}G(\\theta')\\leq\\delta"
+      }
+    ],
+    "efficient-penalty": [
+      {
+        "label": "Reduced penalty objective",
+        "tex": "F_\\gamma(x)=\\gamma\\bigl[v_\\gamma(x)-v(x)\\bigr]"
+      },
+      {
+        "label": "Lower-level feasible set",
+        "tex": "\\mathcal Y(x)=\\{y\\in\\mathcal Y:\\ c(x,y)\\leq0\\}"
+      }
+    ],
+    "pbgd-free": [
+      {
+        "label": "Upper-objective variation",
+        "tex": "\\Delta_f=\\left|f(x,y^\\star)-f(x,y)\\right|"
+      },
+      {
+        "label": "Flatness condition",
+        "tex": "\\Delta_f\\leq c\\lVert y^\\star-y\\rVert^\\alpha+\\delta"
+      }
+    ],
+    "smoothness": [
+      {
+        "label": "Reduced penalty objective",
+        "tex": "F_\\gamma(x)=\\gamma\\bigl[v_\\gamma(x)-v(x)\\bigr]"
+      },
+      {
+        "label": "Perturbed lower-level value",
+        "tex": "\\begin{aligned}v_\\gamma(x)&=\\min_{y\\in\\mathcal Y(x)}\\Bigl[g(x,y)\\\\&\\qquad+\\frac{f(x,y)}{\\gamma}\\Bigr]\\end{aligned}"
+      }
+    ],
+    "blocc": [
+      {
+        "label": "Leader’s objective",
+        "tex": "\\min_{x\\in\\mathcal X}\\;f\\bigl(x,y_g^\\star(x)\\bigr)"
+      },
+      {
+        "label": "Follower’s constrained response",
+        "tex": "\\begin{aligned}y_g^\\star(x)&\\in\\operatorname*{arg\\,min}_{y\\in\\mathcal Y(x)}\\\\&\\quad g(x,y)\\end{aligned}"
+      },
+      {
+        "label": "Coupled lower-level constraints",
+        "tex": "\\mathcal Y(x)=\\{y\\in\\mathcal Y:\\ c(x,y)\\leq0\\}"
+      }
+    ]
+  },
+  "extra": {
+    "bilevel-map": "\\min_x f(x,y_g^\\star(x))",
+    "moo-map": "\\min_x\\bigl(f_1(x),\\ldots,f_M(x)\\bigr)",
+    "flatness-hero": "\\Delta f\\leq c\\,d^\\alpha+\\delta",
+    "flatness-distance": "d=\\lVert y-y_g^\\star\\rVert",
+    "reduced-hero": "F_\\gamma=\\gamma(v_\\gamma-v)",
+    "regime-fixed": "\\mathcal Y(x)=\\widetilde{\\mathcal Y}",
+    "regime-coupled": "\\mathcal Y(x)=\\{y\\in\\mathcal Y:\\ c(x,y)\\leq0\\}",
+    "update-direction": "\\begin{aligned}d_{y,t}&=\\gamma^{-1}\\nabla_y f(x_t,y_t)\\\\&\\quad+\\nabla_y g(x_t,y_t)\\end{aligned}",
+    "update-lower": "y_{t+1}=y_t-\\eta_\\gamma\\,d_{y,t}",
+    "update-upper": "\\begin{aligned}x_{t+1}&=x_t-\\eta\\,d_{x,t}\\\\d_{x,t}&=\\nabla_x f(x_t,y_{t+1})\\end{aligned}",
+    "constraint-demo": "\\min_{0\\leq y\\leq x}(y-2x)^2",
+    "curvature-demo": "\\begin{aligned}H_\\gamma(x,y)&=\\frac{x^2}{2}+\\gamma(y-x)^2\\\\F_\\gamma(x)&=\\min_y H_\\gamma(x,y)\\\\&=\\frac{x^2}{2}\\end{aligned}"
+  },
+  "inline": {
+    "O(ε⁻¹·⁵)": "\\mathcal O(\\varepsilon^{-3/2})",
+    "O(ε⁻¹)": "\\mathcal O(\\varepsilon^{-1})",
+    "O(N⁻²)": "\\mathcal O(N^{-2})",
+    "O(γ)": "\\mathcal O(\\gamma)",
+    "O(1)": "\\mathcal O(1)",
+    "Hγ(x, y)": "H_\\gamma(x,y)",
+    "Hγ(x, 0)": "H_\\gamma(x,0)",
+    "Fγ(x)": "F_\\gamma(x)",
+    "Fγ": "F_\\gamma",
+    "vγ(x)": "v_\\gamma(x)",
+    "vγ": "v_\\gamma",
+    "v(x)": "v(x)",
+    "f(x, y)": "f(x,y)",
+    "f(x, ·)": "f(x,\\cdot)",
+    "r′(w)": "r'(w)",
+    "r′(t)": "r'(t)",
+    "r(w)": "r(w)",
+    "C(w)": "C(w)",
+    "C⁻¹": "C^{-1}",
+    "Y(x)": "\\mathcal Y(x)",
+    "Ỹ": "\\widetilde{\\mathcal Y}",
+    "y*(x)": "y_g^\\star(x)",
+    "y*": "y^\\star",
+    "λ*": "\\lambda^\\star",
+    "∇xf": "\\nabla_x f",
+    "∇xg": "\\nabla_x g",
+    "∇xc": "\\nabla_x c",
+    "f₁(z) = z²": "f_1(z)=z^2",
+    "f₂(z) = (1 − z)⁴": "f_2(z)=(1-z)^4",
+    "0 ≤ z ≤ 1": "0\\leq z\\leq1",
+    "0 ≤ y ≤ x": "0\\leq y\\leq x",
+    "y ≤ x": "y\\leq x",
+    "x > 0": "x>0",
+    "α > 1": "\\alpha>1",
+    "δ > 0": "\\delta>0",
+    "c ≥ 0": "c\\geq0",
+    "c = 1": "c=1",
+    "K = 1": "K=1",
+    "d^1.5 + 0.003": "d^{1.5}+0.003",
+    "d^1.5": "d^{1.5}",
+    "d = ‖y − y*‖": "d=\\lVert y-y^\\star\\rVert",
+    "ηγ": "\\eta_\\gamma",
+    "γ": "\\gamma",
+    "α": "\\alpha",
+    "δ": "\\delta",
+    "ε": "\\varepsilon",
+    "Δ_f": "\\Delta_f",
+    "F(θ)": "F(\\theta)",
+    "G(θ)": "G(\\theta)",
+    "θ": "\\theta",
+    "p̄": "\\bar p",
+    "pₜ": "p_t",
+    "rₜ": "r_t",
+    "qᵢ": "q_i",
+    "wᵢ": "w_i"
+  }
+}

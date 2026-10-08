@@ -90,7 +90,7 @@
       "The key condition is flatness of the upper-level objective with respect to the lower-level variable near a lower-level optimum. The paper quantifies this condition and uses it to bound the omitted value-function correction."
     ],
     "formula": "|f(x, y*) − f(x, y)| ≤ c ‖y* − y‖^α + δ.",
-    "formula_note": "Definition 1: upper-level (δ, α)-flatness with modulus c ≥ 0. y* is a lower-level optimum at x. The paper generally studies δ > 0 and α > 1; this condition accompanies the other assumptions used in the algorithm’s analysis.",
+    "formula_note": "Definition 1: upper-level (δ, α)-flatness with modulus c ≥ 0. For compactness, y* denotes the lower-level optimum at the current x, and Δ_f denotes the absolute upper-loss variation shown above. The paper generally studies δ > 0 and α > 1; flatness accompanies the other assumptions used in the algorithm’s analysis.",
     "formal": "The convergence analysis combines smoothness, lower-level PL-type conditions, the flatness parameters, and algorithmic step-size choices. It quantifies stationarity error and the bias from omitting the value-function term. See Definition 1 and the convergence results in Section 3.",
     "evidence": [
       [
@@ -413,8 +413,8 @@
       "The framework formulates the interaction as bilevel optimization and uses differentiable Gumbel-softmax selection for end-to-end training. It avoids a separate external label encoder."
     ],
     "formula": "Audio → intermediate representation → random-projection quantizer → enhanced pseudo-labels.",
-    "formula_note": "Raw-input quantization supplies an additional anchor target. The interactive diagram shows the roles of these targets; it is not an execution of BiRQ or a prediction of recognition accuracy.",
-    "formal": "BiRQ is a model and training framework. Its central technical content is the bilevel formulation, pseudo-label generation, anchoring, and differentiable selection. See Section 2 for the actual losses and update scheme.",
+    "formula_note": "Equation 8 minimizes the enhanced-label loss F(θ) while requiring the anchoring-label loss G(θ) to stay within δ of its optimum. Both losses average masked-frame cross-entropy over the training data. Section 3 defines the label generators, losses, and training updates.",
+    "formal": "BiRQ is a model and training framework. Its central technical content is the bilevel formulation, pseudo-label generation, anchoring, and differentiable selection. See Section 3 for the actual losses and update scheme.",
     "evidence": [
       [
         "155M Conformer · LibriSpeech",
@@ -471,7 +471,7 @@
       ],
       [
         "Optimization connects the two roles",
-        "The paper formulates the interaction as a bilevel learning problem. Differentiable Gumbel-softmax selection supports end-to-end training of the label-selection mechanism. The exact losses and update rules are in the method section; the page’s diagram focuses on what each component contributes."
+        "The paper formulates the interaction as a bilevel learning problem. Differentiable Gumbel-softmax selection supports end-to-end training of the label-selection mechanism. The exact losses and update rules are in Section 3; the page’s diagram focuses on what each component contributes."
       ],
       [
         "Evaluate with speech recognition",

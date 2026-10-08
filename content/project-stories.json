@@ -190,24 +190,32 @@
       ],
       [
         "Selection connects the discrete and trainable components",
-        "The method uses differentiable Gumbel-softmax selection within its bilevel training framework. Section 2 gives the losses and update scheme; the diagrams here summarize the information flow."
+        "The method uses differentiable Gumbel-softmax selection within its bilevel training framework. Section 3 gives the losses and update scheme; the diagrams here summarize the information flow."
       ]
     ],
     "notation": [
       [
-        "Anchor",
-        "Pseudo-labels generated from raw-input features."
+        "θ",
+        "Parameters of the acoustic encoder."
       ],
       [
-        "Enhanced target",
-        "Pseudo-labels generated from intermediate model features."
+        "F(θ)",
+        "Enhanced-label cross-entropy objective."
+      ],
+      [
+        "G(θ)",
+        "Anchoring-label cross-entropy objective."
+      ],
+      [
+        "δ",
+        "Allowed lower-level suboptimality in the anchoring objective."
       ],
       [
         "WER",
-        "Word error rate measured after recognition fine-tuning."
+        "Word error rate after downstream recognition fine-tuning."
       ]
     ],
-    "anchor": "Section 2 · BiRQ formulation and training",
+    "anchor": "Section 3 · Equation 8 and Algorithm 1",
     "result_title": "Evaluate the targets through speech recognition",
     "result_context": "Table 2, C2 setting: 10-layer 155M Conformer, 960h LibriSpeech self-supervised pretraining, then 100h labeled fine-tuning. The comparison below is test-other WER; test-clean is 6.8% for BEST-RQ and 5.0% for BiRQ.",
     "result_reference": "Table 2 · LibriSpeech recognition results",

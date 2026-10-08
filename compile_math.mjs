@@ -1,0 +1,9 @@
+import fs from 'node:fs';
+import katex from './vendor/katex/dist/katex.mjs';
+const config=JSON.parse(fs.readFileSync(new URL('./content/equations.json',import.meta.url),'utf8'));
+const compiled={};
+const add=(tex,displayMode)=>{const key=(displayMode?'display:':'inline:')+tex;if(!(key in compiled))compiled[key]=katex.renderToString(tex,{displayMode,throwOnError:true,strict:'error',trust:false,output:'htmlAndMathml'});};
+for(const equations of Object.values(config.papers))for(const equation of equations)add(equation.tex,true);
+for(const tex of Object.values(config.extra))add(tex,true);
+for(const tex of Object.values(config.inline))add(tex,false);
+process.stdout.write(JSON.stringify(compiled));
