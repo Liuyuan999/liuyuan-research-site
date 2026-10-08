@@ -1,6 +1,6 @@
 # Liuyuan Jiang — The geometry of learning and decisions
 
-A separate static research website with seven project pages with integrated explanations, interactive teaching diagrams, and seven separate video pages with narration/storyboard downloads. The recorded videos are not included.
+A separate static research website with seven project pages with integrated explanations, interactive teaching diagrams, and local video narration/storyboard drafts. Video links, draft pages, and script downloads are excluded from the deployed site until recordings are ready.
 
 ## Preview
 
@@ -13,7 +13,8 @@ Run `python3 -m http.server 8765 --bind 127.0.0.1 --directory dist` from this fo
 - `content/articles.json`: integrated project explanations, evidence, and narration scenes.
 - `content/explanations/`: editable Markdown exports of the explanations.
 - Old `/blog/` URLs redirect to the matching project page and are excluded from the sitemap.
-- `/videos/<paper>/`: separate video pages. Narration and storyboards appear here, not on project pages.
+- `content/site.json`: site origin and `publish_videos` (currently `false`). This flag controls video links, generated video pages, script downloads, and video sitemap entries.
+- `video-scripts/`: local narration and storyboard drafts, kept out of `dist/` while video publication is disabled.
 - `dist/assets/style.css`: responsive visual design.
 - `dist/assets/site.js`: interactive educational diagrams.
 - `build.py` and `render_articles.py`: generate static pages and editable Markdown exports.
@@ -46,13 +47,13 @@ The initial hosted version is private for review. Public visibility requires cha
 
 ## Recording the videos
 
-Each file in `video-scripts/` contains narration plus on-screen directions. Record the narration, add paper figures with their table/figure identifiers, include captions, and end with the project URL. After uploading a video, add its verified embed URL to the corresponding video page. Do not label a script as a recorded talk.
+Each file in `video-scripts/` contains narration plus on-screen directions. Record the narration, add paper figures with their table/figure identifiers, include captions, and end with the project URL. After uploading a video, add its verified embed URL to the corresponding video page, then enable `publish_videos` in `content/site.json` and rebuild. Do not label a script as a recorded talk.
 
 ## Refined project narratives
 
 `content/project-stories.json` controls each paper’s human-readable headline, hero figure captions, three-step method, technical reasoning, notation, result context, measured chart values, and connections to other papers. `content/articles.json` holds the integrated explanation and video scenes. Measured charts cite their specific table or section. Interactive geometry and bound envelopes are clearly labeled as toy or schematic.
 
-The project pages contain explanations, interactive examples, results, technical details, and citations. Narration and storyboards live at `/videos/<slug>/`; these are production drafts, with no recorded videos yet. Legacy `/blog/<slug>/` URLs redirect to the integrated explanation.
+The project pages contain explanations, interactive examples, results, technical details, and citations. Narration and storyboards remain in local `video-scripts/` drafts. The deployed site does not include video pages or script downloads. Legacy `/blog/<slug>/` URLs redirect to the integrated explanation.
 
 ## Mathematical notation and research areas
 
@@ -79,6 +80,6 @@ The bakery role cards and controls use decorative system emoji for the baker, cu
 The opening front minimizes `f1(z)=z` and `f2(z)=0.5(1−z)+0.5(exp(−5z)−exp(−5))/(1−exp(−5))`, for `z∈[0,1]`, and displays normalized rewards `(1−f1,1−f2)`. Both endpoint tangents have nonzero slopes. The equally spaced weights span the active range `w=s/(1+s)` for `s=−f2′(z)`; they do not include redundant endpoint-only weights outside that range. Arc-length sampling uses the same normalized coordinates and equal plot scales. The application is motivated by SURF Section 4.2 and Appendix F.3, where the real experiment uses summarization-quality and factual-faithfulness reward models with KL regularization; the opening scores are synthetic teaching values.
 
 
-Project-page refinement (October 8, 2026): `content/project-guides.json` stores the paper-specific problem narrative, figure reading guide, reported comparisons, evaluation protocol, theorem pointers, and reader questions. `render_project_pages.py` renders this material alongside the existing demos and local KaTeX. Evidence tabs select actual comparisons transcribed from the cited papers; their panels remain readable with JavaScript disabled. Scripts and storyboards continue to live only on the video pages.
+Project-page refinement (October 8, 2026): `content/project-guides.json` stores the paper-specific problem narrative, figure reading guide, reported comparisons, evaluation protocol, theorem pointers, and reader questions. `render_project_pages.py` renders this material alongside the existing demos and local KaTeX. Evidence tabs select actual comparisons transcribed from the cited papers; their panels remain readable with JavaScript disabled. Scripts and storyboards remain separate from project pages and are kept as local drafts until video publication is enabled.
 
 RetailAgent is listed as **NeurIPS 2026 · IAB Workshop**, following the author’s venue correction; its citation expands IAB to Interpreting Agent Behavior. The wider penalty preprint uses the current source’s theorem labels (3.1, 4.1, 5.1, and 5.2). SURF’s N denotes segments, with N + 1 solved points. Project pages preserve each source’s notation: SURF uses Φ and the vector f_PF, BLOCC uses g^c and μ_g^*, the wider preprint uses the joint objective F̃γ, and EUSIPCO uses Hγ. No shorthand aliases are introduced. The SURF and BLOCC interactives use the source papers’ own examples.

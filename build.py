@@ -21,7 +21,9 @@ def concept_prose(text,seen=None):
         parts.extend([e(text[end:start]),'<a class="concept-link" href="'+e(c['url'])+'" title="'+e(c['title'])+'">'+e(text[start:stop])+'</a>'])
         seen.add(c['term']);end=stop
     return ''.join(parts)+e(text[end:])
-ORIGIN=json.loads((ROOT/'content/site.json').read_text()).get('origin','') if (ROOT/'content/site.json').exists() else ''
+SITE=json.loads((ROOT/'content/site.json').read_text()) if (ROOT/'content/site.json').exists() else {}
+ORIGIN=SITE.get('origin','')
+PUBLISH_VIDEOS=SITE.get('publish_videos',False)
 exec((ROOT/'math_typesetting.py').read_text())
 def head(title,desc,depth=0,path=''):
     b='../'*depth

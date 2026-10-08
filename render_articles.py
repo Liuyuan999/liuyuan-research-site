@@ -51,8 +51,9 @@ for p in PAPERS:
  s=p['slug'];a=A[s];t=S[s]
  body=project_page(p,a,t)
  save('papers/'+s+'/index.html',body)
- video=head(p['short']+' | Video storyboard', 'Narration and storyboard for '+p['title'],2,'videos/'+s+'/')+f'<main id="main" class="wrap"><article class="video-page"><a class="route-back" href="../../papers/{s}/">{e(p["short"])} project page</a><div class="video-intro"><div><p class="eyebrow" style="margin-top:30px">{e(p["short"])} / Video</p><h1>{e(t["headline"])}</h1><p class="subtitle">{e(p["title"])}</p><p class="authors">{authorshtml(p)}</p><div class="actions"><a class="button primary" href="../../papers/{s}/">Project page</a><a class="button" href="{p["paper"]}">Read the paper</a></div></div><aside class="video-meta"><p><strong>Narration and storyboard</strong>Approximately 2 minutes</p><p>Video not yet available.</p></aside></div><section aria-label="Narration and storyboard">{videohtml(p,a)}</section><section class="video-sources"><h2>Research sources</h2>{sourcehtml(p)}</section></article></main>'+footer(2)
- save('videos/'+s+'/index.html',video)
+ if PUBLISH_VIDEOS:
+  video=head(p['short']+' | Video storyboard', 'Narration and storyboard for '+p['title'],2,'videos/'+s+'/')+f'<main id="main" class="wrap"><article class="video-page"><a class="route-back" href="../../papers/{s}/">{e(p["short"])} project page</a><div class="video-intro"><div><p class="eyebrow" style="margin-top:30px">{e(p["short"])} / Video</p><h1>{e(t["headline"])}</h1><p class="subtitle">{e(p["title"])}</p><p class="authors">{authorshtml(p)}</p><div class="actions"><a class="button primary" href="../../papers/{s}/">Project page</a><a class="button" href="{p["paper"]}">Read the paper</a></div></div><aside class="video-meta"><p><strong>Narration and storyboard</strong>Approximately 2 minutes</p><p>Video not yet available.</p></aside></div><section aria-label="Narration and storyboard">{videohtml(p,a)}</section><section class="video-sources"><h2>Research sources</h2>{sourcehtml(p)}</section></article></main>'+footer(2)
+  save('videos/'+s+'/index.html',video)
  # Preserve old incoming URLs while keeping one substantive page per paper.
  target=f'../../papers/{s}/#idea'
  canonical=ORIGIN+'/papers/'+s+'/'
@@ -63,11 +64,17 @@ for p in PAPERS:
  (ROOT/'content/explanations'/f'{s}.md').write_text(md)
  script='# '+p['short']+' — video narration and storyboard\n\nNarration and storyboard. Approximately 2 minutes.\n\nPaper: '+p['paper']+'\n\n'+''.join('## '+time+'\n\n**On screen:** '+visual+'\n\n**Narration:** '+narration+'\n\n' for time,visual,narration in a['scenes'])+'## Recording notes\n\n- Keep toy diagrams visibly labeled as illustrative.\n- Show paper figure/table identifiers when discussing measured results.\n- End with the project URL and a link to the primary paper.\n- Record narration, then add figures and captions.\n'
  (ROOT/'video-scripts'/f'{s}.md').write_text(script)
- save('resources/'+s+'-video-script.md',script)
+ if PUBLISH_VIDEOS:
+  save('resources/'+s+'-video-script.md',script)
+ else:
+  # Remove only the known generated video drafts from the hosted output.
+  for draft in (D/'videos'/s/'index.html', D/'resources'/f'{s}-video-script.md'):
+   if draft.exists():draft.unlink()
  # Structured metadata contains only publicly sourced bibliographic facts.
  schema={'@context':'https://schema.org','@type':'ScholarlyArticle','name':p['title'],'author':[{'@type':'Person','name':n} for n in p['authors']],'url':p['paper'],'datePublished':str(p['year'])}
  f=D/'papers'/s/'index.html';v=f.read_text();f.write_text(v.replace('</head>','<script type="application/ld+json">'+json.dumps(schema).replace('<','\\u003c')+'</script></head>'))
-paths=['']+['papers/'+p['slug']+'/' for p in PAPERS]+['videos/'+p['slug']+'/' for p in PAPERS]
+paths=['']+['papers/'+p['slug']+'/' for p in PAPERS]
+if PUBLISH_VIDEOS:paths+=['videos/'+p['slug']+'/' for p in PAPERS]
 if ORIGIN:
  save('sitemap.xml','<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join('<url><loc>'+e(ORIGIN+'/'+path)+'</loc><lastmod>2026-10-08</lastmod></url>' for path in paths)+'</urlset>')
  save('robots.txt','User-agent: *\nAllow: /\nSitemap: '+ORIGIN+'/sitemap.xml\n')

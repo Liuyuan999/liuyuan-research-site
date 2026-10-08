@@ -69,7 +69,8 @@ def publication_row(p):
  authors=', '.join('<strong>'+e(n)+'</strong>' if n=='Liuyuan Jiang' else e(n) for n in p['authors'])
  links=f'<a href="{p["paper"]}">Paper</a>'
  if p.get('code'):links+=f'<a href="{p["code"]}">Code</a>'
- links+=f'<a href="papers/{slug}/">Project page</a><a href="videos/{slug}/">Video storyboard</a>'
+ links+=f'<a href="papers/{slug}/">Project page</a>'
+ if PUBLISH_VIDEOS:links+=f'<a href="videos/{slug}/">Video storyboard</a>'
  venue=e(p['venue']) if p['venue']!='Preprint' else 'arXiv preprint'
  note='<p class="pub-note">'+e(p['venue_note'])+'</p>' if p.get('venue_note') else ''
  return f'<article id="paper-{slug}" class="publication-row {area["id"]}" aria-labelledby="title-{slug}">{publication_preview(p)}<div class="pub-record"><div class="pub-overline"><span>{p["year"]}</span><span class="topic-label">{e(area["title"])}</span></div><h3 id="title-{slug}"><a href="papers/{slug}/">{e(p["title"])}</a></h3><p class="pub-authors">{authors}</p><p class="pub-venue">{venue}{" · "+str(p["year"]) if str(p["year"]) not in p["venue"] else ""}</p>{note}<p class="pub-summary">{e(p["description"])}</p><div class="pub-links">{links}</div></div></article>'

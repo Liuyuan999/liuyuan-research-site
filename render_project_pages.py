@@ -25,7 +25,8 @@ def project_page(p,a,t):
  toc='<aside class="toc" aria-label="Page contents"><div class="eyebrow">On this page</div>'+''.join(f'<a href="#{i}">{label}</a>' for i,label in labels)+'</aside>'
  actions=f'<a class="button primary" href="{e(p["paper"])}">Read the paper <span aria-hidden="true">↗</span></a>'
  if p.get('code'):actions+=f'<a class="button" href="{e(p["code"])}">Code <span aria-hidden="true">↗</span></a>'
- actions+=f'<a class="button" href="../../videos/{s}/">Video &amp; storyboard</a><a class="text-action" href="#citation">Cite</a>'
+ if PUBLISH_VIDEOS:actions+=f'<a class="button" href="../../videos/{s}/">Video &amp; storyboard</a>'
+ actions+='<a class="text-action" href="#citation">Cite</a>'
  venue=p['venue'] if p['venue']!='Preprint' else 'Preprint · '+str(p['year'])
  hero=f'<header class="project-hero refined-hero"><a class="route-back" href="../../index.html#papers"><span aria-hidden="true">←</span> Publications &amp; projects</a><div class="paper-identity"><p class="meta"><span class="venue">{e(venue)}</span><span>{e(p["topic"])}</span></p><h1>{e(p["title"])}</h1><p class="authors">{authorshtml(p)}</p><div class="actions">{actions}</div></div></header>'
  summary='<ul class="research-summary">'+''.join('<li>'+prose(point['text'])+' <a class="summary-reference" href="#'+e(point['anchor'])+'">'+e(point['label'])+'</a></li>' for point in g['summary_points'])+'</ul>'
