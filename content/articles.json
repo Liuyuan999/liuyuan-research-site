@@ -332,8 +332,8 @@
       "BLOCC uses a primal-dual-assisted penalty formulation. Dual variables represent the influence of the lower-level constraints, and the algorithm uses first-order information for the resulting updates.",
       "The paper establishes approximation and convergence results under smoothness, strong convexity of the lower-level objective, convex lower-level constraints, domain feasibility, and constraint qualification."
     ],
-    "formula": "min over x ∈ X of f(x, y*g(x)); y*g(x) ∈ argmin over Y(x) of g(x, y).",
-    "formula_note": "Y(x) = { y ∈ Y : c(x, y) ≤ 0 }. A constraint is coupled when it depends on x as well as y. The toy example below changes the bound y ≤ x and solves min (y − 2x)² over 0 ≤ y ≤ x.",
+    "formula": "minₓ∈X f(x, y*(x)), with y*(x) ∈ argminᵧ∈Y(x) g(x, y).",
+    "formula_note": "Y(x) = { y ∈ Y : c(x, y) ≤ 0 }. A constraint is coupled when it depends on x as well as y. The interactive toy example on this page changes the bound y ≤ x and solves min (y − 2x)² over 0 ≤ y ≤ x.",
     "formal": "The penalty reformulation approximates lower-level optimality with a quantified error. The analysis uses strong convexity in y, convex constraints in y, nonempty feasible domains, Lipschitz regularity, and LICQ. See Assumptions 1–4 and the approximation and convergence theorems in Section 3.",
     "evidence": [
       [
@@ -492,7 +492,7 @@
       "The study changes input modality, decision horizon, permitted state, and model family. It also shuffles saved action sequences and studies conditioning on self-authored memories to examine sequential structure."
     ],
     "formula": "A(p, r) = Σₜ (pₜ − p̄) rₜ, where p̄ = (1/T) Σₜ pₜ.",
-    "formula_note": "pₜ is 1 for long and 0 for flat, and rₜ is the following interval return. The score compares a binary schedule with constant exposure p̄ on the same realized path. Basis points are used for the toy returns below.",
+    "formula_note": "pₜ is 1 for long and 0 for flat, and rₜ is the following interval return. The score compares a binary schedule with constant exposure p̄ on the same realized path. Basis points are used for the interactive toy returns.",
     "formal": "This is an empirical audit of directional and sequential policy structure under a controlled information boundary. Its timing measure is defined in Equation 1. It does not establish a theorem about all LLM trading policies.",
     "evidence": [
       [

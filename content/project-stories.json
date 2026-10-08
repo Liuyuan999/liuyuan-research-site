@@ -376,7 +376,12 @@
       "max": 0.9
     },
     "second_result": "The experiments also study SFT loss, post-SFT outcomes, and flatness in the representation-learning formulation. These separate measurements help connect the proposed condition to the application without claiming it holds for every model or task.",
-    "connection": "The efficient-penalty preprint provides a broader treatment of alternating updates, smoothness, and the coupled-constraint extension. This page focuses on why the value-function loop can be removed in the analyzed setting."
+    "connection": "The efficient-penalty preprint provides a broader treatment of alternating updates, smoothness, and the coupled-constraint extension. This page focuses on why the value-function loop can be removed in the analyzed setting.",
+    "update_equations": [
+      "y ← y − ηγ [γ⁻¹ ∇ᵧf(x, y) + ∇ᵧg(x, y)]",
+      "x ← x − η ∇ₓf(x, y)"
+    ],
+    "update_caption": "Algorithm 1, with the common choice K = 1: update the lower variable, then use the updated lower iterate for the upper step. ηγ and η are the lower and upper step sizes. The missing value-function correction is precisely what the flatness analysis must account for."
   },
   "smoothness": {
     "headline": "The curvature bound was hiding a cancellation.",
