@@ -1,6 +1,6 @@
 # When bilevel learning can skip a nested solve
 
-Bilevel optimization asks how one learning problem should shape another. The cost often comes from repeatedly solving the inner problem.
+PBGD-Free removes the value-function loop from a penalty method. The reason this can work is upper-level flatness—not simply using fewer updates.
 
 ## One objective sits inside another
 

@@ -1,6 +1,6 @@
 # Audit a trading agent’s timing, not just its exposure
 
-A policy can hold a stock frequently and still choose comparatively unfavorable moments. An exposure-matched metric helps isolate that timing.
+Holding a stock often and holding it at favorable moments are different behaviors. RetailAgent separates exposure from timing to audit sequential LLM decisions.
 
 ## Exposure and timing answer different questions
 
@@ -16,7 +16,7 @@ The timing score sums each following return multiplied by the action minus that 
 
 ## Shuffle the schedule to test the alignment
 
-A shuffle preserves an action count while disrupting when the actions occur. In the principal text condition, the intact schedule has substantially more negative timing than the reported shuffle controls. The study also examines memory and persistence using matched panels. These controls help characterize the sequence rather than explaining the result through exposure alone.
+Same-day shuffling preserves a stock-day’s action count while disrupting interval alignment. Global shuffling provides a different control. In the principal text condition, both controls attenuate the negative timing. The study also examines memory and persistence using matched panels; those comparisons need their stated conditioning and sampling frames.
 
 ## Keep the conclusion at the level tested
 

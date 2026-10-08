@@ -1,6 +1,6 @@
 # Let a speech model improve its own learning targets
 
-Unlabeled audio contains information, but a self-supervised model still needs a target. How that target is made shapes what the model learns.
+BiRQ turns intermediate speech representations into pseudo-labels, while raw-input targets anchor the learner as those representations evolve.
 
 ## A target without a transcript
 

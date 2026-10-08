@@ -1,6 +1,6 @@
 # Why uniform weights do not give uniform trade-offs
 
-A preference is an input to optimization. The distance between the resulting solutions is a property of the problem’s geometry.
+A weight chooses a compromise. SURF asks how far that choice moves us along the Pareto front—and uses the answer to spread solutions more evenly.
 
 ## A small budget makes spacing matter
 

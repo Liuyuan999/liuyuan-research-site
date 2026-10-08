@@ -1,6 +1,6 @@
 # A sharper curvature bound can change an algorithm’s pace
 
-A penalty objective can be steep in joint coordinates while its reduced outer objective has much milder curvature.
+Penalty methods can look increasingly stiff as the penalty grows. Follow the optimized lower-level response, and the reduced objective can have a different curvature scale.
 
 ## Step sizes follow a curvature bound
 

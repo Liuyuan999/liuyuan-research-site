@@ -1,6 +1,6 @@
 # When an outer decision changes what the inner problem can do
 
-Some bilevel decisions change both a follower’s objective and its feasible choices. Coupled constraints encode that dependence.
+In a coupled bilevel problem, the outer decision changes the inner feasible set. BLOCC uses primal-dual information to keep that moving boundary in the optimization.
 
 ## A leader changes the follower’s choices
 

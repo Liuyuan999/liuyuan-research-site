@@ -1,6 +1,6 @@
 # Separate the sources of cost in penalty-based bilevel learning
 
-Large penalties, response tracking, and moving constraints create different costs. A useful analysis treats them separately.
+A large penalty can make a joint objective stiff. A better analysis and a different update rule can change which costs the algorithm must pay.
 
 ## A large penalty is not one single cost
 

@@ -46,3 +46,9 @@ The initial hosted version is private for review. Public visibility requires cha
 ## Recording the videos
 
 Each file in `video-scripts/` contains narration plus on-screen directions. Record the narration, add paper figures with their table/figure identifiers, include captions, and end with the project URL. After uploading a video, add its verified embed URL to the corresponding video page. Do not label a script as a recorded talk.
+
+## Refined project narratives
+
+`content/project-stories.json` controls each paper’s human-readable headline, hero figure captions, three-step method, technical reasoning, notation, result context, measured chart values, and connections to other papers. `content/articles.json` holds the integrated explanation and video scenes. Measured charts cite their specific table or section. Interactive geometry and bound envelopes are clearly labeled as toy or schematic.
+
+The project pages contain explanations, interactive examples, results, technical details, and citations. Narration and storyboards live at `/videos/<slug>/`; these are production drafts, with no recorded videos yet. Legacy `/blog/<slug>/` URLs redirect to the integrated explanation.
