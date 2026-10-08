@@ -1,6 +1,6 @@
 # PBGD-Free — video narration and storyboard
 
-Production draft. Approximately 2 minutes with diagram pauses.
+Narration and storyboard. Approximately 2 minutes.
 
 Paper: https://arxiv.org/abs/2507.20400
 

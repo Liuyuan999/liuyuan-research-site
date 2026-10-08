@@ -64,7 +64,7 @@ for(const d of document.querySelectorAll('[data-demo]')){
   };range.addEventListener('input',update);update();
  }
  if(type==='speech'){
-  const update=source=>{const enhanced=source==='enhanced';d.querySelectorAll('[data-source]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.source===source));b.classList.toggle('primary',b.dataset.source===source);});d.querySelectorAll('[data-node]').forEach(n=>n.classList.toggle('active',['input','quant',enhanced?'repr':'anchor'].includes(n.dataset.node)));d.querySelector('[data-explanation]').textContent=enhanced?'Enhanced targets use intermediate model representations, followed by random-projection quantization. The learner’s evolving features help construct the labels used for learning.':'Anchor targets use raw-input quantization. This input-based branch complements the enhanced targets produced from the evolving model.';};
+  const update=source=>{const enhanced=source==='enhanced';d.querySelectorAll('[data-source]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.source===source));b.classList.toggle('primary',b.dataset.source===source);});d.querySelectorAll('[data-node]').forEach(n=>n.classList.toggle('active',['input','quant',enhanced?'repr':'anchor'].includes(n.dataset.node)));d.querySelector('[data-explanation]').textContent=enhanced?'Enhanced targets use intermediate model representations, followed by random-projection quantization. The labels change as the encoder learns.':'Anchor targets use raw-input quantization. These labels stay fixed as the encoder learns.';};
   d.querySelectorAll('[data-source]').forEach(b=>b.addEventListener('click',()=>update(b.dataset.source)));update('anchor');
  }
  if(type==='flatness'){
@@ -74,12 +74,12 @@ for(const d of document.querySelectorAll('[data-demo]')){
    d.querySelector('[data-metric]').textContent=`Distance contribution: ${(v**1.5).toFixed(4)} · residual: 0.0030`;};range.addEventListener('input',update);update();
  }
  if(type==='regime'){
-  const update=mode=>{const coupled=mode==='coupled';d.querySelectorAll('[data-regime]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.regime===mode));b.classList.toggle('primary',b.dataset.regime===mode);});d.querySelectorAll('[data-regime-formula]').forEach(form=>form.hidden=form.dataset.regimeFormula!==mode);d.querySelector('[data-regime-title]').textContent=coupled?'Coupled constraints / inner solve retained':'Uncoupled constraints / fully single-loop';d.querySelector('[data-regime-description]').textContent=coupled?'The feasible set moves with x. Constraint multipliers enter the value-function derivative, and the coupled PBGD-Free extension retains an inner loop. Its work belongs in the total complexity.':'The feasible set is fixed as x changes. Under flatness and the stated assumptions, the analyzed PBGD-Free update removes the value-function loop and is fully single-loop.';};
+  const update=mode=>{const coupled=mode==='coupled';d.querySelectorAll('[data-regime]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.regime===mode));b.classList.toggle('primary',b.dataset.regime===mode);});d.querySelectorAll('[data-regime-formula]').forEach(form=>form.hidden=form.dataset.regimeFormula!==mode);d.querySelector('[data-regime-title]').textContent=coupled?'Coupled constraints / inner solve retained':'Uncoupled constraints / fully single-loop';d.querySelector('[data-regime-description]').textContent=coupled?'The feasible set moves with x. Constraint multipliers enter the value-function derivative, and the coupled PBGD-Free extension retains an inner loop. This remaining solve contributes to the total computation.':'The feasible set is fixed as x changes. Under flatness and the stated assumptions, PBGD-Free removes the value-function loop and is fully single-loop.';};
   d.querySelectorAll('[data-regime]').forEach(b=>b.addEventListener('click',()=>update(b.dataset.regime)));update('fixed');
  }
  if(type==='schedule'){
   let mode='single',step=0;
-  const update=()=>{const k=mode==='single'?1:4,lower=Math.floor(step/(k+1))*k+Math.min(step%(k+1),k),upper=Math.floor(step/(k+1));d.querySelector('[data-lower]').textContent=lower+' updates';d.querySelector('[data-upper]').textContent=upper+' updates';d.querySelector('[data-stage=lower]').classList.toggle('active',step>0&&step%(k+1)!==0);d.querySelector('[data-stage=upper]').classList.toggle('active',step>0&&step%(k+1)===0);d.querySelector('[data-explanation]').textContent=`Illustrated schedule: ${k} lower-level update${k===1?'':'s'} per upper-level update. ${step===0?'Press Next update to inspect the sequence.':'Completed '+step+' gradient updates in total.'}`;d.querySelectorAll('[data-mode]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.mode===mode));b.classList.toggle('primary',b.dataset.mode===mode);});};
+  const update=()=>{const k=mode==='single'?1:4,lower=Math.floor(step/(k+1))*k+Math.min(step%(k+1),k),upper=Math.floor(step/(k+1));d.querySelector('[data-lower]').textContent=lower+' updates';d.querySelector('[data-upper]').textContent=upper+' updates';d.querySelector('[data-stage=lower]').classList.toggle('active',step>0&&step%(k+1)!==0);d.querySelector('[data-stage=upper]').classList.toggle('active',step>0&&step%(k+1)===0);d.querySelector('[data-explanation]').textContent=`Illustrated schedule: ${k} lower-level update${k===1?'':'s'} per upper-level update. ${step===0?'Press Next update to advance the sequence.':'Completed '+step+' gradient updates in total.'}`;d.querySelectorAll('[data-mode]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.mode===mode));b.classList.toggle('primary',b.dataset.mode===mode);});};
   d.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;step=0;update();}));d.querySelector('[data-next]').addEventListener('click',()=>{step++;update();});update();
  }
 }
@@ -141,7 +141,7 @@ for (const lab of document.querySelectorAll('[data-opening]')) {
    for(const b of lab.querySelectorAll('[data-spacing]'))b.setAttribute('aria-pressed',String(b.dataset.spacing===mode));
    zs=points.map((point,i)=>{const z=mode==='arc'?inverse(i/(points.length-1)):solve(wHi-i*(wHi-wLo)/(points.length-1));point.setAttribute('cx',90+280*(1-z));point.setAttribute('cy',305-280*(1-loss(z)));point.setAttribute('aria-label',`Candidate ${i+1}: quality ${(1-z).toFixed(2)}, faithfulness ${(1-loss(z)).toFixed(2)}`);return z;});
    const gaps=zs.slice(1).map((z,i)=>at(z)-at(zs[i])),ratio=Math.max(...gaps)/Math.min(...gaps);
-   lab.querySelector('[data-spacing-result]').textContent=mode==='arc'?'The candidates now cover the curve with even arc-length gaps.':`The largest gap is ${ratio.toFixed(1)}× the smallest. Some compromises are easier to miss.`;
+   lab.querySelector('[data-spacing-result]').textContent=mode==='arc'?'The candidates now cover the curve with even arc-length gaps.':`The largest gap is ${ratio.toFixed(1)}× the smallest. Equal weight steps produce uneven spacing.`;
    select(selected);
   };
   for(const b of lab.querySelectorAll('[data-spacing]'))b.addEventListener('click',()=>update(b.dataset.spacing));
@@ -228,6 +228,13 @@ for (const lab of document.querySelectorAll('[data-evidence-lab]')) {
   });
  });
  select(0);
+ const followEvidenceHash=()=>{
+  const index=panels.findIndex(panel=>panel.id===location.hash.slice(1));
+  if(index>=0){select(index);panels[index].scrollIntoView({block:'start'});}
+ };
+ panels.forEach((panel,index)=>document.querySelectorAll('a[href="#'+panel.id+'"]').forEach(link=>link.addEventListener('click',()=>select(index))));
+ window.addEventListener('hashchange',followEvidenceHash);
+ followEvidenceHash();
 }
 
 // Keep full equations readable and keyboard-scrollable when a panel is narrow.

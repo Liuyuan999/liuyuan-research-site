@@ -1,6 +1,6 @@
 # Rethinking smoothness — video narration and storyboard
 
-Production draft. Approximately 2 minutes with diagram pauses.
+Narration and storyboard. Approximately 2 minutes.
 
 Paper: https://eurasip.org/Proceedings/Eusipco/Eusipco2025/pdfs/0001183.pdf
 

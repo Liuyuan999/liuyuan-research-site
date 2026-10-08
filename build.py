@@ -1,10 +1,26 @@
 from pathlib import Path
-import json,html,math
+import json,html,math,re
 ROOT=Path(__file__).resolve().parent
 D=ROOT/'dist'
 PAPERS=json.loads((ROOT/'content/papers.json').read_text())
 PROFILE=json.loads((ROOT/'content/profile.json').read_text())
 e=html.escape
+CONCEPTS=json.loads((ROOT/'content/concepts.json').read_text())
+def concept_prose(text,seen=None):
+    seen=seen if seen is not None else set()
+    matches=[]
+    for c in CONCEPTS:
+        if c['term'] in seen:continue
+        terms=[c['term']]+c.get('alternatives',[])
+        pattern=r'\b(?:'+ '|'.join(re.escape(term) for term in terms)+r')\b'
+        m=re.search(pattern,text,re.IGNORECASE)
+        if m:matches.append((m.start(),m.end(),c))
+    parts=[];end=0
+    for start,stop,c in sorted(matches,key=lambda x:x[0]):
+        if start<end:continue
+        parts.extend([e(text[end:start]),'<a class="concept-link" href="'+e(c['url'])+'" title="'+e(c['title'])+'">'+e(text[start:stop])+'</a>'])
+        seen.add(c['term']);end=stop
+    return ''.join(parts)+e(text[end:])
 ORIGIN=json.loads((ROOT/'content/site.json').read_text()).get('origin','') if (ROOT/'content/site.json').exists() else ''
 exec((ROOT/'math_typesetting.py').read_text())
 def head(title,desc,depth=0,path=''):

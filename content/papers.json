@@ -13,7 +13,7 @@
     "topic": "Multi-objective learning",
     "arxiv": "2605.20619",
     "paper": "https://arxiv.org/abs/2605.20619",
-    "description": "Why evenly spaced preferences do not produce evenly spaced trade-offs, and how geometry helps.",
+    "description": "Use the geometry of the Pareto front to choose weights that produce more evenly spaced model trade-offs.",
     "question": "Can we choose weights that cover the Pareto front evenly?",
     "type": "surf",
     "code": "https://github.com/Liuyuan999/MOO_Uniform_PF",
@@ -30,7 +30,8 @@
         "label": "Author publication and acceptance record",
         "url": "https://liuyuan999.github.io/"
       }
-    ]
+    ],
+    "bib_venue": "Advances in Neural Information Processing Systems"
   },
   {
     "slug": "retailagent",
@@ -93,7 +94,8 @@
         "label": "Author publication and acceptance record",
         "url": "https://liuyuan999.github.io/"
       }
-    ]
+    ],
+    "bib_venue": "2026 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)"
   },
   {
     "slug": "efficient-penalty",
@@ -141,7 +143,7 @@
     "arxiv": "2507.20400",
     "paper": "https://arxiv.org/abs/2507.20400",
     "code": "https://github.com/Liuyuan999/PBGD_Free",
-    "description": "Use upper-level flatness to remove the lower-level value-function loop in the analyzed setting.",
+    "description": "Use upper-level flatness to remove the value-function response computation from penalty-based bilevel training.",
     "question": "When can bilevel learning work without a nested solve?",
     "type": "schedule",
     "sources": [
@@ -157,7 +159,9 @@
         "label": "Author publication and acceptance record",
         "url": "https://liuyuan999.github.io/"
       }
-    ]
+    ],
+    "bib_venue": "Advances in Neural Information Processing Systems",
+    "bib_volume": "38"
   },
   {
     "slug": "smoothness",
@@ -188,7 +192,8 @@
         "label": "EUSIPCO 2025 proceedings session",
         "url": "https://eurasip.org/Proceedings/Eusipco/Eusipco2025/HTML/session-index.html"
       }
-    ]
+    ],
+    "bib_venue": "2025 33rd European Signal Processing Conference (EUSIPCO)"
   },
   {
     "slug": "blocc",
@@ -224,6 +229,8 @@
         "label": "Author publication and acceptance record",
         "url": "https://liuyuan999.github.io/"
       }
-    ]
+    ],
+    "bib_venue": "Advances in Neural Information Processing Systems",
+    "bib_volume": "37"
   }
 ]

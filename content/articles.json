@@ -1,7 +1,7 @@
 {
   "surf": {
     "lead": "A weight chooses a compromise. SURF asks how far that choice moves us along the Pareto front—and uses the answer to spread solutions more evenly.",
-    "takeaway": "SURF selects scalarization weights using an arc-length map of the Pareto front, so a limited solution budget can represent trade-offs more evenly.",
+    "takeaway": "When a model must balance competing goals, changing their weights evenly can leave large gaps between the resulting solutions. SURF adjusts the weights using distance along the Pareto front. The result is more evenly spaced choices from the same number of trained models.",
     "problem": [
       "Suppose a model must balance two objectives. A common approach combines them into one weighted loss, solves it, and repeats for several weights. Equal gaps between the weights look like an even way to explore preferences. But the resulting points can cluster on the Pareto front.",
       "The missing ingredient is traversal speed: changing a weight by a fixed amount can move the solution a little in one region and a lot in another. Uniformity in weight space therefore does not imply uniformity in objective space."
@@ -72,7 +72,7 @@
   },
   "pbgd-free": {
     "lead": "PBGD-Free uses upper-level flatness to bound the bias from removing the value-function loop, yielding a single-loop penalty method.",
-    "takeaway": "PBGD-Free uses first-order updates without tracking the lower-level value function. Flatness conditions control the bias introduced by removing that correction.",
+    "takeaway": "Bilevel training can require refining a lower-level model component repeatedly before updating the upper-level decision. PBGD-Free replaces that nested procedure with one lower-level tracking step and one upper-level update per iteration. Its flatness condition describes when this simplification is valid: the outer loss changes little as the lower variable moves near an optimum.",
     "problem": [
       "In a bilevel problem, the upper-level objective is evaluated at a lower-level solution. Computing that response and its effect on the outer decision can require nested optimization or second-order operations.",
       "A penalty formulation replaces exact lower-level optimality with an objective gap. But computing the lower-level optimal value can still require another solve. Removing this solve saves work while introducing a gradient bias that needs analysis."
@@ -145,7 +145,7 @@
   },
   "efficient-penalty": {
     "lead": "Reduced-curvature analysis permits larger outer steps. Flatness-based updates remove one response computation, with separate methods for fixed and coupled constraints.",
-    "takeaway": "The paper sharpens smoothness analysis for alternating penalty updates and extends PBGD-Free. Uncoupled constraints admit fully single-loop updates; coupled constraints retain an inner loop with reduced complexity.",
+    "takeaway": "Repeated inner solves can dominate the cost of bilevel training. This paper sharpens the curvature analysis to allow larger outer steps and removes one response computation when the outer objective changes little near a lower-level optimum. Fixed constraints admit one update per level. When the constraints move with the outer decision, the method retains a constrained inner solve.",
     "problem": [
       "Penalty-based bilevel methods face two costs: step sizes can shrink as a penalty grows, and inner solves can consume many updates. Coupled constraints add another dependence because the outer variable changes the inner feasible set.",
       "A joint smoothness bound on all variables can obscure the geometry seen by alternating updates. The paper studies a reduced penalty formulation that separates these roles."
@@ -218,7 +218,7 @@
   },
   "smoothness": {
     "lead": "Penalty methods can look increasingly stiff as the penalty grows. Follow the optimized lower-level response, and the reduced objective can have a different curvature scale.",
-    "takeaway": "Analyzing second-order directional derivatives of the reduced penalty objective gives an O(1) smoothness bound in the paper’s regime and improves outer iteration bounds for alternating penalty methods.",
+    "takeaway": "Stronger penalties enforce that response more accurately, but the joint objective can bend more sharply and suggest smaller gradient steps. By analyzing the objective after lower-level optimization, this paper reveals a curvature cancellation. Under its smoothness and constraint-regularity conditions, the outer curvature bound stays constant as the penalty grows.",
     "problem": [
       "Existing smoothness estimates for joint penalty objectives scale with the penalty parameter. A gradient method then needs small steps, which worsens the iteration bound.",
       "The quantity that matters to an alternating outer update is the reduced objective after lower-level minimization. The paper analyzes its curvature directly instead of applying the joint bound unchanged."
@@ -291,7 +291,7 @@
   },
   "blocc": {
     "lead": "In a coupled bilevel problem, the outer decision changes the inner feasible set. BLOCC uses primal-dual information to keep that moving boundary in the optimization.",
-    "takeaway": "BLOCC combines penalty reformulation with primal-dual information to optimize bilevel problems whose lower-level constraints depend on the upper-level decision.",
+    "takeaway": "In transportation planning, changing network capacity also changes which traffic allocations are feasible. BLOCC handles this kind of bilevel problem by tracking both the optimized lower response and the influence of its active constraints. The resulting gradient-based method accounts for moving feasible boundaries, with convergence analysis and experiments on constrained classifiers and network design.",
     "problem": [
       "In infrastructure planning, a network design affects the choices available to users. In hyperparameter selection, outer parameters can affect the constraints used to train a model. A lower-level feasible set that depends on an outer variable captures this coupling.",
       "Methods built for an unconstrained or fixed-domain lower-level problem do not directly capture how the feasible boundary moves. The algorithm needs to track the role of constraints in the lower-level response."
@@ -363,7 +363,7 @@
   },
   "birq": {
     "lead": "BiRQ turns intermediate speech representations into pseudo-labels, while raw-input targets anchor the learner as those representations evolve.",
-    "takeaway": "BiRQ reuses intermediate model representations to generate enhanced pseudo-labels and combines them with raw-input anchors in a bilevel training framework.",
+    "takeaway": "BiRQ learns from audio without transcripts. It creates training targets from the model’s intermediate speech features and combines them with targets from the raw audio features. This lets the targets improve with the encoder while the raw-input targets anchor learning. The trained model makes fewer transcription errors in the reported comparisons with BEST-RQ.",
     "problem": [
       "Self-supervised speech learning predicts labels derived from audio without requiring a transcript for every recording. A simple random quantizer provides inexpensive labels, while an external representation model can supply richer labels with additional training stages.",
       "BiRQ studies how to improve labels inside the same model. The target generator and the learner then interact, making stabilization part of the design."
@@ -434,7 +434,7 @@
   },
   "retailagent": {
     "lead": "Holding a stock often and holding it at favorable moments are different behaviors. RetailAgent separates exposure from timing to audit sequential LLM decisions.",
-    "takeaway": "RetailAgent audits sequential long-or-flat decisions using within-stock timing after removing average exposure. The paper reports negative timing and studies how it changes with trajectory shuffling and self-authored memory.",
+    "takeaway": "A trading agent can earn positive returns simply by staying invested in a rising stock. RetailAgent matches average exposure to isolate whether the agent chooses favorable intervals to hold the stock. In the numerical-text experiment, its timing is negative and becomes much less negative when the action sequence is shuffled.",
     "problem": [
       "An LLM agent sees an anonymized intraday price history and chooses whether to hold a stock during the next interval. The next return is revealed only after the action.",
       "Aggregate return mixes the amount of exposure with the timing of exposure. A timing audit asks whether the agent is long during relatively favorable intervals on the same stock-day after accounting for its average long fraction."
